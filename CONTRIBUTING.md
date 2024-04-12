@@ -40,8 +40,7 @@ If you have an idea for a new feature or improvement for Paios, we would love to
 All contributions to Paios go through a code review process. This helps ensure the quality and maintainability of the codebase. Please be open to feedback and make any necessary changes based on the code review comments.
 
 ## License
-
-By contributing to Paios, you agree that your contributions will be licensed under the [MIT License](https://opensource.org/licenses/MIT).
+By contributing to Paios, you acknowledge that your contributions will be licensed under the [MIT License](https://opensource.org/licenses/MIT) and that you have read and certified the [Developer Certificate of Origin (DCO)](CERTIFICATION.md).
 
 ## Contact
 
