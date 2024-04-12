@@ -1,18 +1,18 @@
 import { useRecordContext } from "react-admin";
 import { Edit, Create, List, Datagrid, TextField, TextInput, ReferenceField, ReferenceInput, SimpleForm, EditButton } from "react-admin";
 
-const PostTitle = () => {
+const DocumentTitle = () => {
     const record = useRecordContext();
-    return <span>Post {record ? `"${record.title}"` : ""}</span>;
+    return <span>Document {record ? `"${record.title}"` : ""}</span>;
 };
 
-const postFilters = [
+const docFilters = [
     <TextInput source="q" label="Search" alwaysOn />,
     <ReferenceInput source="userId" label="User" reference="users" />,
 ];
 
-export const PostList = () => (
-    <List filters={postFilters}>
+export const DocList = () => (
+    <List filters={docFilters}>
         <Datagrid rowClick="edit">
             <TextField source="id" />
             <ReferenceField source="userId" reference="users" link="show" />
@@ -22,7 +22,7 @@ export const PostList = () => (
     </List>
 );
 
-export const PostEdit = () => (
+export const DocEdit = () => (
     <Edit>
         <SimpleForm>
             <TextInput source="id" InputProps={{ disabled: true }}/>
@@ -33,7 +33,7 @@ export const PostEdit = () => (
     </Edit>
 );
 
-export const PostCreate = () => (
+export const DocCreate = () => (
     <Create>
         <SimpleForm>
             <ReferenceInput source="userId" reference="users" />
