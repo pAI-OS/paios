@@ -1,0 +1,271 @@
+openapi: 3.1.0
+info:
+  version: '1.0'
+  title: Kwaai Paios API
+  summary: Paios Administration Interface API
+  description: 'API for Paios admin interfaces (web, app) to backend services.'
+  termsOfService: ''
+  contact:
+    name: Kwaai
+    url: 'https://www.kwaai.ai'
+    email: contact@kwaai.ai
+  license:
+    url: 'https://kwaai.mit-license.org/'
+    name: MIT
+servers:
+  - url: 'http://localhost:3000'
+    description: ''
+paths:
+  '/users/{userId}':
+    get:
+      tags:
+        - User Management
+      summary: Get User Info by User ID
+      description: Retrieve the information of the user with the matching user ID.
+      operationId: get-users-userId
+      parameters:
+        - name: userId
+          in: path
+          description: Id of an existing user.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: User Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                Get User Alice Smith:
+                  value:
+                    id: 142
+                    firstName: Alice
+                    lastName: Smith
+                    email: alice.smith@gmail.com
+                    dateOfBirth: '1997-10-31'
+                    emailVerified: true
+                    signUpDate: '2019-08-24'
+        '404':
+          description: User Not Found
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+    patch:
+      summary: Update User Information
+      description: Update the information of an existing user.
+      operationId: patch-users-userId
+      parameters:
+        - name: userId
+          in: path
+          description: Id of an existing user.
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Patch user properties to update.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                email:
+                  type: string
+                  description: 'If a new email is given, the user''s email verified property will be set to false.'
+                dateOfBirth:
+                  type: string
+            examples:
+              Update First Name:
+                value:
+                  firstName: Rebecca
+              Update Email:
+                value:
+                  email: rebecca@gmail.com
+              Update Last Name & Date of Birth:
+                value:
+                  lastName: Baker
+                  dateOfBirth: '1985-10-02'
+      responses:
+        '200':
+          description: User Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                Updated User Rebecca Baker:
+                  value:
+                    id: 13
+                    firstName: Rebecca
+                    lastName: Baker
+                    email: rebecca@gmail.com
+                    dateOfBirth: '1985-10-02'
+                    emailVerified: false
+                    createDate: '2019-08-24'
+        '404':
+          description: User Not Found
+        '409':
+          description: Email Already Taken
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+  /user:
+    post:
+      summary: Create New User
+      description: Create a new user.
+      operationId: post-user
+      requestBody:
+        description: Post the necessary fields for the API to create a new user.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                email:
+                  type: string
+                dateOfBirth:
+                  type: string
+                  format: date
+              required:
+                - firstName
+                - lastName
+                - email
+                - dateOfBirth
+            examples:
+              Create User Bob Fellow:
+                value:
+                  firstName: Bob
+                  lastName: Fellow
+                  email: bob.fellow@gmail.com
+                  dateOfBirth: '1996-08-24'
+      responses:
+        '200':
+          description: User Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                New User Bob Fellow:
+                  value:
+                    id: 12
+                    firstName: Bob
+                    lastName: Fellow
+                    email: bob.fellow@gmail.com
+                    dateOfBirth: '1996-08-24'
+                    emailVerified: false
+                    createDate: '2020-11-18'
+        '400':
+          description: Missing Required Information
+        '409':
+          description: Email Already Taken
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+  '/abilities/{name}':
+    get:
+      tags:
+        - Abilities
+      summary: Get Abilities by Name
+      description: Get Abilities by Name
+      operationId: get-ability-name
+      parameters:
+        - name: name
+          in: query
+          description: Ability name
+          schema:
+            type: string
+        - name: name
+          in: path
+          description: Name of an existing ability.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ability'
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+tags:
+  - name: Abilities
+    description: Installation and configuration of abilities
+  - name: User Management
+    description: Management of user accounts
+components:
+  schemas:
+    User:
+      type: object
+      title: User
+      description: Paios users
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the given user.
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        dateOfBirth:
+          type: string
+          format: date
+          examples:
+            - '1997-10-31'
+        emailVerified:
+          type: boolean
+          description: Set to true if the user's email has been verified.
+        createDate:
+          type: string
+          description: The date that the user was created.
+          format: date
+      required:
+        - id
+        - firstName
+        - lastName
+        - email
+        - emailVerified
+      examples:
+        - id: 142
+          firstName: Alice
+          lastName: Smith
+          email: alice.smith@gmail.com
+          dateOfBirth: '1997-10-31'
+          emailVerified: true
+          signUpDate: '2019-08-24'
+    Ability:
+      type: object
+      title: Ability
+      description: Additional abilities (plug-ins)
+      properties:
+        name:
+          type: string
+          pattern: '^[a-z0-9-]+'
+          minLength: 2
+          maxLength: 100
+          examples:
+            - optical-character-recognition
+        description:
+          type: string
+          pattern: '^[A-Za-z0-9 -]+'
+          maxLength: 200
+          examples:
+            - Optical Character Recognition
+      examples:
+        - name: optical-character-recognition
+          description: Optical Character Recognition
