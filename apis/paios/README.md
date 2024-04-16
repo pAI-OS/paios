@@ -16,6 +16,8 @@ The API can be mocked locally using Stoplight's [Prism](https://github.com/stopl
 
 To start the local prism server using the current version of the API:
 
-    prism proxy 'https://raw.githubusercontent.com/Kwaai-AI-Lab/Paios/main/apis/paios/openapi.yaml'
+    prism proxy apis/paios/openapi.yaml
 
-Note: If the repo is not public, include the token from the "Raw" link.
+prism can also load the API directly from the repo:
+
+    prism proxy 'https://raw.githubusercontent.com/Kwaai-AI-Lab/Paios/main/apis/paios/openapi.yaml'
