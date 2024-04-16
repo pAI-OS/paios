@@ -242,6 +242,12 @@ paths:
                       dateOfBirth: '1975-11-02'
                       emailVerified: true
                       signUpDate: '2022-10-02'
+          headers:
+            X-Total-Count:
+              schema:
+                type: integer
+                example: 2
+              description: Count of results required by jsonServer Data Provider for pagination
       servers:
         - url: 'http://localhost:3000'
           description: ''
