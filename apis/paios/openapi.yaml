@@ -1,6 +1,6 @@
 openapi: 3.1.0
 info:
-  version: '1.0'
+  version: '0.1'
   title: Kwaai Paios API
   summary: Paios Administration Interface API
   description: 'API for Paios admin interfaces (web, app) to backend services.'
@@ -53,6 +53,8 @@ paths:
         - url: 'http://localhost:3000'
           description: ''
     patch:
+      tags:
+        - User Management
       summary: Update User Information
       description: Update the information of an existing user.
       operationId: patch-users-userId
@@ -116,6 +118,8 @@ paths:
           description: ''
   /user:
     post:
+      tags:
+        - User Management
       summary: Create New User
       description: Create a new user.
       operationId: post-user
@@ -197,6 +201,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Ability'
+              examples:
+                Example 1:
+                  value:
+                    name: optical-character-recognition
+                    description: Optical Character Recognition
       servers:
         - url: 'http://localhost:3000'
           description: ''
@@ -233,6 +242,34 @@ paths:
                       dateOfBirth: '1975-11-02'
                       emailVerified: true
                       signUpDate: '2022-10-02'
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+  /abilities:
+    get:
+      tags:
+        - Abilities
+      summary: Get all abilities.
+      description: Get all abilities.
+      operationId: get-abilities
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ability'
+              examples:
+                Example 1:
+                  value:
+                    - name: optical-character-recognition
+                      description: Optical Character Recognition
+                    - name: vector-database
+                      description: Vector Database
+                    - name: relational-database
+                      description: Relational Database
       servers:
         - url: 'http://localhost:3000'
           description: ''
