@@ -200,6 +200,42 @@ paths:
       servers:
         - url: 'http://localhost:3000'
           description: ''
+  /users:
+    get:
+      tags:
+        - User Management
+      summary: Retrieve all users
+      description: Get all users.
+      operationId: get-users
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+              examples:
+                Example 1:
+                  value:
+                    - id: 142
+                      firstName: Alice
+                      lastName: Smith
+                      email: alice.smith@gmail.com
+                      dateOfBirth: '1997-10-31'
+                      emailVerified: true
+                      signUpDate: '2019-08-24'
+                    - id: 351
+                      firstName: Bob
+                      lastName: Jones
+                      email: bob.jones@gmail.com
+                      dateOfBirth: '1975-11-02'
+                      emailVerified: true
+                      signUpDate: '2022-10-02'
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
 tags:
   - name: Abilities
     description: Installation and configuration of abilities
