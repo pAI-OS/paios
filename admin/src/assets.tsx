@@ -1,18 +1,18 @@
 import { useRecordContext } from "react-admin";
 import { Edit, Create, List, Datagrid, TextField, TextInput, ReferenceField, ReferenceInput, SimpleForm, EditButton } from "react-admin";
 
-const DocumentTitle = () => {
+const AssetTitle = () => {
     const record = useRecordContext();
-    return <span>Document {record ? `"${record.title}"` : ""}</span>;
+    return <span>Asset {record ? `"${record.title}"` : ""}</span>;
 };
 
-const docFilters = [
+const assetFilters = [
     <TextInput source="q" label="Search" alwaysOn />,
     <ReferenceInput source="userId" label="User" reference="users" />,
 ];
 
-export const DocList = () => (
-    <List filters={docFilters}>
+export const AssetList = () => (
+    <List filters={assetFilters}>
         <Datagrid rowClick="edit">
             <TextField source="id" />
             <ReferenceField source="userId" reference="users" link="show" />
@@ -22,23 +22,23 @@ export const DocList = () => (
     </List>
 );
 
-export const DocEdit = () => (
+export const AssetEdit = () => (
     <Edit>
         <SimpleForm>
             <TextInput source="id" InputProps={{ disabled: true }}/>
             <ReferenceInput source="userId" reference="users" />
             <TextInput source="title" />
-            <TextInput source="body" multiline rows={5} />
+            <TextInput source="description" multiline rows={5} />
         </SimpleForm>
     </Edit>
 );
 
-export const DocCreate = () => (
+export const AssetCreate = () => (
     <Create>
         <SimpleForm>
             <ReferenceInput source="userId" reference="users" />
             <TextInput source="title" />
-            <TextInput source="body" multiline rows={5} />
+            <TextInput source="description" multiline rows={5} />
         </SimpleForm>
     </Create>
 );
