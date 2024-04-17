@@ -13,7 +13,7 @@ const abilityFilters = [
 export const AbilityList = () => (
     <List filters={abilityFilters}>
         <Datagrid rowClick="show">
-            <TextField source="name" />
+            <TextField source="title" />
             <TextField source="description" />
             <ShowButton />
         </Datagrid>
@@ -24,7 +24,7 @@ export const AbilityShow = () => (
     <Show>
         <SimpleShowLayout>
                 <TextField source="id" />
-                    <TextField source="name" />
+                    <TextField source="title" />
                     <TextField source="description" />
         </SimpleShowLayout>
     </Show>

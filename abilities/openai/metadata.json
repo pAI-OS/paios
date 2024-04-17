@@ -1,0 +1,8 @@
+{
+    "id": "openai",
+    "title": "OpenAI",
+    "description": "OpenAI is an AI research and deployment company.",
+    "author": "OpenAI Inc.",
+    "language": "python",
+    "license": "Apache-2.0"
+}

@@ -1,4 +1,7 @@
 from flask import jsonify, make_response
+import os
+import json
+import os
 
 # List of users
 # TODO: We're not implementing multi-user yet so this is subject to change
@@ -22,19 +25,32 @@ users = [
 ]
 
 # List of abilities
-# TODO: These should be read from known files in enumerated directories under the abilities directory
-abilities = [
-    {
-        "id": "optical-character-recognition",
-        "name": "Optical Character Recognition",
-        "description": "Conversion of images to text"
-    },
-    {
-        "id": "vector-database",
-        "name": "Vector Database",
-        "description": "Stores vectors (fixed-length lists of numbers) along with other data items"
-    }
-]
+abilities = []
+
+abilities_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "abilities"))
+for subdir, dirs, files in os.walk(abilities_dir):
+    for file in files:
+        if file == "metadata.json":
+            metadata_path = os.path.join(subdir, file)
+            try:
+                with open(metadata_path) as f:
+                    metadata = json.load(f)
+                    abilities.append(metadata)
+            except (FileNotFoundError, json.JSONDecodeError):
+                pass
+
+# abilities = [
+#     {
+#         "id": "optical-character-recognition",
+#         "name": "Optical Character Recognition",
+#         "description": "Conversion of images to text"
+#     },
+#     {
+#         "id": "vector-database",
+#         "name": "Vector Database",
+#         "description": "Stores vectors (fixed-length lists of numbers) along with other data items"
+#     }
+# ]
 
 # List of assets
 # TODO: These should be read from storage sources like local directory, S3, NAS, Solid pod, etc.

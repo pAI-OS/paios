@@ -1,0 +1,8 @@
+{
+    "id": "chroma",
+    "title": "Chroma embedding database",
+    "description": "The fastest way to build Python or JavaScript LLM apps with memory!",
+    "author": "Chroma <hello@trychroma.com>",
+    "language": "python",
+    "license": "Apache-2.0"
+}
