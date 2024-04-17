@@ -21,11 +21,11 @@ paths:
         - User Management
       summary: Get User by User ID
       description: Retrieve the information of the user with the matching user ID.
-      operationId: paios_api.get_user_by_id
+      operationId: api.get_user_by_id
       parameters:
         - name: userId
           in: path
-          description: Id of an existing user.
+          description: Id of an existing user
           required: true
           schema:
             type: integer
@@ -56,11 +56,11 @@ paths:
         - User Management
       summary: Update User Information
       description: Update the information of an existing user.
-      operationId: patch-users-userId
+      operationId: api.patch_user_by_id
       parameters:
         - name: userId
           in: path
-          description: Id of an existing user.
+          description: Id of an existing user
           required: true
           schema:
             type: integer
@@ -121,7 +121,7 @@ paths:
         - User Management
       summary: Create New User
       description: Create a new user.
-      operationId: post-user
+      operationId: api.create_new_user
       requestBody:
         description: Post the necessary fields for the API to create a new user.
         content:
@@ -174,17 +174,17 @@ paths:
       servers:
         - url: 'http://localhost:3000'
           description: ''
-  '/abilities/{id}':
+  '/abilities/{abilityId}':
     get:
       tags:
         - Abilities
       summary: Get Abilities by ID
       description: Retrieve the information of the ability with the matching ability ID.
-      operationId: get-ability-id
+      operationId: api.get_abilities_by_id
       parameters:
-        - name: id
+        - name: abilityId
           in: path
-          description: Id of an existing ability.
+          description: ID of an existing ability
           required: true
           schema:
             type: string
@@ -210,7 +210,7 @@ paths:
         - User Management
       summary: Retrieve all users
       description: Get all users.
-      operationId: get-all-users
+      operationId: api.retrieve_all_users
       responses:
         '200':
           description: OK
@@ -252,7 +252,7 @@ paths:
         - Abilities
       summary: Retrieve all abilities
       description: Retrieve the information of all abilities.
-      operationId: get-abilities
+      operationId: api.retrieve_all_abilities
       responses:
         '200':
           description: OK
@@ -286,7 +286,7 @@ paths:
         - Asset Management
       summary: Get Asset by ID
       description: Retrieve the information of the asset with the matching asset ID.
-      operationId: get-asset-assetId
+      operationId: api.get_asset_by_id
       parameters:
         - name: assetId
           in: path
@@ -318,7 +318,7 @@ paths:
         - Asset Management
       summary: Retrieve all assets
       description: Retrieve the information of all assets.
-      operationId: get-assets
+      operationId: api.retrieve_all_assets
       responses:
         '200':
           description: OK
