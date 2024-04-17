@@ -1,4 +1,4 @@
-# react-admin
+# Paios Admin
 
 ## Installation
 
