@@ -97,6 +97,7 @@ def retrieve_all_users():
 def retrieve_all_abilities():
     return retrieve_all(abilities)
 
+
 def get_asset_by_id(assetId):
 
     for asset in assets:
