@@ -433,6 +433,8 @@ components:
       properties:
         id:
           type: integer
+        userId:
+          type: integer
         title:
           type: string
         creator:
@@ -443,11 +445,13 @@ components:
           type: string
       examples:
         - id: 523
+          userId: 142
           title: Attention Is All You Need
           creator: Vaswani et al
           subject: Artificial Intelligence
           description: 'We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.'
         - id: 952
+          userId: 351
           title: Generative Adversarial Networks
           creator: Goodfellow et al
           subject: Artificial Intelligence
