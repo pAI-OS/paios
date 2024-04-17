@@ -21,7 +21,7 @@ paths:
         - User Management
       summary: Get User by User ID
       description: Retrieve the information of the user with the matching user ID.
-      operationId: get-user-userId
+      operationId: paios_api.get_user_by_id
       parameters:
         - name: userId
           in: path
@@ -210,7 +210,7 @@ paths:
         - User Management
       summary: Retrieve all users
       description: Get all users.
-      operationId: get-users
+      operationId: get-all-users
       responses:
         '200':
           description: OK
