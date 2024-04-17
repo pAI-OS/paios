@@ -416,12 +416,12 @@ components:
       description: Additional abilities (plug-ins)
       properties:
         id:
-          type: integer
-        name:
           type: string
           pattern: '^[a-z0-9-]+'
           minLength: 2
           maxLength: 100
+        name:
+          type: string
           examples:
             - optical-character-recognition
         description:
