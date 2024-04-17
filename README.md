@@ -28,3 +28,7 @@ Run the prism mock server:
 Run the node (vite) dev server in another shell:
 
     npm run dev
+
+Visit the development site:
+
+    https://localhost:5173
