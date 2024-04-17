@@ -15,7 +15,7 @@ export const AssetList = () => (
     <List filters={assetFilters}>
         <Datagrid rowClick="edit">
             <TextField source="id" />
-            <ReferenceField source="userId" reference="users" link="show" emptyText="WAT?" />
+            <ReferenceField source="userId" reference="users" link="show" />
             <TextField source="title" />
             <EditButton />
         </Datagrid>
