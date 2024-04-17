@@ -274,6 +274,12 @@ paths:
                       description: Optical Character Recognition
                     - name: vector-database
                       description: Vector Database
+          headers:
+            X-Total-Count:
+              schema:
+                type: string
+                example: '2'
+              description: Count of results required by jsonServer Data Provider for pagination
       servers:
         - url: 'http://localhost:3000'
           description: ''
