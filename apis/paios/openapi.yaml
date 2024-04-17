@@ -175,22 +175,17 @@ paths:
       servers:
         - url: 'http://localhost:3000'
           description: ''
-  '/abilities/{name}':
+  '/abilities/{id}':
     get:
       tags:
         - Abilities
-      summary: Get Abilities by Name
-      description: Get Abilities by Name
-      operationId: get-ability-name
+      summary: Get Abilities by ID
+      description: Retrieve the information of the ability with the matching ability ID.
+      operationId: get-ability-id
       parameters:
-        - name: name
-          in: query
-          description: Ability name
-          schema:
-            type: string
-        - name: name
+        - name: id
           in: path
-          description: Name of an existing ability.
+          description: Id of an existing ability.
           required: true
           schema:
             type: string
@@ -204,8 +199,9 @@ paths:
               examples:
                 Example 1:
                   value:
-                    name: optical-character-recognition
-                    description: Optical Character Recognition
+                    id: optical-character-recognition
+                    name: Optical Character Recognition
+                    description: Conversion of images to text
       servers:
         - url: 'http://localhost:3000'
           description: ''
@@ -270,10 +266,12 @@ paths:
               examples:
                 Example 1:
                   value:
-                    - name: optical-character-recognition
-                      description: Optical Character Recognition
-                    - name: vector-database
-                      description: Vector Database
+                    - id: optical-character-recognition
+                      name: Optical Character Recognition
+                      description: Conversion of images to text
+                    - id: vector-database
+                      name: Vector Database
+                      description: Stores vectors (fixed-length lists of numbers) along with other data items
           headers:
             X-Total-Count:
               schema:
@@ -287,7 +285,7 @@ paths:
     get:
       tags:
         - Asset Management
-      summary: Get Asset by Asset ID
+      summary: Get Asset by ID
       description: Retrieve the information of the asset with the matching asset ID.
       operationId: get-asset-assetId
       parameters:
@@ -417,6 +415,8 @@ components:
       title: Ability
       description: Additional abilities (plug-ins)
       properties:
+        id:
+          type: integer
         name:
           type: string
           pattern: '^[a-z0-9-]+'
@@ -431,10 +431,12 @@ components:
           examples:
             - Optical Character Recognition
       examples:
-        - name: optical-character-recognition
-          description: Optical Character Recognition
-        - name: vector-database
-          description: Vector Database
+        - id: optical-character-recognition
+          name: Optical Character Recognition
+          description: Conversion of images to text
+        - id: vector-database
+          name: Vector Database
+          description: Stores vectors (fixed-length lists of numbers) along with other data items
     Asset:
       type: object
       title: Asset
