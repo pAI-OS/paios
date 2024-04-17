@@ -3,7 +3,7 @@ import { List, Datagrid, TextField, TextInput, Show, SimpleShowLayout, ShowButto
 
 const AbilityTitle = () => {
     const record = useRecordContext();
-    return <span>Ability {record ? `"${record.title}"` : ""}</span>;
+    return <span>Ability {record ? `"${record.name}"` : ""}</span>;
 };
 
 const abilityFilters = [
