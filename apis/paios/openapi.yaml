@@ -20,9 +20,9 @@ paths:
     get:
       tags:
         - User Management
-      summary: Get User Info by User ID
+      summary: Get User by User ID
       description: Retrieve the information of the user with the matching user ID.
-      operationId: get-users-userId
+      operationId: get-user-userId
       parameters:
         - name: userId
           in: path
@@ -248,6 +248,10 @@ paths:
                 type: integer
                 example: 2
               description: Count of results required by jsonServer Data Provider for pagination
+            Access-Control-Expose-Headers:
+              schema:
+                type: string
+              description: X-Total-Count
       servers:
         - url: 'http://localhost:3000'
           description: ''
@@ -255,8 +259,8 @@ paths:
     get:
       tags:
         - Abilities
-      summary: Get all abilities.
-      description: Get all abilities.
+      summary: Retrieve all abilities
+      description: Retrieve the information of all abilities.
       operationId: get-abilities
       responses:
         '200':
@@ -279,9 +283,62 @@ paths:
       servers:
         - url: 'http://localhost:3000'
           description: ''
+  '/assets/{assetId}':
+    get:
+      tags:
+        - Asset Management
+      summary: Get Asset by Asset ID
+      description: Retrieve the information of the asset with the matching asset ID.
+      operationId: get-asset-assetId
+      parameters:
+        - name: assetId
+          in: path
+          description: Id of an existing asset.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+              examples:
+                Example 1:
+                  value:
+                    id: 523
+                    title: Attention Is All You Need
+                    creator: Ashish Vaswani et al
+                    subject: Artificial Intelligence
+                    description: 'We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.'
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+  /assets:
+    get:
+      tags:
+        - Asset Management
+      summary: Retrieve all assets
+      description: Retrieve the information of all assets.
+      operationId: get-assets
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Asset'
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
 tags:
   - name: Abilities
     description: Installation and configuration of abilities
+  - name: Asset Management
+    description: Management of assets
   - name: User Management
     description: Management of user accounts
 components:
@@ -348,3 +405,23 @@ components:
       examples:
         - name: optical-character-recognition
           description: Optical Character Recognition
+    Asset:
+      type: object
+      title: Asset
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        creator:
+          type: string
+        subject:
+          type: string
+        description:
+          type: string
+      examples:
+        - id: 0
+          title: string
+          creator: string
+          subject: string
+          description: string
