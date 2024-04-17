@@ -1,3 +1,5 @@
+from flask import jsonify, make_response
+
 # List of users
 users = [
     {
@@ -52,6 +54,13 @@ assets = [
   }
 ]
 
+
+def retrieve_all(payload, status_code=200):
+        #response = make_response(jsonify(payload), status_code) # Return the user objects and a 200 OK status code
+        #response.headers['X-Total-Count'] = len(payload)
+        #return response
+        return jsonify(payload), status_code, {'X-Total-Count': len(payload)}
+
 def get_user_by_id(userId):
 
     for user in users:
@@ -60,14 +69,18 @@ def get_user_by_id(userId):
         
     return {"error": "User not found"}, 404  # Return an error message and a 404 Not Found status code
 
+
 def not_implemented():
     return {"message": "This operation is not implemented yet."}, 501
+
 
 def patch_user_by_id(userId):
     return not_implemented()
 
+
 def create_new_user():
     return not_implemented()
+
 
 def get_abilities_by_id(abilityId):
     for ability in abilities:
@@ -76,11 +89,13 @@ def get_abilities_by_id(abilityId):
 
     return {"error": "Ability not found"}, 404  # Return an error message and a 404 Not Found status code
 
+
 def retrieve_all_users():
-    return users, 200 # Return the user objects and a 200 OK status code
+    return retrieve_all(users)
+
 
 def retrieve_all_abilities():
-    return abilities, 200 # Return the ability objects and a 200 OK status code
+    return retrieve_all(abilities)
 
 def get_asset_by_id(assetId):
 
@@ -90,5 +105,6 @@ def get_asset_by_id(assetId):
 
     return {"error": "Asset not found"}, 404  # Return an error message and a 404 Not Found status code
 
+
 def retrieve_all_assets():
-    return assets, 200 # Return the asset objects and a 200 OK status code
+    return retrieve_all(assets)
