@@ -1,6 +1,5 @@
 import { useMediaQuery, Theme } from "@mui/material";
 import { List, SimpleList, Show, SimpleShowLayout, Datagrid, TextField, EmailField, UrlField } from "react-admin";
-import MyUrlField from "./MyUrlField";
 
 export const UserList = () => {
     const isSmall = useMediaQuery<Theme>((theme) => theme.breakpoints.down("sm"));
