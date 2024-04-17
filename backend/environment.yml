@@ -1,0 +1,10 @@
+name: paios-backend
+channels:
+  - defaults
+dependencies:
+  - python=3.12
+  - flask=3.0.3
+  - pip
+  - pip:
+    - connexion[flask,swagger-ui,uvicorn]==3.0.6
+    - openapi-spec-validator
