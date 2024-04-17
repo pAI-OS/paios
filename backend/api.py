@@ -1,6 +1,7 @@
 from flask import jsonify, make_response
 
 # List of users
+# TODO: We're not implementing multi-user yet so this is subject to change
 users = [
     {
         "id": 142,
@@ -21,6 +22,7 @@ users = [
 ]
 
 # List of abilities
+# TODO: These should be read from known files in enumerated directories under the abilities directory
 abilities = [
     {
         "id": "optical-character-recognition",
@@ -35,6 +37,7 @@ abilities = [
 ]
 
 # List of assets
+# TODO: These should be read from storage sources like local directory, S3, NAS, Solid pod, etc.
 assets = [
   {
     "id": 523,
