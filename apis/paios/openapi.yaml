@@ -1,8 +1,7 @@
-openapi: 3.1.0
+openapi: 3.0.3
 info:
   version: '0.1'
   title: Kwaai Paios API
-  summary: Paios Administration Interface API
   description: 'API for Paios admin interfaces (web, app) to backend services.'
   termsOfService: ''
   contact:
@@ -380,8 +379,7 @@ components:
         dateOfBirth:
           type: string
           format: date
-          examples:
-            - '1997-10-31'
+          example: '1997-10-31'
         emailVerified:
           type: boolean
           description: Set to true if the user's email has been verified.
@@ -395,21 +393,6 @@ components:
         - lastName
         - email
         - emailVerified
-      examples:
-        - id: 142
-          firstName: Alice
-          lastName: Smith
-          email: alice.smith@gmail.com
-          dateOfBirth: '1997-10-31'
-          emailVerified: true
-          signUpDate: '2019-08-24'
-        - id: 351
-          firstName: Bob
-          lastName: Jones
-          email: bob.jones@gmail.com
-          dateOfBirth: '1975-11-02'
-          emailVerified: true
-          signUpDate: '2022-10-02'
     Ability:
       type: object
       title: Ability
@@ -422,21 +405,12 @@ components:
           maxLength: 100
         name:
           type: string
-          examples:
-            - optical-character-recognition
+          example: optical-character-recognition
         description:
           type: string
           pattern: '^[A-Za-z0-9 -]+'
           maxLength: 200
-          examples:
-            - Optical Character Recognition
-      examples:
-        - id: optical-character-recognition
-          name: Optical Character Recognition
-          description: Conversion of images to text
-        - id: vector-database
-          name: Vector Database
-          description: Stores vectors (fixed-length lists of numbers) along with other data items
+          example: Optical Character Recognition
     Asset:
       type: object
       title: Asset
@@ -453,16 +427,3 @@ components:
           type: string
         description:
           type: string
-      examples:
-        - id: 523
-          userId: 142
-          title: Attention Is All You Need
-          creator: Vaswani et al
-          subject: Artificial Intelligence
-          description: 'We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.'
-        - id: 952
-          userId: 351
-          title: Generative Adversarial Networks
-          creator: Goodfellow et al
-          subject: Artificial Intelligence
-          description: 'We propose a new framework for estimating generative models via an adversarial process, in which we simultaneously train two models: a generative model G that captures the data distribution, and a discriminative model D that estimates the probability that a sample came from the training data rather than G.'
