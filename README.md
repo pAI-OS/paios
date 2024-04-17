@@ -5,11 +5,11 @@ Personal AI Operating System (Paios)
 
 Clone the repository:
 
-    git clone https://github.com/Kwaai-AI-Lab/Paios.git
+    git clone https://github.com/Kwaai-AI-Lab/paios.git
 
 Change to the admin directory:
 
-    cd Paios/admin
+    cd paios/admin
 
 Install Node.js dependencies:
 
@@ -19,7 +19,7 @@ Install Node.js dependencies:
 
 Change to the admin directory:
 
-    cd Paios/admin
+    cd paios/admin
 
 Run the prism mock server:
 
