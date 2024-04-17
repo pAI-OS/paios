@@ -14,6 +14,6 @@ With the Paios Admin Dashboard, you can:
         <li>Automate complex tasks and workflows across apps with simple natural language commands</li>
         <li>Get personalized insights, recommendations and intelligent assistance to optimize your productivity and digital wellbeing</li>
     </ul>
-The PaiOS Admin Dashboard makes it easy to unleash the full potential of artificial intelligence to streamline and enhance every aspect of your digital experience. Take charge of your AI-driven future with Kwaai PaiOS.</CardContent>
+The Paios Admin Dashboard makes it easy to unleash the full potential of artificial intelligence to streamline and enhance every aspect of your digital experience. Take charge of your AI-driven future with Kwaai PaiOS.</CardContent>
     </Card>
 );
