@@ -329,11 +329,13 @@ paths:
                 Example 1:
                   value:
                     - id: 523
+                      userId: 142
                       title: Attention Is All You Need
                       creator: Ashish Vaswani et al
                       subject: Artificial Intelligence
                       description: 'We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.'
                     - id: 952
+                      userId: 351
                       title: Generative Adversarial Networks
                       creator: Goodfellow et al
                       subject: Artificial Intelligence
