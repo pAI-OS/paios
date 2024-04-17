@@ -1,5 +1,5 @@
 import { useRecordContext } from "react-admin";
-import { List, Datagrid, TextField, TextInput, Show, SimpleShowLayout, EditButton } from "react-admin";
+import { List, Datagrid, TextField, TextInput, Show, SimpleShowLayout, ShowButton } from "react-admin";
 
 const AbilityTitle = () => {
     const record = useRecordContext();
@@ -12,10 +12,10 @@ const abilityFilters = [
 
 export const AbilityList = () => (
     <List filters={abilityFilters}>
-        <Datagrid rowClick="edit">
+        <Datagrid rowClick="show">
             <TextField source="name" />
             <TextField source="description" />
-            <EditButton />
+            <ShowButton />
         </Datagrid>
     </List>
 );
@@ -23,7 +23,7 @@ export const AbilityList = () => (
 export const AbilityShow = () => (
     <Show>
         <SimpleShowLayout>
-                <TextField source="name" />
+                <TextField source="id" />
                     <TextField source="name" />
                     <TextField source="description" />
         </SimpleShowLayout>
