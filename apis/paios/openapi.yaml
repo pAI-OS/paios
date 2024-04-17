@@ -293,7 +293,7 @@ paths:
           description: Id of an existing asset.
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         '200':
           description: OK
@@ -408,8 +408,6 @@ components:
           example: optical-character-recognition
         description:
           type: string
-          pattern: '^[A-Za-z0-9 -]+'
-          maxLength: 200
           example: Optical Character Recognition
     Asset:
       type: object
