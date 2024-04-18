@@ -1,0 +1,8 @@
+{
+    "id": "llamafile",
+    "title": "llamafile",
+    "description": "large language model tool",
+    "author": "OpenAI Inc.",
+    "language": "python",
+    "license": "Apache-2.0"
+}
