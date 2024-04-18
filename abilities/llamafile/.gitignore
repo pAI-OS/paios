@@ -1,3 +1,6 @@
 # ignore models
 *.zip
 *.llamafile
+
+# ignore logs
+llama.log
