@@ -13,6 +13,7 @@ const abilityFilters = [
 export const AbilityList = () => (
     <List filters={abilityFilters}>
         <Datagrid rowClick="show">
+            <TextField source="id" label="Name" />
             <TextField source="title" />
             <TextField source="description" />
             <ShowButton />
