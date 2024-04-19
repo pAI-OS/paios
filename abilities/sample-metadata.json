@@ -1,0 +1,56 @@
+{
+    "name": "my-ability",
+    "version": "1.0.0",
+    "description": "A sample ability",
+    "main": "main.py",
+    "scripts": {
+        "start": "python3 main.py arg1 arg2",
+        "test": "pytest"
+    },
+    "author": {
+        "name": "Your Name",
+        "email": "your.email@example.com",
+        "url": "http://your-website.com"
+    },
+    "maintainer": {
+        "name": "Your Name",
+        "email": "your.email@example.com",
+        "url": "http://your-website.com"
+    },
+    "license": "MIT",
+    "dependencies": {
+        "container": [
+            {
+                "name": "tensorflow/tensorflow",
+                "version": "2.5.0",
+                "priority": "recommended"
+            }
+        ],
+        "debian": [
+            {
+                "name": "libssl-dev",
+                "version": "1.1.1",
+                "priority": "required"
+            },
+            {
+                "name": "libffi-dev",
+                "version": "3.3-1",
+                "priority": "optional"
+            }
+        ],
+        "python": [
+            {
+                "name": "numpy",
+                "version": "1.21.0",
+                "priority": "recommended"
+            }
+        ],
+        "resources": [
+            {
+                "name": "llava.llamafile",
+                "url": "https://example.com/models/llava.llamafile",
+                "filename": "models/llava.llamafile"
+            }
+        ]
+    }
+}
