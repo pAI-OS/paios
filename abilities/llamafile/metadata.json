@@ -2,6 +2,14 @@
     "id": "llamafile",
     "title": "llamafile",
     "description": "large language model tool",
-    "author": "@jart",
-    "language": "cosmocc",
+    "author": {
+        "name": "Mozilla Foundation",
+        "url": "https://foundation.mozilla.org/"
+    },
+    "maintainer": {
+        "name": "Sam Johnston",
+        "email": "samj@samj.net",
+        "url": "http://samjohnston.org"
+    },
+    "language": "cosmocc"
 }
