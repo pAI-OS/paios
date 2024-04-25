@@ -13,7 +13,7 @@ Change to the backend directory:
 
     cd paios/backend
 
-Install [miniforce](https://github.com/conda-forge/miniforge) (or miniconda/Anaconda) and create a new python environment with dependencies:
+Install [miniforge](https://github.com/conda-forge/miniforge) (or miniconda/Anaconda) and create a new python environment with dependencies:
 
     conda env create -f environment.yml
 
