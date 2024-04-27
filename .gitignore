@@ -162,3 +162,7 @@ cython_debug/
 # cruft
 .DS_Store
 .vscode
+
+# data
+data/*
+!data/README.md
