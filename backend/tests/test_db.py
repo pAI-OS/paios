@@ -3,7 +3,6 @@ from db import create_config_item, read_config_item, update_config_item, delete_
 
 class TestDbFunctions(unittest.TestCase):
     def setUp(self):
-        # Code to set up your database to a known state
         pass
 
     def test_create_config_item(self):
@@ -12,8 +11,8 @@ class TestDbFunctions(unittest.TestCase):
         key = 'test_key'
         value = 'test_value'
         create_config_item(key, value, tenant=tenant)
-        # Add assertions to verify the result
         result = read_config_item(key, tenant=tenant)
+        delete_config_item(key, tenant=tenant)
         self.assertEqual(result, value)
 
     def test_read_config_item(self):
@@ -23,7 +22,7 @@ class TestDbFunctions(unittest.TestCase):
         value = 'test_value'
         create_config_item(key, value, tenant=tenant)
         result = read_config_item(key, tenant=tenant)
-        # Add assertions to verify the result
+        delete_config_item(key, tenant=tenant)
         self.assertEqual(result, value)
 
     def test_update_config_item(self):
@@ -34,8 +33,8 @@ class TestDbFunctions(unittest.TestCase):
         new_value = 'new_test_value'
         create_config_item(key, old_value, tenant=tenant)
         update_config_item(key, new_value, tenant=tenant)
-        # Add assertions to verify the result
         result = read_config_item(key, tenant=tenant)
+        delete_config_item(key, tenant=tenant)
         self.assertEqual(result, new_value)
 
     def test_delete_config_item(self):
@@ -43,12 +42,10 @@ class TestDbFunctions(unittest.TestCase):
         tenant = 'test'
         key = 'test_key'
         delete_config_item(key, tenant=tenant)
-        # Add assertions to verify the result
         result = read_config_item(key, tenant=tenant)
         self.assertIsNone(result)
 
     def tearDown(self):
-        # Code to clean up your database after each test
         pass
 
 if __name__ == '__main__':
