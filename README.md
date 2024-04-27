@@ -61,19 +61,3 @@ Run the node (vite) dev server in its own shell:
 Visit the admin interface:
 
     http://127.0.0.1:5173
-
-## Development Environment
-
-### API Mocking
-
-Change to the admin interface directory:
-
-    cd paios/admin
-
-Install Node.js dependencies:
-
-    npm install
-
-Run the prism mock server:
-
-    prism mock ../apis/paios/openapi.yaml
