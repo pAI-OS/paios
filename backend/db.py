@@ -7,9 +7,21 @@ from cryptography.fernet import Fernet
 load_dotenv()
 
 # Helper function to connect, execute, commit, and close the database
-def execute_query(query, params=None):
-    conn = sqlite3.connect('../data/config.db')
+def execute_query(query, params=None, tenant=None):
+    db_path = os.path.join('..', 'data', tenant, 'config.db') if tenant else os.path.join('..', 'data', 'config.db')
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)  # Create the path if required
+
+    conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
+
+    # Check if the table exists
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='config'")
+    table_exists = cursor.fetchone()
+
+    if not table_exists:
+        # Create the table if it doesn't exist
+        cursor.execute("CREATE TABLE config (key TEXT, value TEXT)")
+
     if params:
         cursor.execute(query, params)
     else:
@@ -26,7 +38,7 @@ def get_encryption_key():
     if not encryption_key:
         encryption_key = Fernet.generate_key().decode()
         with open('.env', 'a') as f:
-            f.write(f'\nPAIOS_DB_ENCRYPTION_KEY={encryption_key}')
+            f.write(f'PAIOS_DB_ENCRYPTION_KEY={encryption_key}\n')
     return encryption_key
 
 # Encrypt a value using Fernet encryption
@@ -42,15 +54,15 @@ def decrypt_value(encrypted_value):
     return decrypted_value
 
 # Create a new config item
-def create_config_item(key, value):
+def create_config_item(key, value, tenant=None):
     encrypted_value = encrypt_value(value)
     query = 'INSERT INTO config (key, value) VALUES (?, ?)'
-    execute_query(query, (key, encrypted_value))
+    execute_query(query, (key, encrypted_value), tenant)
 
 # Read a config item by key
-def read_config_item(key):
+def read_config_item(key, tenant=None):
     query = 'SELECT value FROM config WHERE key = ?'
-    result = execute_query(query, (key,))
+    result = execute_query(query, (key,), tenant)
     if result:
         encrypted_value = result[0][0]
         decrypted_value = decrypt_value(encrypted_value)
@@ -59,12 +71,12 @@ def read_config_item(key):
         return None
 
 # Update a config item by key
-def update_config_item(key, value):
+def update_config_item(key, value, tenant=None):
     encrypted_value = encrypt_value(value)
     query = 'UPDATE config SET value = ? WHERE key = ?'
-    execute_query(query, (encrypted_value, key))
+    execute_query(query, (encrypted_value, key), tenant)
 
 # Delete a config item by key
-def delete_config_item(key):
+def delete_config_item(key, tenant=None):
     query = 'DELETE FROM config WHERE key = ?'
-    execute_query(query, (key,))
+    execute_query(query, (key,), tenant)
