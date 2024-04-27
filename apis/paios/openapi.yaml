@@ -21,7 +21,7 @@ paths:
         - User Management
       summary: Get User by User ID
       description: Retrieve the information of the user with the matching user ID.
-      operationId: api.get_user_by_id
+      operationId: api.retrieve_user_by_id
       parameters:
         - name: userId
           in: path
@@ -56,7 +56,7 @@ paths:
         - User Management
       summary: Update User Information
       description: Update the information of an existing user.
-      operationId: api.patch_user_by_id
+      operationId: api.update_user_by_id
       parameters:
         - name: userId
           in: path
@@ -180,7 +180,7 @@ paths:
         - Abilities
       summary: Get Abilities by ID
       description: Retrieve the information of the ability with the matching ability ID.
-      operationId: api.get_abilities_by_id
+      operationId: api.retrieve_ability_by_id
       parameters:
         - name: abilityId
           in: path
@@ -286,7 +286,7 @@ paths:
         - Asset Management
       summary: Get Asset by ID
       description: Retrieve the information of the asset with the matching asset ID.
-      operationId: api.get_asset_by_id
+      operationId: api.retrieve_asset_by_id
       parameters:
         - name: assetId
           in: path
@@ -358,7 +358,7 @@ paths:
         - Configuration Management
       summary: Retrieve Config by Key
       description: Retrieve the config item with the specified key.
-      operationId: api.get_config_by_key
+      operationId: api.retrieve_config_by_key
       parameters:
         - name: key
           in: path

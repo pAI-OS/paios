@@ -80,7 +80,7 @@ def retrieve_all(payload, status_code=200):
         #return response
         return jsonify(payload), status_code, {'X-Total-Count': len(payload)}
 
-def get_user_by_id(userId):
+def retrieve_user_by_id(userId):
 
     for user in users:
         if user['id'] == userId:
@@ -93,7 +93,7 @@ def not_implemented():
     return {"message": "This operation is not implemented yet."}, 501
 
 
-def patch_user_by_id(userId):
+def update_user_by_id(userId):
     return not_implemented()
 
 
@@ -101,7 +101,7 @@ def create_new_user():
     return not_implemented()
 
 
-def get_abilities_by_id(abilityId):
+def retrieve_ability_by_id(abilityId):
     for ability in abilities:
         if ability['id'] == abilityId:
             return ability, 200 # Return the ability object and a 200 OK status code
@@ -117,7 +117,7 @@ def retrieve_all_abilities():
     return retrieve_all(abilities)
 
 
-def get_asset_by_id(assetId):
+def retrieve_asset_by_id(assetId):
 
     for asset in assets:
         if asset['id'] == assetId:
