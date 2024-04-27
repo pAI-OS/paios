@@ -352,11 +352,88 @@ paths:
       servers:
         - url: 'http://localhost:3000'
           description: ''
+  '/config/{key}':
+    get:
+      tags:
+        - Configuration Management
+      summary: Retrieve Config by Key
+      description: Retrieve the config item with the specified key.
+      operationId: api.get_config_by_key
+      parameters:
+        - name: key
+          in: path
+          description: Key for Config item
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Config'
+              examples:
+                Example 1:
+                  value: 123
+                Example 2:
+                  value: secret
+                Example 3:
+                  value:
+                    x: 'y'
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+    post:
+      tags:
+        - Configuration Management
+      summary: Create Config by Key
+      description: Retrieve a config item with the specified key.
+      operationId: api.create_config_by_key
+      parameters:
+        - name: key
+          in: path
+          description: Key for Config item
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Config'
+      responses:
+        '200':
+          description: OK
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+    delete:
+      tags:
+        - Configuration Management
+      summary: Delete Config by Key
+      description: Delete a config item with the specified key.
+      operationId: api.delete_config_by_key
+      parameters:
+        - name: key
+          in: path
+          description: Key for Config item
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
 tags:
   - name: Abilities
     description: Installation and configuration of abilities
   - name: Asset Management
     description: Management of assets
+  - name: Configuration Management
+    description: Management of configuration
   - name: User Management
     description: Management of user accounts
 components:
@@ -425,3 +502,10 @@ components:
           type: string
         description:
           type: string
+    Config:
+      title: Config
+      anyOf:
+        - type: integer
+        - type: string
+        - type: boolean
+        - type: object
