@@ -128,3 +128,5 @@ def retrieve_asset_by_id(assetId):
 
 def retrieve_all_assets():
     return retrieve_all(assets)
+
+

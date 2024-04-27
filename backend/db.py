@@ -60,6 +60,12 @@ def decrypt_value(encrypted_value):
     decrypted_value = f.decrypt(encrypted_value).decode()
     return decrypted_value
 
+# Create or update config item
+def set_config_item(key, value, tenant=None):
+    encrypted_value = encrypt_value(value)
+    query = 'INSERT OR REPLACE INTO config (key, value) VALUES (?, ?)'
+    execute_query(query, (key, encrypted_value), tenant)
+
 # Create a new config item
 def create_config_item(key, value, tenant=None):
     encrypted_value = encrypt_value(value)
