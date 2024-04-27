@@ -1,5 +1,5 @@
 import unittest
-from db import create_config_item, read_config_item, update_config_item, delete_config_item
+from db import create_config_item, read_config_item, update_config_item, delete_config_item, set_config_item
 
 class TestDbFunctions(unittest.TestCase):
     def setUp(self):
@@ -33,6 +33,18 @@ class TestDbFunctions(unittest.TestCase):
         new_value = 'new_test_value'
         create_config_item(key, old_value, tenant=tenant)
         update_config_item(key, new_value, tenant=tenant)
+        result = read_config_item(key, tenant=tenant)
+        delete_config_item(key, tenant=tenant)
+        self.assertEqual(result, new_value)
+
+    def test_set_config_item(self):
+        # Test that set_config_item correctly updates a value in the database
+        tenant = 'test'
+        key = 'test_key'
+        old_value = 'old_test_value'
+        new_value = 'new_test_value'
+        set_config_item(key, old_value, tenant=tenant)
+        set_config_item(key, new_value, tenant=tenant)
         result = read_config_item(key, tenant=tenant)
         delete_config_item(key, tenant=tenant)
         self.assertEqual(result, new_value)
