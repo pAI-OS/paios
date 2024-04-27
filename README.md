@@ -13,17 +13,21 @@ Change to the backend directory:
 
     cd paios/backend
 
-Install [miniforge](https://github.com/conda-forge/miniforge) (or miniconda/Anaconda) and create a new python environment with dependencies:
+Create a new python virtual environment (venv) in .venv:
 
-    conda env create -f environment.yml
+    python3 -m venv .venv
 
 Activate the new environment:
 
-    conda activate paios-backend
+    source .venv/bin/activate
+
+Install dependencies into the venv environment:
+
+    pip install -r requirements.txt
 
 Run the backend python/connexion server:
 
-    python main.py
+    python3 main.py
 
 Visit the API to verify it's working:
 
