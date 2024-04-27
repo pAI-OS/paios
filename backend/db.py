@@ -20,16 +20,23 @@ def execute_query(query, params=None, tenant=None):
 
     if not table_exists:
         # Create the table if it doesn't exist
-        cursor.execute("CREATE TABLE config (key TEXT, value TEXT)")
+        cursor.execute("CREATE TABLE config (key TEXT UNIQUE, value TEXT)")
+        cursor.execute("CREATE INDEX idx_config_key ON config (key)")
 
-    if params:
-        cursor.execute(query, params)
-    else:
-        cursor.execute(query)
-    result = cursor.fetchall()
-    conn.commit()
-    cursor.close()
-    conn.close()
+    try:
+        if params:
+            cursor.execute(query, params)
+        else:
+            cursor.execute(query)
+        result = cursor.fetchall()
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        raise e
+    finally:
+        cursor.close()
+        conn.close()
+
     return result
 
 # Helper function to get the encryption key from environment variables or generate a new one and save it to .env
