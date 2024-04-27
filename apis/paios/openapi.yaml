@@ -505,7 +505,8 @@ components:
     Config:
       title: Config
       anyOf:
-        - type: integer
-        - type: string
         - type: boolean
+        - type: integer
+        - type: number
+        - type: string
         - type: object
