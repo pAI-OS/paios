@@ -356,9 +356,9 @@ paths:
     get:
       tags:
         - Configuration Management
-      summary: Retrieve Config by Key
+      summary: Get Config by Key
       description: Retrieve the config item with the specified key.
-      operationId: api.retrieve_config_by_key
+      operationId: api.get_config_by_key
       parameters:
         - name: key
           in: path
@@ -387,9 +387,9 @@ paths:
     post:
       tags:
         - Configuration Management
-      summary: Create Config by Key
-      description: Retrieve a config item with the specified key.
-      operationId: api.create_config_by_key
+      summary: Set Config by Key
+      description: Set a config item with the specified key.
+      operationId: api.set_config_by_key
       parameters:
         - name: key
           in: path
