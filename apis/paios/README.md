@@ -10,11 +10,11 @@ The Paios API is specified in OpenAPI format and was created in Stoplight.
 
 ## Mocking
 
-The API can be mocked locally using Stoplight's [Prism](https://github.com/stoplightio/prism), which can be installed as follows:
+APIs can be mocked locally using tools like Stoplight's [Prism](https://github.com/stoplightio/prism), which can be installed as follows:
 
     npm install -g @stoplight/prism-cli
 
-To start the local prism server using the current version of the API:
+To start the local prism server:
 
     prism proxy apis/paios/openapi.yaml
 
