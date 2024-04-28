@@ -3,8 +3,8 @@ import { Title } from "react-admin";
 
 export const Dashboard = () => (
     <Card>
-        <Title title="Personal AI Operating System (Paios)" />
-        <CardHeader title="Welcome to the Personal AI Operating System (Paios)" />
+        <Title title="Personal Artificial Intelligence Operating System (PAIOS)" />
+        <CardHeader title="Welcome to the Personal Artificial Intelligence Operating System (PAIOS)" />
         <CardContent>Take control of your digital life with the revolutionary Paios Admin Dashboard. This intuitive interface puts you in the driver's seat of your own AI-powered operating system.
 With the Paios Admin Dashboard, you can:
     <ul>

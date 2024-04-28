@@ -1,4 +1,4 @@
-# Paios Backend
+# PAIOS Backend
 
 ## Setup
 
