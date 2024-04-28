@@ -26,6 +26,13 @@ users = [
 ]
 
 # List of abilities
+# abilities = [
+#     {
+#         "id": "optical-character-recognition",
+#         "name": "Optical Character Recognition",
+#         "description": "Conversion of images to text"
+#     }
+# ]
 abilities = []
 
 abilities_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "abilities"))
@@ -40,18 +47,6 @@ for subdir, dirs, files in os.walk(abilities_dir):
             except (FileNotFoundError, json.JSONDecodeError):
                 pass
 
-# abilities = [
-#     {
-#         "id": "optical-character-recognition",
-#         "name": "Optical Character Recognition",
-#         "description": "Conversion of images to text"
-#     },
-#     {
-#         "id": "vector-database",
-#         "name": "Vector Database",
-#         "description": "Stores vectors (fixed-length lists of numbers) along with other data items"
-#     }
-# ]
 
 # List of assets
 # TODO: These should be read from storage sources like local directory, S3, NAS, Solid pod, etc.
