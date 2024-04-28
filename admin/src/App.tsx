@@ -14,8 +14,8 @@ import { authProvider } from "./authProvider";
 
 export const App = () => (
 <Admin dataProvider={dataProvider} authProvider={authProvider} dashboard={Dashboard} >
-  <Resource name="assets" list={AssetList} create={AssetCreate} edit={AssetEdit} icon={DocIcon} />
+  <Resource name="assets" list={AssetList} create={AssetCreate} edit={AssetEdit} recordRepresentation='title' icon={DocIcon} />
   <Resource name="users" list={UserList} show={UserShow} recordRepresentation={(record) => `${record.firstName} ${record.lastName}`} icon={UserIcon} />
-  <Resource name="abilities" list={AbilityList} show={AbilityShow} recordRepresentation='description' icon={ExtensionIcon} />
+  <Resource name="abilities" list={AbilityList} show={AbilityShow} recordRepresentation='id' icon={ExtensionIcon} />
 </Admin>
 );

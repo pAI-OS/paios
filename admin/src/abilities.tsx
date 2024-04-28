@@ -28,7 +28,7 @@ const StartButton = () => {
 
 const AbilityTitle = () => {
     const record = useRecordContext();
-    return <span>Ability {record ? `"${record.name}"` : ""}</span>;
+    return <span>Abilities {record ? `- ${record.id}` : ""}</span>;
 };
 
 const abilityFilters = [
@@ -48,7 +48,7 @@ export const AbilityList = () => (
 );
 
 export const AbilityShow = () => (
-    <Show>
+    <Show title={<AbilityTitle />}>
             <SimpleShowLayout>
                 <TextField source="id" />
                 <TextField source="title" />

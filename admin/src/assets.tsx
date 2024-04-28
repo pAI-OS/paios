@@ -3,7 +3,7 @@ import { Edit, Create, List, Datagrid, TextField, TextInput, ReferenceField, Ref
 
 const AssetTitle = () => {
     const record = useRecordContext();
-    return <span>Asset {record ? `"${record.title}"` : ""}</span>;
+    return <span>Asset {record ? `- ${record.title}` : ""}</span>;
 };
 
 const assetFilters = [
@@ -23,7 +23,7 @@ export const AssetList = () => (
 );
 
 export const AssetEdit = () => (
-    <Edit>
+    <Edit title={<AssetTitle />}>
         <SimpleForm>
             <TextInput source="id" InputProps={{ disabled: true }}/>
             <ReferenceInput source="userId" reference="users" />
