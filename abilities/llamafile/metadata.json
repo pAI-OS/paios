@@ -11,5 +11,8 @@
         "email": "samj@samj.net",
         "url": "http://samjohnston.org"
     },
-    "language": "cosmocc"
+    "language": "cosmocc",
+    "scripts": {
+        "start": "llava-v1.5-7b-q4.llamafile.zip"
+    }
 }
