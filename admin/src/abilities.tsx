@@ -1,6 +1,8 @@
+import React, { useState, useEffect } from 'react';
 import { Button, useNotify, useRefresh, useRecordContext } from "react-admin";
 import { List, Datagrid, TextField, TextInput, Show, SimpleShowLayout, ShowButton } from "react-admin";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import ReactMarkdown from 'react-markdown';
 
 const StartButton = () => {
     const record = useRecordContext();
@@ -47,12 +49,24 @@ export const AbilityList = () => (
     </List>
 );
 
-export const AbilityShow = () => (
-    <Show>
-        <SimpleShowLayout>
+export const AbilityShow = (props: any) => {
+    const [markdown, setMarkdown] = useState('');
+
+    useEffect(() => {
+        const { id } = props;
+        fetch(`/path/to/ability/directory/${id}.md`)
+            .then(response => response.text())
+            .then(setMarkdown);
+    }, [props]);
+
+    return (
+        <Show {...props}>
+            <SimpleShowLayout>
                 <TextField source="id" />
-                    <TextField source="title" />
-                    <TextField source="description" />
-        </SimpleShowLayout>
-    </Show>
-);
+                <TextField source="title" />
+                <TextField source="description" />
+                <ReactMarkdown>{markdown}</ReactMarkdown>
+            </SimpleShowLayout>
+        </Show>
+    );
+};

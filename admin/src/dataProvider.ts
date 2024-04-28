@@ -7,7 +7,6 @@ const httpClient = (url: string, options: any = {}) => {
   }
   
   const token = import.meta.env.VITE_PAIOS_BEARER_TOKEN;
-  console.log('Token: ' + token);
   options.headers.set('Authorization', `Bearer ${token}`);
   return fetchUtils.fetchJson(url, options);
 }
