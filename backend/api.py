@@ -1,7 +1,8 @@
 from flask import jsonify
 import os
+import signal
+import subprocess
 import json
-import os
 import db
 
 # List of users
@@ -119,7 +120,7 @@ def retrieve_asset_by_id(assetId):
 
     return {"error": "Asset not found"}, 404
 
-# Abilities
+# Abilities Management
 def start_ability(abilityId):
     print(f"Starting ability {abilityId}")
     start_script = None
@@ -131,8 +132,22 @@ def start_ability(abilityId):
     if start_script is None:
         return {"error": "Ability not found or start script not set"}, 404
 
-    os.system(os.path.join('..', 'abilities', abilityId, start_script))
+    # Start the subprocess and store the PID in the ability dictionary
+    process = subprocess.Popen([os.path.join('..', 'abilities', abilityId, start_script)], shell=True)
+    ability['pid'] = process.pid
     return ok()
+
+def stop_ability(abilityId):
+    for ability in abilities:
+        if ability['id'] == abilityId:
+            if 'pid' in ability:
+                # Terminate the subprocess
+                os.kill(ability['pid'], signal.SIGTERM)
+                return ok()
+            else:
+                return {"error": "Ability not running"}, 404
+
+    return {"error": "Ability not found"}, 404
 
 # Configuration Management
 
