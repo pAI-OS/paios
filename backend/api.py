@@ -2,6 +2,7 @@ from flask import jsonify, make_response
 import os
 import json
 import os
+import db
 
 # List of users
 # TODO: We're not implementing multi-user yet so this is subject to change
@@ -116,7 +117,6 @@ def retrieve_all_users():
 def retrieve_all_abilities():
     return retrieve_all(abilities)
 
-
 def retrieve_asset_by_id(assetId):
 
     for asset in assets:
@@ -130,3 +130,38 @@ def retrieve_all_assets():
     return retrieve_all(assets)
 
 
+# Get config item from database
+def get_config_by_key(key):
+    try:
+        value = db.read_config_item(key)
+        if value is None:
+            return {"error": "Config item not found"}, 404
+
+        return value, 200
+    except Exception as e:
+        return {"error": str(e)}, 500
+
+
+# Set config item in database
+def set_config_by_key(key, body):
+    try:
+        if isinstance(body, dict):
+            body = json.dumps(body)  # Convert the dictionary to a JSON string
+        elif isinstance(body, bytes):
+            body = body.decode()  # Convert the bytes object to a string
+        else:
+            return {"error": "Invalid body type. Expected dict or bytes."}, 400
+
+        db.set_config_item(key, body)
+        return {"message": "Config item set successfully"}, 200
+    except Exception as e:
+        return {"error": str(e)}, 500
+
+
+# Delete config item from database
+def delete_config_by_key(key):
+    try:
+        db.delete_config_item(key)
+        return '', 204
+    except Exception as e:
+        return {"error": str(e)}, 500
