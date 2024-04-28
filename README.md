@@ -11,3 +11,5 @@ Clone the repository:
 Start the backend per [backend/README.md](backend/README.md).
 
 Start the admin interface per [admin/README.md](admin/README.md)
+
+Visit [http://localhost:5173/](http://localhost:5173/)
