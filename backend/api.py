@@ -78,9 +78,9 @@ def retrieve_all(payload, status_code=200): return jsonify(payload), status_code
 # OPTIONS are required for CORS preflight requests
 def options_abilities(): return ok()
 def options_abilities_abilityid(): return ok()
+def options_abilities_abilityid_start(): return ok()
 def options_assets(): return ok()
 def options_assets_assetid(): return ok()
-def options_assets_assetid_start(): return ok()
 def options_config(): return ok()
 def options_user(): return ok()
 def options_users(): return ok()
