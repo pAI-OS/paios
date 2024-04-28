@@ -115,6 +115,25 @@ paths:
       servers:
         - url: 'http://localhost:3000'
           description: ''
+    options:
+      tags:
+        - User Management
+      summary: Options
+      description: Respond to OPTIONS requests.
+      operationId: api.options_users_userid
+      parameters:
+        - name: userId
+          in: path
+          description: Id of an existing user
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
   /user:
     post:
       tags:
@@ -174,6 +193,18 @@ paths:
       servers:
         - url: 'http://localhost:3000'
           description: ''
+    options:
+      tags:
+        - User Management
+      summary: Options
+      description: Respond to OPTIONS requests.
+      operationId: api.options_user
+      responses:
+        '200':
+          description: OK
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
   '/abilities/{abilityId}':
     get:
       tags:
@@ -201,6 +232,25 @@ paths:
                     id: optical-character-recognition
                     name: Optical Character Recognition
                     description: Conversion of images to text
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+    options:
+      tags:
+        - Abilities
+      summary: Options
+      description: Respond to OPTIONS requests.
+      operationId: api.options_abilities_abilityid
+      parameters:
+        - name: abilityId
+          in: path
+          description: ID of an existing ability
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
       servers:
         - url: 'http://localhost:3000'
           description: ''
@@ -246,6 +296,18 @@ paths:
       servers:
         - url: 'http://localhost:3000'
           description: ''
+    options:
+      tags:
+        - User Management
+      summary: Options
+      description: Respond to OPTIONS requests.
+      operationId: api.options_users
+      responses:
+        '200':
+          description: OK
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
   /abilities:
     get:
       tags:
@@ -280,6 +342,18 @@ paths:
       servers:
         - url: 'http://localhost:3000'
           description: ''
+    options:
+      tags:
+        - Abilities
+      summary: Options
+      description: Respond to OPTIONS requests.
+      operationId: api.options_abilities
+      responses:
+        '200':
+          description: OK
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
   '/assets/{assetId}':
     get:
       tags:
@@ -309,6 +383,25 @@ paths:
                     creator: Vaswani et al
                     subject: Artificial Intelligence
                     description: 'We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.'
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+    options:
+      tags:
+        - Asset Management
+      summary: Options
+      description: Respond to OPTIONS requests.
+      operationId: api.options_assets_assetid
+      parameters:
+        - name: assetId
+          in: path
+          description: Id of an existing asset.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
       servers:
         - url: 'http://localhost:3000'
           description: ''
@@ -349,6 +442,18 @@ paths:
                 type: string
                 example: '2'
               description: Count of results required by jsonServer Data Provider for pagination
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+    options:
+      tags:
+        - Asset Management
+      summary: Options
+      description: Respond to OPTIONS requests.
+      operationId: api.options_assets
+      responses:
+        '200':
+          description: OK
       servers:
         - url: 'http://localhost:3000'
           description: ''
@@ -402,6 +507,9 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Config'
+          text/plain:
+            schema:
+              $ref: '#/components/schemas/Config'
       responses:
         '200':
           description: OK
@@ -414,6 +522,25 @@ paths:
       summary: Delete Config by Key
       description: Delete a config item with the specified key.
       operationId: api.delete_config_by_key
+      parameters:
+        - name: key
+          in: path
+          description: Key for Config item
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+    options:
+      tags:
+        - Configuration Management
+      summary: Options
+      description: Respond to OPTIONS requests.
+      operationId: api.options_config
       parameters:
         - name: key
           in: path
