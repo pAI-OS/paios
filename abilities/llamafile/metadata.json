@@ -13,6 +13,15 @@
     },
     "language": "cosmocc",
     "scripts": {
-        "start": "llava-v1.5-7b-q4.llamafile.zip"
+        "start": "llava-v1.5-7b-q4.llamafile"
+    },
+    "dependencies": {
+        "resources": [
+            {
+                "name": "LLaVA 1.5",
+                "url": "https://huggingface.co/jartine/llava-v1.5-7B-GGUF/resolve/main/llava-v1.5-7b-q4.llamafile",
+                "filename": "llava-v1.5-7b-q4.llamafile"
+            }
+        ]
     }
 }
