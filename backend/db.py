@@ -1,6 +1,6 @@
 import os
 import sqlite3
-from dotenv import load_dotenv
+from dotenv import load_dotenv, set_key
 from cryptography.fernet import Fernet
 
 # Load environment variables from .env file including the encryption key if not already set
@@ -44,8 +44,7 @@ def get_encryption_key():
     encryption_key = os.environ.get('PAIOS_DB_ENCRYPTION_KEY')
     if not encryption_key:
         encryption_key = Fernet.generate_key().decode()
-        with open('.env', 'a') as f:
-            f.write(f'PAIOS_DB_ENCRYPTION_KEY={encryption_key}\n')
+        set_key('.env', 'PAIOS_DB_ENCRYPTION_KEY', encryption_key)
     return encryption_key
 
 # Encrypt a value using Fernet encryption
