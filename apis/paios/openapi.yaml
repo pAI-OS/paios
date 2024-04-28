@@ -15,6 +15,465 @@ servers:
   - url: 'http://localhost:3000'
     description: ''
 paths:
+  /abilities:
+    get:
+      tags:
+        - Abilities
+      summary: Retrieve all abilities
+      description: Retrieve the information of all abilities.
+      operationId: api.retrieve_all_abilities
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Ability'
+              examples:
+                Example 1:
+                  value:
+                    - id: optical-character-recognition
+                      name: Optical Character Recognition
+                      description: Conversion of images to text
+                    - id: vector-database
+                      name: Vector Database
+                      description: Stores vectors (fixed-length lists of numbers) along with other data items
+          headers:
+            X-Total-Count:
+              schema:
+                type: string
+                example: '2'
+              description: Count of results required by jsonServer Data Provider for pagination
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+    options:
+      tags:
+        - Abilities
+      summary: Options
+      description: Respond to OPTIONS requests.
+      operationId: api.options_abilities
+      responses:
+        '200':
+          description: OK
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+  '/abilities/{abilityId}':
+    get:
+      tags:
+        - Abilities
+      summary: Get Abilities by ID
+      description: Retrieve the information of the ability with the matching ability ID.
+      operationId: api.retrieve_ability_by_id
+      parameters:
+        - name: abilityId
+          in: path
+          description: ID of an existing ability
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ability'
+              examples:
+                Example 1:
+                  value:
+                    id: optical-character-recognition
+                    name: Optical Character Recognition
+                    description: Conversion of images to text
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+    options:
+      tags:
+        - Abilities
+      summary: Options
+      description: Respond to OPTIONS requests.
+      operationId: api.options_abilities_abilityid
+      parameters:
+        - name: abilityId
+          in: path
+          description: ID of an existing ability
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+  '/abilities/{abilityId}/start':
+    post:
+      tags:
+        - Abilities
+      summary: Start ability.
+      description: Starts the ability with the matching ability ID.
+      operationId: api.start_ability
+      parameters:
+        - name: abilityId
+          in: path
+          description: ID of an existing ability
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+    options:
+      tags:
+        - Abilities
+      summary: Options
+      description: Respond to OPTIONS requests.
+      operationId: api.options_abilities_abilityid_start
+      parameters:
+        - name: abilityId
+          in: path
+          description: ID of an existing ability
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+  /assets:
+    get:
+      tags:
+        - Asset Management
+      summary: Retrieve all assets
+      description: Retrieve the information of all assets.
+      operationId: api.retrieve_all_assets
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Asset'
+              examples:
+                Example 1:
+                  value:
+                    - id: 523
+                      userId: 142
+                      title: Attention Is All You Need
+                      creator: Ashish Vaswani et al
+                      subject: Artificial Intelligence
+                      description: 'We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.'
+                    - id: 952
+                      userId: 351
+                      title: Generative Adversarial Networks
+                      creator: Goodfellow et al
+                      subject: Artificial Intelligence
+                      description: 'We propose a new framework for estimating generative models via an adversarial process, in which we simultaneously train two models: a generative model G that captures the data distribution, and a discriminative model D that estimates the probability that a sample came from the training data rather than G.'
+          headers:
+            X-Total-Count:
+              schema:
+                type: string
+                example: '2'
+              description: Count of results required by jsonServer Data Provider for pagination
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+    options:
+      tags:
+        - Asset Management
+      summary: Options
+      description: Respond to OPTIONS requests.
+      operationId: api.options_assets
+      responses:
+        '200':
+          description: OK
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+  '/assets/{assetId}':
+    get:
+      tags:
+        - Asset Management
+      summary: Get Asset by ID
+      description: Retrieve the information of the asset with the matching asset ID.
+      operationId: api.retrieve_asset_by_id
+      parameters:
+        - name: assetId
+          in: path
+          description: Id of an existing asset.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+              examples:
+                Example 1:
+                  value:
+                    id: 523
+                    title: Attention Is All You Need
+                    creator: Vaswani et al
+                    subject: Artificial Intelligence
+                    description: 'We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.'
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+    options:
+      tags:
+        - Asset Management
+      summary: Options
+      description: Respond to OPTIONS requests.
+      operationId: api.options_assets_assetid
+      parameters:
+        - name: assetId
+          in: path
+          description: Id of an existing asset.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+  '/config/{key}':
+    get:
+      tags:
+        - Configuration Management
+      summary: Get Config by Key
+      description: Retrieve the config item with the specified key.
+      operationId: api.get_config_by_key
+      parameters:
+        - name: key
+          in: path
+          description: Key for Config item
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Config'
+              examples:
+                Example 1:
+                  value: 123
+                Example 2:
+                  value: secret
+                Example 3:
+                  value:
+                    x: 'y'
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+    post:
+      tags:
+        - Configuration Management
+      summary: Set Config by Key
+      description: Set a config item with the specified key.
+      operationId: api.set_config_by_key
+      parameters:
+        - name: key
+          in: path
+          description: Key for Config item
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Config'
+          text/plain:
+            schema:
+              $ref: '#/components/schemas/Config'
+      responses:
+        '200':
+          description: OK
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+    delete:
+      tags:
+        - Configuration Management
+      summary: Delete Config by Key
+      description: Delete a config item with the specified key.
+      operationId: api.delete_config_by_key
+      parameters:
+        - name: key
+          in: path
+          description: Key for Config item
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+    options:
+      tags:
+        - Configuration Management
+      summary: Options
+      description: Respond to OPTIONS requests.
+      operationId: api.options_config
+      parameters:
+        - name: key
+          in: path
+          description: Key for Config item
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+  /user:
+    post:
+      tags:
+        - User Management
+      summary: Create New User
+      description: Create a new user.
+      operationId: api.create_new_user
+      requestBody:
+        description: Post the necessary fields for the API to create a new user.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                firstName:
+                  type: string
+                lastName:
+                  type: string
+                email:
+                  type: string
+                dateOfBirth:
+                  type: string
+                  format: date
+              required:
+                - firstName
+                - lastName
+                - email
+                - dateOfBirth
+            examples:
+              Create User Bob Fellow:
+                value:
+                  firstName: Bob
+                  lastName: Fellow
+                  email: bob.fellow@gmail.com
+                  dateOfBirth: '1996-08-24'
+      responses:
+        '200':
+          description: User Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                New User Bob Fellow:
+                  value:
+                    id: 12
+                    firstName: Bob
+                    lastName: Fellow
+                    email: bob.fellow@gmail.com
+                    dateOfBirth: '1996-08-24'
+                    emailVerified: false
+                    createDate: '2020-11-18'
+        '400':
+          description: Missing Required Information
+        '409':
+          description: Email Already Taken
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+    options:
+      tags:
+        - User Management
+      summary: Options
+      description: Respond to OPTIONS requests.
+      operationId: api.options_user
+      responses:
+        '200':
+          description: OK
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+  /users:
+    get:
+      tags:
+        - User Management
+      summary: Retrieve all users
+      description: Get all users.
+      operationId: api.retrieve_all_users
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+              examples:
+                Example 1:
+                  value:
+                    - id: 142
+                      firstName: Alice
+                      lastName: Smith
+                      email: alice.smith@gmail.com
+                      dateOfBirth: '1997-10-31'
+                      emailVerified: true
+                      signUpDate: '2019-08-24'
+                    - id: 351
+                      firstName: Bob
+                      lastName: Jones
+                      email: bob.jones@gmail.com
+                      dateOfBirth: '1975-11-02'
+                      emailVerified: true
+                      signUpDate: '2022-10-02'
+          headers:
+            X-Total-Count:
+              schema:
+                type: integer
+                example: 2
+              description: Count of results required by jsonServer Data Provider for pagination
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+    options:
+      tags:
+        - User Management
+      summary: Options
+      description: Respond to OPTIONS requests.
+      operationId: api.options_users
+      responses:
+        '200':
+          description: OK
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
   '/users/{userId}':
     get:
       tags:
@@ -134,426 +593,6 @@ paths:
       servers:
         - url: 'http://localhost:3000'
           description: ''
-  /user:
-    post:
-      tags:
-        - User Management
-      summary: Create New User
-      description: Create a new user.
-      operationId: api.create_new_user
-      requestBody:
-        description: Post the necessary fields for the API to create a new user.
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                firstName:
-                  type: string
-                lastName:
-                  type: string
-                email:
-                  type: string
-                dateOfBirth:
-                  type: string
-                  format: date
-              required:
-                - firstName
-                - lastName
-                - email
-                - dateOfBirth
-            examples:
-              Create User Bob Fellow:
-                value:
-                  firstName: Bob
-                  lastName: Fellow
-                  email: bob.fellow@gmail.com
-                  dateOfBirth: '1996-08-24'
-      responses:
-        '200':
-          description: User Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-              examples:
-                New User Bob Fellow:
-                  value:
-                    id: 12
-                    firstName: Bob
-                    lastName: Fellow
-                    email: bob.fellow@gmail.com
-                    dateOfBirth: '1996-08-24'
-                    emailVerified: false
-                    createDate: '2020-11-18'
-        '400':
-          description: Missing Required Information
-        '409':
-          description: Email Already Taken
-      servers:
-        - url: 'http://localhost:3000'
-          description: ''
-    options:
-      tags:
-        - User Management
-      summary: Options
-      description: Respond to OPTIONS requests.
-      operationId: api.options_user
-      responses:
-        '200':
-          description: OK
-      servers:
-        - url: 'http://localhost:3000'
-          description: ''
-  '/abilities/{abilityId}':
-    get:
-      tags:
-        - Abilities
-      summary: Get Abilities by ID
-      description: Retrieve the information of the ability with the matching ability ID.
-      operationId: api.retrieve_ability_by_id
-      parameters:
-        - name: abilityId
-          in: path
-          description: ID of an existing ability
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Ability'
-              examples:
-                Example 1:
-                  value:
-                    id: optical-character-recognition
-                    name: Optical Character Recognition
-                    description: Conversion of images to text
-      servers:
-        - url: 'http://localhost:3000'
-          description: ''
-    options:
-      tags:
-        - Abilities
-      summary: Options
-      description: Respond to OPTIONS requests.
-      operationId: api.options_abilities_abilityid
-      parameters:
-        - name: abilityId
-          in: path
-          description: ID of an existing ability
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-      servers:
-        - url: 'http://localhost:3000'
-          description: ''
-  /users:
-    get:
-      tags:
-        - User Management
-      summary: Retrieve all users
-      description: Get all users.
-      operationId: api.retrieve_all_users
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/User'
-              examples:
-                Example 1:
-                  value:
-                    - id: 142
-                      firstName: Alice
-                      lastName: Smith
-                      email: alice.smith@gmail.com
-                      dateOfBirth: '1997-10-31'
-                      emailVerified: true
-                      signUpDate: '2019-08-24'
-                    - id: 351
-                      firstName: Bob
-                      lastName: Jones
-                      email: bob.jones@gmail.com
-                      dateOfBirth: '1975-11-02'
-                      emailVerified: true
-                      signUpDate: '2022-10-02'
-          headers:
-            X-Total-Count:
-              schema:
-                type: integer
-                example: 2
-              description: Count of results required by jsonServer Data Provider for pagination
-      servers:
-        - url: 'http://localhost:3000'
-          description: ''
-    options:
-      tags:
-        - User Management
-      summary: Options
-      description: Respond to OPTIONS requests.
-      operationId: api.options_users
-      responses:
-        '200':
-          description: OK
-      servers:
-        - url: 'http://localhost:3000'
-          description: ''
-  /abilities:
-    get:
-      tags:
-        - Abilities
-      summary: Retrieve all abilities
-      description: Retrieve the information of all abilities.
-      operationId: api.retrieve_all_abilities
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Ability'
-              examples:
-                Example 1:
-                  value:
-                    - id: optical-character-recognition
-                      name: Optical Character Recognition
-                      description: Conversion of images to text
-                    - id: vector-database
-                      name: Vector Database
-                      description: Stores vectors (fixed-length lists of numbers) along with other data items
-          headers:
-            X-Total-Count:
-              schema:
-                type: string
-                example: '2'
-              description: Count of results required by jsonServer Data Provider for pagination
-      servers:
-        - url: 'http://localhost:3000'
-          description: ''
-    options:
-      tags:
-        - Abilities
-      summary: Options
-      description: Respond to OPTIONS requests.
-      operationId: api.options_abilities
-      responses:
-        '200':
-          description: OK
-      servers:
-        - url: 'http://localhost:3000'
-          description: ''
-  '/assets/{assetId}':
-    get:
-      tags:
-        - Asset Management
-      summary: Get Asset by ID
-      description: Retrieve the information of the asset with the matching asset ID.
-      operationId: api.retrieve_asset_by_id
-      parameters:
-        - name: assetId
-          in: path
-          description: Id of an existing asset.
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Asset'
-              examples:
-                Example 1:
-                  value:
-                    id: 523
-                    title: Attention Is All You Need
-                    creator: Vaswani et al
-                    subject: Artificial Intelligence
-                    description: 'We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.'
-      servers:
-        - url: 'http://localhost:3000'
-          description: ''
-    options:
-      tags:
-        - Asset Management
-      summary: Options
-      description: Respond to OPTIONS requests.
-      operationId: api.options_assets_assetid
-      parameters:
-        - name: assetId
-          in: path
-          description: Id of an existing asset.
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: OK
-      servers:
-        - url: 'http://localhost:3000'
-          description: ''
-  /assets:
-    get:
-      tags:
-        - Asset Management
-      summary: Retrieve all assets
-      description: Retrieve the information of all assets.
-      operationId: api.retrieve_all_assets
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Asset'
-              examples:
-                Example 1:
-                  value:
-                    - id: 523
-                      userId: 142
-                      title: Attention Is All You Need
-                      creator: Ashish Vaswani et al
-                      subject: Artificial Intelligence
-                      description: 'We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.'
-                    - id: 952
-                      userId: 351
-                      title: Generative Adversarial Networks
-                      creator: Goodfellow et al
-                      subject: Artificial Intelligence
-                      description: 'We propose a new framework for estimating generative models via an adversarial process, in which we simultaneously train two models: a generative model G that captures the data distribution, and a discriminative model D that estimates the probability that a sample came from the training data rather than G.'
-          headers:
-            X-Total-Count:
-              schema:
-                type: string
-                example: '2'
-              description: Count of results required by jsonServer Data Provider for pagination
-      servers:
-        - url: 'http://localhost:3000'
-          description: ''
-    options:
-      tags:
-        - Asset Management
-      summary: Options
-      description: Respond to OPTIONS requests.
-      operationId: api.options_assets
-      responses:
-        '200':
-          description: OK
-      servers:
-        - url: 'http://localhost:3000'
-          description: ''
-  '/config/{key}':
-    get:
-      tags:
-        - Configuration Management
-      summary: Get Config by Key
-      description: Retrieve the config item with the specified key.
-      operationId: api.get_config_by_key
-      parameters:
-        - name: key
-          in: path
-          description: Key for Config item
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Config'
-              examples:
-                Example 1:
-                  value: 123
-                Example 2:
-                  value: secret
-                Example 3:
-                  value:
-                    x: 'y'
-      servers:
-        - url: 'http://localhost:3000'
-          description: ''
-    post:
-      tags:
-        - Configuration Management
-      summary: Set Config by Key
-      description: Set a config item with the specified key.
-      operationId: api.set_config_by_key
-      parameters:
-        - name: key
-          in: path
-          description: Key for Config item
-          required: true
-          schema:
-            type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Config'
-          text/plain:
-            schema:
-              $ref: '#/components/schemas/Config'
-      responses:
-        '200':
-          description: OK
-      servers:
-        - url: 'http://localhost:3000'
-          description: ''
-    delete:
-      tags:
-        - Configuration Management
-      summary: Delete Config by Key
-      description: Delete a config item with the specified key.
-      operationId: api.delete_config_by_key
-      parameters:
-        - name: key
-          in: path
-          description: Key for Config item
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-      servers:
-        - url: 'http://localhost:3000'
-          description: ''
-    options:
-      tags:
-        - Configuration Management
-      summary: Options
-      description: Respond to OPTIONS requests.
-      operationId: api.options_config
-      parameters:
-        - name: key
-          in: path
-          description: Key for Config item
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-      servers:
-        - url: 'http://localhost:3000'
-          description: ''
 tags:
   - name: Abilities
     description: Installation and configuration of abilities
@@ -565,38 +604,6 @@ tags:
     description: Management of user accounts
 components:
   schemas:
-    User:
-      type: object
-      title: User
-      description: Paios users
-      properties:
-        id:
-          type: integer
-          description: Unique identifier for the given user.
-        firstName:
-          type: string
-        lastName:
-          type: string
-        email:
-          type: string
-          format: email
-        dateOfBirth:
-          type: string
-          format: date
-          example: '1997-10-31'
-        emailVerified:
-          type: boolean
-          description: Set to true if the user's email has been verified.
-        createDate:
-          type: string
-          description: The date that the user was created.
-          format: date
-      required:
-        - id
-        - firstName
-        - lastName
-        - email
-        - emailVerified
     Ability:
       type: object
       title: Ability
@@ -637,3 +644,35 @@ components:
         - type: number
         - type: string
         - type: object
+    User:
+      type: object
+      title: User
+      description: Paios users
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the given user.
+        firstName:
+          type: string
+        lastName:
+          type: string
+        email:
+          type: string
+          format: email
+        dateOfBirth:
+          type: string
+          format: date
+          example: '1997-10-31'
+        emailVerified:
+          type: boolean
+          description: Set to true if the user's email has been verified.
+        createDate:
+          type: string
+          description: The date that the user was created.
+          format: date
+      required:
+        - id
+        - firstName
+        - lastName
+        - email
+        - emailVerified
