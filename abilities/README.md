@@ -1,4 +1,4 @@
-# Paios Abilities
+# PAIOS Abilities
 
 Welcome to Kwaai's Personal AI Operating System (Paios) abilities. This directory is a comprehensive library of modular components, known as "abilities," which extend the core functionality of Paios. Each ability is housed in its own directory and serves a specific purpose, from data storage solutions to protocol support and advanced AI integrations.
 

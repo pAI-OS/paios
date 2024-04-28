@@ -1,4 +1,4 @@
-# Paios Admin
+# PAIOS Admin
 
 ## Installation
 
