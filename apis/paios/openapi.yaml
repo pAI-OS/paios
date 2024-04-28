@@ -149,6 +149,45 @@ paths:
       servers:
         - url: 'http://localhost:3000'
           description: ''
+  '/abilities/{abilityId}/stop':
+    post:
+      tags:
+        - Abilities Management
+      summary: Stop ability.
+      description: Stops the ability with the matching ability ID.
+      operationId: api.stop_ability
+      parameters:
+        - name: abilityId
+          in: path
+          description: ID of an existing ability
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+    options:
+      tags:
+        - Abilities Management
+      summary: Options
+      description: Respond to OPTIONS requests.
+      operationId: api.options_abilities_abilityid_stop
+      parameters:
+        - name: abilityId
+          in: path
+          description: ID of an existing ability
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
   /assets:
     get:
       tags:
