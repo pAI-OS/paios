@@ -1,6 +1,7 @@
 import { Button, useNotify, useRefresh, useRecordContext } from "react-admin";
 import { List, Datagrid, TextField, TextInput, Show, SimpleShowLayout, ShowButton } from "react-admin";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import { apiBase, httpClient } from "./apiBackend";
 
 const StartButton = () => {
     const record = useRecordContext();
@@ -8,8 +9,7 @@ const StartButton = () => {
     const refresh = useRefresh();
 
     const handleClick = () => {
-        // Replace this with your actual start logic
-        fetch(`/api/abilities/start/${record.id}`, { method: 'POST' })
+        httpClient(`${apiBase}/abilities/${record.id}/start`, { method: 'POST' })
             .then(() => {
                 notify('Ability started');
                 refresh();
