@@ -90,6 +90,18 @@ def retrieve_user_by_id(userId):
     return {"error": "User not found"}, 404  # Return an error message and a 404 Not Found status code
 
 
+def ok():
+    return {"message": "OK"}, 200
+
+def options_users_userid(): return ok()
+def options_user(): return ok()
+def options_abilities_abilityid(): return ok()
+def options_users(): return ok()
+def options_abilities(): return ok()
+def options_assets_assetid(): return ok()
+def options_assets(): return ok()
+def options_config(): return ok()
+
 def not_implemented():
     return {"message": "This operation is not implemented yet."}, 501
 
