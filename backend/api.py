@@ -122,6 +122,16 @@ def retrieve_asset_by_id(assetId):
 # Abilities
 def start_ability(abilityId):
     print(f"Starting ability {abilityId}")
+    start_script = None
+    for ability in abilities:
+        if ability['id'] == abilityId:
+            start_script = ability.get('scripts', {}).get('start')
+            break
+
+    if start_script is None:
+        return {"error": "Ability not found or start script not set"}, 404
+
+    os.system(os.path.join('..', 'abilities', abilityId, start_script))
     return ok()
 
 # Configuration Management
