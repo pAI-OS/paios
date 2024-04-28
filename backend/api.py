@@ -80,6 +80,7 @@ def retrieve_all(payload, status_code=200): return jsonify(payload), status_code
 def options_abilities(): return ok()
 def options_abilities_abilityid(): return ok()
 def options_abilities_abilityid_start(): return ok()
+def options_abilities_abilityid_stop(): return ok()
 def options_assets(): return ok()
 def options_assets_assetid(): return ok()
 def options_config(): return ok()
