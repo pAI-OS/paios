@@ -1,14 +1,19 @@
-import { Button, useNotify, useRefresh, useRecordContext } from "react-admin";
-import { List, Datagrid, TextField, TextInput, Show, SimpleShowLayout, ShowButton } from "react-admin";
+import { useNotify, useRefresh, useRecordContext } from "react-admin";
+import { Button, List, Datagrid, TextField, TextInput, Show, SimpleShowLayout, ShowButton } from "react-admin";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import StopIcon from '@mui/icons-material/Stop';
 import { apiBase, httpClient } from "./apiBackend";
 
-const StartButton = () => {
+const StartStopButton = () => {
     const record = useRecordContext();
     const notify = useNotify();
     const refresh = useRefresh();
+    const isStarted = Boolean(record.pid);
 
-    const handleClick = () => {
+    const handleStartClick = (event: React.MouseEvent) => {
+        // prevent the click event propagating to the row and calling show
+        event.stopPropagation();
+
         httpClient(`${apiBase}/abilities/${record.id}/start`, { method: 'POST' })
             .then(() => {
                 notify('Ability started');
@@ -19,8 +24,26 @@ const StartButton = () => {
             });
     };
 
-    return (
-        <Button label="Start" onClick={handleClick}>
+    const handleStopClick = (event: React.MouseEvent) => {
+        // prevent the click event propagating to the row and calling show
+        event.stopPropagation();
+
+        httpClient(`${apiBase}/abilities/${record.id}/stop`, { method: 'POST' })
+            .then(() => {
+                notify('Ability stopped');
+                refresh();
+            })
+            .catch((e) => {
+                notify('Error: ability not stopped', { type: 'warning' })
+            });
+    };
+
+    return isStarted ? (
+        <Button label="Stop" onClick={handleStopClick}>
+            <StopIcon />
+        </Button>
+    ) : (
+        <Button label="Start" onClick={handleStartClick}>
             <PlayArrowIcon />
         </Button>
     );
@@ -41,7 +64,7 @@ export const AbilityList = () => (
             <TextField source="id" label="Name" />
             <TextField source="title" />
             <TextField source="description" />
-            <StartButton />
+            <StartStopButton />
             <ShowButton />
         </Datagrid>
     </List>
