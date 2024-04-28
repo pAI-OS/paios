@@ -104,24 +104,24 @@ def retrieve_user_by_id(userId):
 
     for user in users:
         if user['id'] == userId:
-            return user, 200  # Return the user object and a 200 OK status code
+            return user, 200
     
-    return {"error": "User not found"}, 404  # Return an error message and a 404 Not Found status code
+    return {"error": "User not found"}, 404
 
 def retrieve_ability_by_id(abilityId):
     for ability in abilities:
         if ability['id'] == abilityId:
-            return ability, 200 # Return the ability object and a 200 OK status code
+            return ability, 200
 
-    return {"error": "Ability not found"}, 404  # Return an error message and a 404 Not Found status code
+    return {"error": "Ability not found"}, 404
 
 def retrieve_asset_by_id(assetId):
 
     for asset in assets:
         if asset['id'] == assetId:
-            return asset, 200 # Return the asset object and a 200 OK status code
+            return asset, 200
 
-    return {"error": "Asset not found"}, 404  # Return an error message and a 404 Not Found status code
+    return {"error": "Asset not found"}, 404
 
 # Configuration Management
 
