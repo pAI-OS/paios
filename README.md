@@ -1,6 +1,4 @@
-# PAIOS
-
-Personal Artificial Intelligence Operating System (PAIOS)
+# Personal Artificial Intelligence Operating System (PAIOS)
 
 ## Getting Started
 
