@@ -75,24 +75,12 @@ assets = [
 ]
 
 
-def retrieve_all(payload, status_code=200):
-        #response = make_response(jsonify(payload), status_code) # Return the user objects and a 200 OK status code
-        #response.headers['X-Total-Count'] = len(payload)
-        #return response
-        return jsonify(payload), status_code, {'X-Total-Count': len(payload)}
+# Helper functions for common responses
+def ok(): return {"message": "OK"}, 200
+def not_implemented(): return {"message": "This operation is not implemented yet."}, 501
+def retrieve_all(payload, status_code=200): return jsonify(payload), status_code, {'X-Total-Count': len(payload)}
 
-def retrieve_user_by_id(userId):
-
-    for user in users:
-        if user['id'] == userId:
-            return user, 200  # Return the user object and a 200 OK status code
-        
-    return {"error": "User not found"}, 404  # Return an error message and a 404 Not Found status code
-
-
-def ok():
-    return {"message": "OK"}, 200
-
+# OPTIONS are required for CORS preflight requests
 def options_users_userid(): return ok()
 def options_user(): return ok()
 def options_abilities_abilityid(): return ok()
@@ -102,17 +90,23 @@ def options_assets_assetid(): return ok()
 def options_assets(): return ok()
 def options_config(): return ok()
 
-def not_implemented():
-    return {"message": "This operation is not implemented yet."}, 501
+# Not implemented yet
+def update_user_by_id(userId): return not_implemented()
+def create_new_user(): return not_implemented()
 
+# Retrieve all
+def retrieve_all_users(): return retrieve_all(users)
+def retrieve_all_abilities(): return retrieve_all(abilities)
+def retrieve_all_assets(): return retrieve_all(assets)
 
-def update_user_by_id(userId):
-    return not_implemented()
+# Retrieve by ID
+def retrieve_user_by_id(userId):
 
-
-def create_new_user():
-    return not_implemented()
-
+    for user in users:
+        if user['id'] == userId:
+            return user, 200  # Return the user object and a 200 OK status code
+    
+    return {"error": "User not found"}, 404  # Return an error message and a 404 Not Found status code
 
 def retrieve_ability_by_id(abilityId):
     for ability in abilities:
@@ -120,14 +114,6 @@ def retrieve_ability_by_id(abilityId):
             return ability, 200 # Return the ability object and a 200 OK status code
 
     return {"error": "Ability not found"}, 404  # Return an error message and a 404 Not Found status code
-
-
-def retrieve_all_users():
-    return retrieve_all(users)
-
-
-def retrieve_all_abilities():
-    return retrieve_all(abilities)
 
 def retrieve_asset_by_id(assetId):
 
@@ -137,10 +123,7 @@ def retrieve_asset_by_id(assetId):
 
     return {"error": "Asset not found"}, 404  # Return an error message and a 404 Not Found status code
 
-
-def retrieve_all_assets():
-    return retrieve_all(assets)
-
+# Configuration Management
 
 # Get config item from database
 def get_config_by_key(key):
