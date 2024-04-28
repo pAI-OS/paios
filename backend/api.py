@@ -76,14 +76,14 @@ def not_implemented(): return {"message": "This operation is not implemented yet
 def retrieve_all(payload, status_code=200): return jsonify(payload), status_code, {'X-Total-Count': len(payload)}
 
 # OPTIONS are required for CORS preflight requests
-def options_users_userid(): return ok()
-def options_user(): return ok()
-def options_abilities_abilityid(): return ok()
-def options_users(): return ok()
 def options_abilities(): return ok()
-def options_assets_assetid(): return ok()
+def options_abilities_abilityid(): return ok()
 def options_assets(): return ok()
+def options_assets_assetid(): return ok()
 def options_config(): return ok()
+def options_user(): return ok()
+def options_users(): return ok()
+def options_users_userid(): return ok()
 
 # Not implemented yet
 def update_user_by_id(userId): return not_implemented()
@@ -117,6 +117,11 @@ def retrieve_asset_by_id(assetId):
             return asset, 200
 
     return {"error": "Asset not found"}, 404
+
+# Abilities
+def start_ability(abilityId):
+    print(f"Starting ability {abilityId}")
+    return ok()
 
 # Configuration Management
 
