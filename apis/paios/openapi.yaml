@@ -18,7 +18,7 @@ paths:
   /abilities:
     get:
       tags:
-        - Abilities
+        - Abilities Management
       summary: Retrieve all abilities
       description: Retrieve the information of all abilities.
       operationId: api.retrieve_all_abilities
@@ -51,7 +51,7 @@ paths:
           description: ''
     options:
       tags:
-        - Abilities
+        - Abilities Management
       summary: Options
       description: Respond to OPTIONS requests.
       operationId: api.options_abilities
@@ -64,7 +64,7 @@ paths:
   '/abilities/{abilityId}':
     get:
       tags:
-        - Abilities
+        - Abilities Management
       summary: Get Abilities by ID
       description: Retrieve the information of the ability with the matching ability ID.
       operationId: api.retrieve_ability_by_id
@@ -93,7 +93,7 @@ paths:
           description: ''
     options:
       tags:
-        - Abilities
+        - Abilities Management
       summary: Options
       description: Respond to OPTIONS requests.
       operationId: api.options_abilities_abilityid
@@ -113,7 +113,7 @@ paths:
   '/abilities/{abilityId}/start':
     post:
       tags:
-        - Abilities
+        - Abilities Management
       summary: Start ability.
       description: Starts the ability with the matching ability ID.
       operationId: api.start_ability
@@ -132,7 +132,7 @@ paths:
           description: ''
     options:
       tags:
-        - Abilities
+        - Abilities Management
       summary: Options
       description: Respond to OPTIONS requests.
       operationId: api.options_abilities_abilityid_start
@@ -594,7 +594,7 @@ paths:
         - url: 'http://localhost:3000'
           description: ''
 tags:
-  - name: Abilities
+  - name: Abilities Management
     description: Installation and configuration of abilities
   - name: Asset Management
     description: Management of assets
