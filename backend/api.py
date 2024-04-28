@@ -137,6 +137,8 @@ def get_config_by_key(key):
         if value is None:
             return {"error": "Config item not found"}, 404
 
+        # Parse the stored JSON back into a Python object
+        value = json.loads(value)
         return value, 200
     except Exception as e:
         return {"error": str(e)}, 500
@@ -145,13 +147,8 @@ def get_config_by_key(key):
 # Set config item in database
 def set_config_by_key(key, body):
     try:
-        if isinstance(body, dict):
-            body = json.dumps(body)  # Convert the dictionary to a JSON string
-        elif isinstance(body, bytes):
-            body = body.decode()  # Convert the bytes object to a string
-        else:
-            return {"error": "Invalid body type. Expected dict or bytes."}, 400
-
+        # Convert body to JSON, even if it's a bare value
+        body = json.dumps(body)
         db.set_config_item(key, body)
         return {"message": "Config item set successfully"}, 200
     except Exception as e:
