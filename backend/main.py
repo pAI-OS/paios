@@ -8,7 +8,7 @@ from auth import validate_bearer_token
 # in operationId (eg api.get_asset_by_id in api.py)
 
 app = connexion.App(__name__, specification_dir='../apis/paios/')
-CORS(app.app, expose_headers='X-Total-Count')
+CORS(app.app, expose_headers='X-Total-Count', supports_credentials=True)
 
 app.app.before_request(validate_bearer_token)
 
