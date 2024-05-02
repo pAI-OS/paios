@@ -1,5 +1,5 @@
 import { useNotify, useRefresh, useRecordContext } from "react-admin";
-import { Button, List, Datagrid, TextField, TextInput, Show, SimpleShowLayout, ShowButton } from "react-admin";
+import { Button, List, Datagrid, UrlField, TextField, TextInput, Show, SimpleShowLayout, ShowButton } from "react-admin";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StopIcon from '@mui/icons-material/Stop';
 import { apiBase, httpClient } from "./apiBackend";
@@ -71,11 +71,43 @@ export const AbilityList = () => (
 );
 
 export const AbilityShow = () => (
+
     <Show title={<AbilityTitle />}>
             <SimpleShowLayout>
                 <TextField source="id" />
                 <TextField source="title" />
                 <TextField source="description" />
+                <AbilityDependencies />
             </SimpleShowLayout>
         </Show>
     );
+
+export const AbilityDependencies = () => {
+    const record = useRecordContext();
+
+    if (!record) {
+        console.log("Record not available");
+        return null; // or any other fallback UI
+    }
+    console.log("Record: ");
+    console.log(record);
+
+    const dependencies = record.dependencies;
+    console.log("Dependencies: ");
+    console.log(dependencies);
+
+    //const dependencies = record.dependencies.resources;
+    const resources = dependencies.resources;
+    console.log("Resources: ");
+    console.log(resources);
+
+    //const data = resources.map((resource: any) => ({ name: resource.name }));
+
+    return (
+        <Datagrid data={resources} sort={{ field: 'name', order: 'ASC' }}>
+            <TextField source="name" />
+            <TextField source="filename" />
+            <UrlField source="url" />
+        </Datagrid>
+    );
+};
