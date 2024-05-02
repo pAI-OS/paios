@@ -86,22 +86,11 @@ export const AbilityDependencies = () => {
     const record = useRecordContext();
 
     if (!record) {
-        console.log("Record not available");
         return null; // or any other fallback UI
     }
-    console.log("Record: ");
-    console.log(record);
 
     const dependencies = record.dependencies;
-    console.log("Dependencies: ");
-    console.log(dependencies);
-
-    //const dependencies = record.dependencies.resources;
     const resources = dependencies.resources;
-    console.log("Resources: ");
-    console.log(resources);
-
-    //const data = resources.map((resource: any) => ({ name: resource.name }));
 
     return (
         <Datagrid data={resources} sort={{ field: 'name', order: 'ASC' }}>
