@@ -1,5 +1,6 @@
 // ResourceDependency.tsx
-import { Datagrid, TextField } from 'react-admin';
+import { Button, Datagrid, TextField } from 'react-admin';
+import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 
 export const ResourceDependency = (props: { dependencies: any }) => {
     return (
@@ -7,6 +8,9 @@ export const ResourceDependency = (props: { dependencies: any }) => {
             <TextField source="name" />
             <TextField source="filename" />
             <TextField source="url" />
+            <Button label="Download" onClick={() => { /* handle download action */ }}>
+                <DownloadForOfflineIcon />
+            </Button>
         </Datagrid>
     );
 };
