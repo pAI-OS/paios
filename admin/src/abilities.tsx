@@ -1,8 +1,10 @@
-import { useNotify, useRefresh, useRecordContext } from "react-admin";
+import { useNotify, useRefresh, useRecordContext, TabbedShowLayout, Tab } from "react-admin";
 import { Button, List, Datagrid, UrlField, TextField, TextInput, Show, SimpleShowLayout, ShowButton } from "react-admin";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StopIcon from '@mui/icons-material/Stop';
 import { apiBase, httpClient } from "./apiBackend";
+import { DebianDependency } from './dependencies/DebianDependency';
+import { ResourceDependency } from './dependencies/ResourceDependency';
 
 const StartStopButton = () => {
     const record = useRecordContext();
@@ -90,13 +92,11 @@ export const AbilityDependencies = () => {
     }
 
     const dependencies = record.dependencies;
-    const resources = dependencies.resources;
 
     return (
-        <Datagrid data={resources} sort={{ field: 'name', order: 'ASC' }}>
-            <TextField source="name" />
-            <TextField source="filename" />
-            <UrlField source="url" />
-        </Datagrid>
+        <TabbedShowLayout >
+            {dependencies.debian &&     (<Tab label="Debian"><DebianDependency dependencies={dependencies.debian} /></Tab>)}
+            {dependencies.resources &&   (<Tab label="Resource"><ResourceDependency dependencies={dependencies.resources} /></Tab>)}
+        </TabbedShowLayout>
     );
 };
