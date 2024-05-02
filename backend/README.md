@@ -4,7 +4,7 @@
 
 Enter the pAI-OS backend source directory:
 
-    cd paios/backed/
+    cd paios/backend/
 
 Create a new python virtual environment (venv) in .venv:
 
