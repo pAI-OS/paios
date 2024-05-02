@@ -1,4 +1,4 @@
-# PAIOS Backend
+# pAI-OS Backend
 
 ## Setup
 

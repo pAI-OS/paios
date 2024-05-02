@@ -1,12 +1,12 @@
-# Paios API
+# pAI-OS API
 
 ## Overview
 
-The Paios API allows management interfaces to communicate with the backend services for functionality like enumerating, configuring, and activiating plugins ("abilities").
+The pAI-OS API allows management interfaces to communicate with the backend services for functionality like enumerating, configuring, and activiating plugins ("abilities").
 
 ## Editing
 
-The Paios API is specified in OpenAPI format and was created in Stoplight.
+The pAI-OS API is specified in OpenAPI format and was created in Stoplight.
 
 ## Mocking
 
