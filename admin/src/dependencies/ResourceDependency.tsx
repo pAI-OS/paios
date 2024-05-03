@@ -1,8 +1,8 @@
 // ResourceDependency.tsx
+import { useEffect, useRef } from 'react';
 import { Button, Datagrid, TextField, useRecordContext, useNotify, useRefresh } from 'react-admin';
 import DownloadIcon from '@mui/icons-material/Download';
 import DownloadingIcon from '@mui/icons-material/Downloading';
-import FileDownloadOffIcon from '@mui/icons-material/FileDownloadOff';
 import DeleteIcon from '@mui/icons-material/Delete'
 import { apiBase, httpClient } from "../apiBackend";
 
@@ -65,8 +65,7 @@ const DownloadButton = ({ abilityId }: { abilityId: string }) => {
         );
     }
 
-    // file is partially downloaded, show continue button
-    //if (((record.localSize || 0) > 0) && ((record.localSize || 0) < (record.remoteSize || 0))) {
+    // file is partially downloaded, show stop button
     if (record.keepDownloading) {
         return (
         <Button label="Downloading" onClick={handleStopDownloadClick}>
@@ -87,14 +86,38 @@ const DownloadButton = ({ abilityId }: { abilityId: string }) => {
 
 export const ResourceDependency = (props: { dependencies: any }) => {
     const record = useRecordContext();
+    const refresh = useRefresh();
     const abilityId = String(record.id);
+    const intervalId = useRef<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+        // Clear any existing interval
+        if (intervalId.current) {
+            clearInterval(intervalId.current);
+            intervalId.current = null;
+        }
+
+        // If any dependency is still downloading, set a new interval
+        if (props.dependencies.some((dependency: any) => dependency.keepDownloading)) {
+            intervalId.current = setInterval(() => {
+                refresh();
+            }, 5000);
+        }
+
+        return () => {
+            // Clear the interval when the component is unmounted
+            if (intervalId.current) {
+                clearInterval(intervalId.current);
+            }
+        };
+    }, [props.dependencies, refresh]);
 
     return (
         <Datagrid data={props.dependencies} sort={{ field: 'name', order: 'ASC' }}>
             <TextField source="name" />
             <TextField source="filename" />
             <TextField source="url" />
-            <DownloadButton abilityId={abilityId} />        
+            <DownloadButton abilityId={abilityId} />    
         </Datagrid>
     );
 };
