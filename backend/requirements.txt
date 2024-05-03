@@ -1,5 +1,6 @@
 flask==3.0.3
 flask_cors
+requests
 openapi-spec-validator
 connexion[flask,swagger-ui,uvicorn]==3.0.6
 cryptography
