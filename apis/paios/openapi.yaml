@@ -114,7 +114,7 @@ paths:
     post:
       tags:
         - Abilities Management
-      summary: Start ability.
+      summary: Start ability
       description: Starts the ability with the matching ability ID.
       operationId: api.start_ability
       parameters:
@@ -153,7 +153,7 @@ paths:
     post:
       tags:
         - Abilities Management
-      summary: Stop ability.
+      summary: Stop ability
       description: Stops the ability with the matching ability ID.
       operationId: api.stop_ability
       parameters:
@@ -629,6 +629,32 @@ paths:
       responses:
         '200':
           description: OK
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+  '/abilities/{abilityId}/dependencies/{dependencyId}/download':
+    post:
+      tags:
+        - Abilities Management
+      summary: Start download
+      description: Downloads an ability's dependency.
+      operationId: api.download_ability_dependency
+      parameters:
+        - name: abilityId
+          in: path
+          description: 'ID of an existing ability (e.g., optical-character-recognition)'
+          required: true
+          schema:
+            type: string
+        - name: dependencyId
+          in: path
+          description: 'ID of an ability''s dependency (e.g., pandas)'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Download started
       servers:
         - url: 'http://localhost:3000'
           description: ''
