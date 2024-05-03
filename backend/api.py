@@ -36,7 +36,10 @@ users = [
 # ]
 abilities = []
 
+data_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data"))
+abilities_data_dir = os.path.abspath(os.path.join(data_dir, "abilities"))
 abilities_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "abilities"))
+
 for subdir in os.listdir(abilities_dir):
     if os.path.isdir(os.path.join(abilities_dir, subdir)):
         metadata_path = os.path.join(abilities_dir, subdir, "metadata.json")
@@ -49,7 +52,8 @@ for subdir in os.listdir(abilities_dir):
                     if 'dependencies' in metadata:
                         if 'resources' in metadata['dependencies']:
                             for resource in metadata['dependencies']['resources']:
-                                resource_path = os.path.join(abilities_dir, subdir, resource['filename'])
+                                resource_path = os.path.join(abilities_data_dir, subdir, resource['filename'])
+                                print(resource_path)
                                 if os.path.exists(resource_path):
                                     resource['localSize'] = os.path.getsize(resource_path)
                                 if 'remoteSize' in resource and 'localSize' in resource:
@@ -83,12 +87,13 @@ def ability_dependency_download_start(abilityId, dependencyId):
 
     # threads check if they should keep running on each loop
     timeout = 60*60*24 # one day in seconds
+    ability_data_dir = os.path.join(abilities_data_dir, abilityId)
+    local_file = ''
 
     try:
-        ability = get_ability(abilityId)
-        dependency = next((item for item in ability["dependencies"]["resources"] if item["id"] == dependencyId), None)
+        dependency = get_ability_dependency(abilityId, dependencyId)
         url = dependency["url"]
-        dependency["localFile"] = os.path.join(abilities_dir, abilityId, dependency["filename"])
+        local_file = os.path.join(ability_data_dir, dependency["filename"])
         dependency["keepDownloading"] = True
     except KeyError:
         print(f"An error occurred downloading ability {abilityId} dependency {dependencyId}")
@@ -96,9 +101,10 @@ def ability_dependency_download_start(abilityId, dependencyId):
 
     def download_file():
         #print("Downloading " + url + " to " + dependency["localFile"])
+        os.makedirs(ability_data_dir, exist_ok=True)
         with requests.get(url, stream=True) as r:
             r.raise_for_status()
-            with open(dependency["localFile"], 'wb') as f:
+            with open(local_file, 'wb') as f:
                 for chunk in r.iter_content(chunk_size=8192): 
                     if chunk: 
                         f.write(chunk)
@@ -108,13 +114,13 @@ def ability_dependency_download_start(abilityId, dependencyId):
     def update_progress():
         while time.time() - start_time < timeout: # give up after timeout
             try:
-                if os.path.exists(dependency["localFile"]):
+                if os.path.exists(local_file):
                     # sleep first so thread doesn't exit immediately on first loop (e.g. re-downloading)
                     time.sleep(1)
-                    dependency["localSize"] = os.path.getsize(dependency["localFile"])
+                    dependency["localSize"] = os.path.getsize(local_file)
                     dependency["percentComplete"] = round((dependency["localSize"] / dependency["remoteSize"]) * 100, 2)
                     if (dependency["localSize"] == dependency["remoteSize"]):
-                        print("Already downloaded " + dependency["localFile"])
+                        #print("Already downloaded " + local_file)
                         return # download complete so exit thread
                     keep_downloading()
             except KeyError as e:
@@ -138,15 +144,18 @@ def ability_dependency_download_stop(abilityId, dependencyId):
     # sets keepDownloading to False to stop download thread
     dependency = get_ability_dependency(abilityId, dependencyId)
     if dependency:
-        dependency["keepDownloading"] = False
+        if "keepDownloading" in dependency:
+            del dependency["keepDownloading"]
 
 
 def ability_dependency_download_delete(abilityId, dependencyId): 
     # deletes local file
     dependency = get_ability_dependency(abilityId, dependencyId)
+    ability_data_dir = os.path.join(abilities_data_dir, abilityId)
+    local_file = os.path.join(ability_data_dir, dependency["filename"])
     if dependency:
         try:
-            os.remove(dependency["localFile"])
+            os.remove(local_file)
         except FileNotFoundError:
             pass
 
