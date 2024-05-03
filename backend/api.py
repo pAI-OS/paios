@@ -53,9 +53,8 @@ for subdir in os.listdir(abilities_dir):
                                 print(resource_path)
                                 if os.path.exists(resource_path):
                                     resource['localSize'] = os.path.getsize(resource_path)
-                                if 'remoteSize' in resource and 'sizeLocal' in resource:
-                                    resource['percentComplete'] = int((resource['localSize'] / resource['remoteSize']) * 100)
-
+                                if 'remoteSize' in resource and 'localSize' in resource:
+                                    resource['percentComplete'] = round((resource['localSize'] / resource['remoteSize']) * 100, 2)
                     abilities.append(metadata)
            
             except (FileNotFoundError, json.JSONDecodeError):
@@ -103,6 +102,7 @@ def options_users_userid(): return ok()
 # Not implemented yet
 def update_user_by_id(userId): return not_implemented()
 def create_new_user(): return not_implemented()
+def download_ability_dependency(abilityId, dependencyId): return not_implemented()
 
 # Retrieve all
 def retrieve_all_users(): return retrieve_all(users)
