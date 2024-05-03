@@ -18,9 +18,11 @@
     "dependencies": {
         "resources": [
             {
+                "id": "llava15",
                 "name": "LLaVA 1.5",
                 "url": "https://huggingface.co/jartine/llava-v1.5-7B-GGUF/resolve/main/llava-v1.5-7b-q4.llamafile",
-                "filename": "llava-v1.5-7b-q4.llamafile"
+                "filename": "llava-v1.5-7b-q4.llamafile",
+                "remoteSize": 4286714993
             }
         ]
     }
