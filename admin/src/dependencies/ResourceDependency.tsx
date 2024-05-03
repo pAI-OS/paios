@@ -1,6 +1,7 @@
 // ResourceDependency.tsx
 import { Button, Datagrid, TextField, useRecordContext, useNotify, useRefresh } from 'react-admin';
-import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
+import DownloadIcon from '@mui/icons-material/Download';
+import DownloadingIcon from '@mui/icons-material/Downloading';
 import FileDownloadOffIcon from '@mui/icons-material/FileDownloadOff';
 import DeleteIcon from '@mui/icons-material/Delete'
 import { apiBase, httpClient } from "../apiBackend";
@@ -25,7 +26,7 @@ const DownloadButton = ({ abilityId }: { abilityId: string }) => {
             });
     };
 
-    const handleStopClick = (event: React.MouseEvent) => {
+    const handleDeleteClick = (event: React.MouseEvent) => {
         // prevent the click event propagating to the row and calling show
         event.stopPropagation();
 
@@ -39,15 +40,37 @@ const DownloadButton = ({ abilityId }: { abilityId: string }) => {
             });
     };
 
-    return !isDownloaded ? (
+
+    // file is downloaded, show delete button
+    if ((record.localSize || 0) === (record.remoteSize || 0)) {
+        return (
+        <Button label="Delete" onClick={handleDeleteClick}>
+            <DeleteIcon />
+        </Button>
+        );
+    }
+
+    // file is partially downloaded, show continue button
+    if (((record.localSize || 0) > 0) && ((record.localSize || 0) < (record.remoteSize || 0))) {
+        return (record.keepDownloading) ? (
+        <Button label="Downloading" onClick={handleDownloadClick}>
+            <DownloadingIcon />
+        </Button>
+        ) : (
+            <Button label="Continue" onClick={handleDownloadClick}>
+                <DownloadIcon />
+            </Button>
+        );
+    }
+
+    // file is not downloaded, show download button
+    if ((record.localSize || 0) === 0) {
+        return (
         <Button label="Download" onClick={handleDownloadClick}>
-            <DownloadForOfflineIcon />
+            <DownloadIcon />
         </Button>
-    ) : (
-        <Button label="Start" onClick={handleStopClick}>
-            <FileDownloadOffIcon />
-        </Button>
-    );
+        );
+    }
 };
 
 export const ResourceDependency = (props: { dependencies: any }) => {
