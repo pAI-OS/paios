@@ -95,8 +95,8 @@ export const AbilityDependencies = () => {
 
     return (
         <TabbedShowLayout >
-            {dependencies.debian &&     (<Tab label="Debian"><DebianDependency dependencies={dependencies.debian} /></Tab>)}
-            {dependencies.resources &&   (<Tab label="Resource"><ResourceDependency dependencies={dependencies.resources} /></Tab>)}
+            {dependencies.debian && (<Tab label="Debian"><DebianDependency dependencies={dependencies.debian} /></Tab>)}
+            {dependencies.resources && (<Tab label="Resource"><ResourceDependency dependencies={dependencies.resources} /></Tab>)}
         </TabbedShowLayout>
     );
 };
