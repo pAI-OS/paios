@@ -109,7 +109,7 @@ def ability_dependency_download_start(abilityId, dependencyId):
                     if chunk: 
                         f.write(chunk)
                     keep_downloading()
-        del(dependency["keepDownloading"])
+        if "keepDownloading" in dependency: del(dependency["keepDownloading"])
 
     def update_progress():
         while time.time() - start_time < timeout: # give up after timeout
@@ -239,6 +239,8 @@ def retrieve_asset_by_id(assetId):
 
 # Abilities Management
 def start_ability(abilityId):
+    import stat
+
     print(f"Starting ability {abilityId}")
     ability = get_ability(abilityId)
     start_script = ability.get('scripts', {}).get('start')
@@ -247,7 +249,19 @@ def start_ability(abilityId):
         return {"error": "Ability not found or start script not set"}, 404
 
     # Start the subprocess and store the PID in the ability dictionary
-    process = subprocess.Popen([os.path.join('..', 'abilities', abilityId, start_script)], shell=True)
+    start_script = os.path.join(abilities_data_dir, abilityId, start_script)
+    current_permissions = stat.S_IMODE(os.lstat(start_script).st_mode)
+
+    if os.name == "posix":    
+        if not os.access(start_script, os.X_OK):
+            current_permissions = stat.S_IMODE(os.lstat(start_script).st_mode)
+            try:
+                print(f"Warning: Setting execute bit on {start_script}")
+                os.chmod(start_script, current_permissions | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+            except Exception as e:
+                print(f"Warning: Failed to set execute bit on start script: {e}")
+
+    process = subprocess.Popen([start_script], shell=True)
     ability['pid'] = process.pid
     return ok()
 
