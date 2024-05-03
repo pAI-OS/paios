@@ -52,7 +52,7 @@ const DownloadButton = ({ abilityId }: { abilityId: string }) => {
 
 export const ResourceDependency = (props: { dependencies: any }) => {
     const record = useRecordContext();
-    const abilityId = record.id;
+    const abilityId = String(record.id);
 
     return (
         <Datagrid data={props.dependencies} sort={{ field: 'name', order: 'ASC' }}>
