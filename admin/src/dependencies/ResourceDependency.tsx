@@ -10,7 +10,6 @@ const DownloadButton = ({ abilityId }: { abilityId: string }) => {
     const record = useRecordContext();
     const notify = useNotify();
     const refresh = useRefresh();
-    const isDownloaded = false;
 
     const handleDownloadClick = (event: React.MouseEvent) => {
         // prevent the click event propagating to the row and calling show
@@ -51,15 +50,12 @@ const DownloadButton = ({ abilityId }: { abilityId: string }) => {
     }
 
     // file is partially downloaded, show continue button
-    if (((record.localSize || 0) > 0) && ((record.localSize || 0) < (record.remoteSize || 0))) {
-        return (record.keepDownloading) ? (
-        <Button label="Downloading" onClick={handleDownloadClick}>
+    //if (((record.localSize || 0) > 0) && ((record.localSize || 0) < (record.remoteSize || 0))) {
+    if (record.keepDownloading) {
+        return (
+        <Button label="Downloading">
             <DownloadingIcon />
         </Button>
-        ) : (
-            <Button label="Continue" onClick={handleDownloadClick}>
-                <DownloadIcon />
-            </Button>
         );
     }
 
