@@ -37,17 +37,30 @@ users = [
 abilities = []
 
 abilities_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "abilities"))
-for subdir, dirs, files in os.walk(abilities_dir):
-    for file in files:
-        if file == "metadata.json":
-            metadata_path = os.path.join(subdir, file)
+for subdir in os.listdir(abilities_dir):
+    if os.path.isdir(os.path.join(abilities_dir, subdir)):
+        metadata_path = os.path.join(abilities_dir, subdir, "metadata.json")
+        if os.path.exists(metadata_path):
             try:
                 with open(metadata_path) as f:
                     metadata = json.load(f)
+
+                    # dependencies
+                    if 'dependencies' in metadata:
+                        if 'resources' in metadata['dependencies']:
+                            for resource in metadata['dependencies']['resources']:
+                                print(json.dumps(resource))
+                                resource_path = os.path.join(abilities_dir, subdir, resource['filename'])
+                                print(resource_path)
+                                if os.path.exists(resource_path):
+                                    resource['sizeLocal'] = os.path.getsize(resource_path)
+                                if 'size' in resource and 'sizeLocal' in resource:
+                                    resource['percentComplete'] = int((resource['sizeLocal'] / resource['size']) * 100)
+
                     abilities.append(metadata)
+           
             except (FileNotFoundError, json.JSONDecodeError):
                 pass
-
 
 # List of assets
 # TODO: These should be read from storage sources like local directory, S3, NAS, Solid pod, etc.
