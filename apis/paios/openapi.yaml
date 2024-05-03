@@ -658,6 +658,31 @@ paths:
       servers:
         - url: 'http://localhost:3000'
           description: ''
+    options:
+      tags:
+        - Abilities Management
+      summary: Options
+      description: Respond to OPTIONS requests.
+      operationId: api.options_abilies_dependencies
+      parameters:
+        - name: abilityId
+          in: path
+          description: 'ID of an existing ability (e.g., optical-character-recognition)'
+          required: true
+          schema:
+            type: string
+        - name: dependencyId
+          in: path
+          description: 'ID of an ability''s dependency (e.g., pandas)'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
 tags:
   - name: Abilities Management
     description: Installation and configuration of abilities

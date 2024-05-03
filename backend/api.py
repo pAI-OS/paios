@@ -34,7 +34,7 @@ users = [
 #         "description": "Conversion of images to text"
 #     }
 # ]
-abilities = []
+abilities = {}
 
 abilities_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "abilities"))
 for subdir in os.listdir(abilities_dir):
@@ -53,7 +53,7 @@ for subdir in os.listdir(abilities_dir):
                                     resource['localSize'] = os.path.getsize(resource_path)
                                 if 'remoteSize' in resource and 'localSize' in resource:
                                     resource['percentComplete'] = round((resource['localSize'] / resource['remoteSize']) * 100, 2)
-                    abilities.append(metadata)
+                    abilities[metadata.get("id")] = metadata
            
             except (FileNotFoundError, json.JSONDecodeError):
                 pass
@@ -62,32 +62,55 @@ def download_ability_dependency(abilityId, dependencyId):
     import threading
     import requests
     import time
+    import os
 
-    def download_file(url, filename):
-        local_filename = filename
+    # threads check if they should keep running on each loop
+    timeout = 60*60*24 # one day in seconds
+
+    try:
+        ability = abilities[abilityId]
+        dependency = next((item for item in ability["dependencies"]["resources"] if item["id"] == dependencyId), None)
+        url = dependency["url"]
+        dependency["localFile"] = os.path.join(abilities_dir, abilityId, dependency["filename"])
+        dependency["keepDownloading"] = True
+    except KeyError:
+        print(f"An error occurred downloading ability {abilityId} dependency {dependencyId}")
+        return
+
+    def download_file():
+        #print("Downloading " + url + " to " + dependency["localFile"])
         with requests.get(url, stream=True) as r:
             r.raise_for_status()
-            with open(local_filename, 'wb') as f:
+            with open(dependency["localFile"], 'wb') as f:
                 for chunk in r.iter_content(chunk_size=8192): 
                     if chunk: 
                         f.write(chunk)
+                    keep_downloading()
+        del(dependency["keepDownloading"])
 
-    def update_progress(abilityId, dependencyId, filename):
-        while True:
-            local_size = os.path.getsize(filename)
-            metadata = next((item for item in abilities if item["id"] == abilityId), None)
-            if metadata:
-                dependency = next((item for item in metadata['dependencies']['resources'] if item["id"] == dependencyId), None)
-                if dependency:
-                    dependency['localSize'] = local_size
-                    if 'remoteSize' in dependency and 'localSize' in dependency:
-                        dependency['percentComplete'] = round((dependency['localSize'] / dependency['remoteSize']) * 100, 2)
-            time.sleep(1)
+    def update_progress():
+        while time.time() - start_time < timeout: # give up after timeout
+            try:
+                if os.path.exists(dependency["localFile"]):
+                    dependency["localSize"] = os.path.getsize(dependency["localFile"])
+                    dependency["percentComplete"] = round((dependency["localSize"] / dependency["remoteSize"]) * 100, 2)
+                    if (dependency["localSize"] == dependency["remoteSize"]): return # download complete so exit thread
+                    time.sleep(1)
+                    keep_downloading()
+            except KeyError as e:
+                print(f"An error occurred updating progress of ability {abilityId} dependency {dependencyId} download: {e}")
+                return
 
-    threading.Thread(target=download_file, args=(dependency['url'], dependency['filename'])).start()
-    threading.Thread(target=update_progress, args=(abilityId, dependencyId, dependency['filename'])).start()
-    
-    # return not_implemented()
+
+    def keep_downloading():
+        # give up and exit thread after timeout
+        if time.time() - start_time > timeout: return
+        # exit thread if keepDownloading is False or removed
+        if not next((item for item in ability["dependencies"]["resources"] if item["id"] == dependencyId), None).get('keepDownloading'): return
+
+    start_time = time.time()
+    threading.Thread(target=download_file).start()
+    threading.Thread(target=update_progress).start()
 
 # List of assets
 # TODO: These should be read from storage sources like local directory, S3, NAS, Solid pod, etc.
@@ -121,6 +144,7 @@ def options_abilities(): return ok()
 def options_abilities_abilityid(): return ok()
 def options_abilities_abilityid_start(): return ok()
 def options_abilities_abilityid_stop(): return ok()
+def options_abilies_dependencies(): return ok()
 def options_assets(): return ok()
 def options_assets_assetid(): return ok()
 def options_config(): return ok()
@@ -131,7 +155,6 @@ def options_users_userid(): return ok()
 # Not implemented yet
 def update_user_by_id(userId): return not_implemented()
 def create_new_user(): return not_implemented()
-def download_ability_dependency(abilityId, dependencyId): return not_implemented()
 
 # Retrieve all
 def retrieve_all_users(): return retrieve_all(users)
@@ -148,11 +171,11 @@ def retrieve_user_by_id(userId):
     return {"error": "User not found"}, 404
 
 def retrieve_ability_by_id(abilityId):
-    for ability in abilities:
-        if ability['id'] == abilityId:
-            return ability, 200
-
-    return {"error": "Ability not found"}, 404
+    ability = abilities.get(abilityId)
+    if ability:
+        return ability, 200
+    else:
+        return {"error": "Ability not found"}, 404
 
 def retrieve_asset_by_id(assetId):
 
@@ -165,11 +188,8 @@ def retrieve_asset_by_id(assetId):
 # Abilities Management
 def start_ability(abilityId):
     print(f"Starting ability {abilityId}")
-    start_script = None
-    for ability in abilities:
-        if ability['id'] == abilityId:
-            start_script = ability.get('scripts', {}).get('start')
-            break
+    ability = abilities[abilityId]
+    start_script = ability.get('scripts', {}).get('start')
 
     if start_script is None:
         return {"error": "Ability not found or start script not set"}, 404
@@ -180,17 +200,16 @@ def start_ability(abilityId):
     return ok()
 
 def stop_ability(abilityId):
-    for ability in abilities:
-        if ability['id'] == abilityId:
-            if 'pid' in ability:
-                # Terminate the subprocess
-                os.kill(ability['pid'], signal.SIGTERM)
-                del ability['pid']  # Remove the pid from the ability dictionary
-                return ok()
-            else:
-                return {"error": "Ability not running"}, 404
+    ability = abilities.get(abilityId)
+    if not ability: return {"error": "Ability not found"}, 404
+    if 'pid' in ability:
+        # Terminate the subprocess
+        os.kill(ability['pid'], signal.SIGTERM)
+        del ability['pid']  # Remove the pid from the ability dictionary
+        return ok()
+    else:
+        return {"error": "Ability not running"}, 404
 
-    return {"error": "Ability not found"}, 404
 
 # Configuration Management
 
