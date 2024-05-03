@@ -156,6 +156,8 @@ def ability_dependency_download_delete(abilityId, dependencyId):
     if dependency:
         try:
             os.remove(local_file)
+            if "localSize" in dependency: del dependency["localSize"]
+            if "keepDownloading" in dependency: del dependency["keepDownloading"] # in case it was stopped
         except FileNotFoundError:
             pass
 

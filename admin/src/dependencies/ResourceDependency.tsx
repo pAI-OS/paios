@@ -30,13 +30,13 @@ const DownloadButton = ({ abilityId }: { abilityId: string }) => {
         // prevent the click event propagating to the row and calling show
         event.stopPropagation();
 
-        httpClient(`${apiBase}/abilities/${abilityId}/dependencies/resources/${record.id}/download/start`, { method: 'POST' })
+        httpClient(`${apiBase}/abilities/${abilityId}/dependencies/resources/${record.id}/download/stop`, { method: 'POST' })
             .then(() => {
-                notify('Download started');
+                notify('Download stop requested');
                 refresh();
             })
             .catch((e) => {
-                notify('Error: download not started', { type: 'warning' })
+                notify('Error: download not stopped', { type: 'warning' })
             });
     };
 
@@ -47,7 +47,7 @@ const DownloadButton = ({ abilityId }: { abilityId: string }) => {
 
         httpClient(`${apiBase}/abilities/${abilityId}/dependencies/resources/${record.id}/download/delete`, { method: 'POST' })
             .then(() => {
-                notify('Deletion requested');
+                notify('Download deletion requested');
                 refresh();
             })
             .catch((e) => {
