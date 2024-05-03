@@ -23,7 +23,71 @@
                 "url": "https://huggingface.co/jartine/llava-v1.5-7B-GGUF/resolve/main/llava-v1.5-7b-q4.llamafile",
                 "filename": "llava-v1.5-7b-q4.llamafile",
                 "remoteSize": 4286714993
+            },
+            {
+                "id": "tinyllama11b",
+                "name": "TinyLlama-1.1B",
+                "url": "https://huggingface.co/jartine/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/TinyLlama-1.1B-Chat-v1.0.F16.llamafile",
+                "filename": "TinyLlama-1.1B-Chat-v1.0.F16.llamafile",
+                "remoteSize": 2225345005
+            },
+            {
+                "id": "mistral7binstruct",
+                "name": "Mistral-7B-Instruct",
+                "url": "https://huggingface.co/jartine/Mistral-7B-Instruct-v0.2-llamafile/resolve/main/mistral-7b-instruct-v0.2.Q4_0.llamafile",
+                "filename": "mistral-7b-instruct-v0.2.Q4_0.llamafile",
+                "remoteSize": 4136047333
+            },
+            {
+                "id": "phi3mini4kinstruct",
+                "name": "Phi-3-mini-4k-instruct",
+                "url": "https://huggingface.co/jartine/Phi-3-mini-4k-instruct-llamafile/resolve/main/Phi-3-mini-4k-instruct.F16.llamafile",
+                "filename": "Phi-3-mini-4k-instruct.F16.llamafile",
+                "remoteSize": 7671518172
+            },
+            {
+                "id": "mixtral8x7binstruct",
+                "name": "Mixtral-8x7B-Instruct",
+                "url": "https://huggingface.co/jartine/Mixtral-8x7B-Instruct-v0.1-llamafile/resolve/main/mixtral-8x7b-instruct-v0.1.Q5_K_M.llamafile",
+                "filename": "mixtral-8x7b-instruct-v0.1.Q5_K_M.llamafile",
+                "remoteSize": 33256706797
+            },
+            {
+                "id": "wizardcoderpython34b",
+                "name": "WizardCoder-Python-34B",
+                "url": "https://huggingface.co/jartine/WizardCoder-Python-34B-V1.0-llamafile/resolve/main/wizardcoder-python-34b-v1.0.Q5_K_M.llamafile",
+                "filename": "wizardcoder-python-34b-v1.0.Q5_K_M.llamafile",
+                "remoteSize": 23863169529
+            },
+            {
+                "id": "wizardcoderpython13b",
+                "name": "WizardCoder-Python-13B",
+                "url": "https://huggingface.co/jartine/wizardcoder-13b-python/resolve/main/wizardcoder-python-13b.llamafile",
+                "filename": "wizardcoder-python-13b.llamafile",
+                "remoteSize": 9257030383
+            },
+            {
+                "id": "llama3instruct70b",
+                "name": "LLaMA-3-Instruct-70B",
+                "url": "https://huggingface.co/jartine/Meta-Llama-3-70B-Instruct-llamafile/resolve/main/Meta-Llama-3-70B-Instruct.Q4_0.llamafile",
+                "filename": "Meta-Llama-3-70B-Instruct.Q4_0.llamafile",
+                "remoteSize": 39994659426
+            },
+            {
+                "id": "llama3instruct8b",
+                "name": "LLaMA-3-Instruct-8B",
+                "url": "https://huggingface.co/jartine/Meta-Llama-3-8B-Instruct-llamafile/resolve/main/Meta-Llama-3-8B-Instruct.Q5_K_M.llamafile",
+                "filename": "Meta-Llama-3-8B-Instruct.Q5_K_M.llamafile",
+                "remoteSize": 5760815951
+            },
+            {
+                "id": "rocket3b",
+                "name": "Rocket-3B",
+                "url": "https://huggingface.co/jartine/rocket-3B-llamafile/resolve/main/rocket-3b.Q5_K_M.llamafile",
+                "filename": "rocket-3b.Q5_K_M.llamafile",
+                "remoteSize": 2017726928
             }
+
         ]
     }
 }
