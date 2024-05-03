@@ -75,13 +75,13 @@ const DownloadButton = ({ abilityId }: { abilityId: string }) => {
     }
 
     // file is not downloaded, show download button
-    if ((record.localSize || 0) === 0) {
+    //if ((record.localSize || 0) === 0) {
         return (
         <Button label="Download" onClick={handleStartDownloadClick}>
             <DownloadIcon />
         </Button>
         );
-    }
+    //}
 };
 
 export const ResourceDependency = (props: { dependencies: any }) => {
