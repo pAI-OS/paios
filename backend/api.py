@@ -34,7 +34,7 @@ users = [
 #         "description": "Conversion of images to text"
 #     }
 # ]
-abilities = {}
+abilities = []
 
 abilities_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "abilities"))
 for subdir in os.listdir(abilities_dir):
@@ -45,6 +45,7 @@ for subdir in os.listdir(abilities_dir):
                 with open(metadata_path) as f:
                     metadata = json.load(f)
 
+                    # calculate dependency metadata
                     if 'dependencies' in metadata:
                         if 'resources' in metadata['dependencies']:
                             for resource in metadata['dependencies']['resources']:
@@ -53,10 +54,19 @@ for subdir in os.listdir(abilities_dir):
                                     resource['localSize'] = os.path.getsize(resource_path)
                                 if 'remoteSize' in resource and 'localSize' in resource:
                                     resource['percentComplete'] = round((resource['localSize'] / resource['remoteSize']) * 100, 2)
-                    abilities[metadata.get("id")] = metadata
+
+                    # dictionary of abilities keyed by id needs to be converted to list of objects for react-admin's Datagrid
+                    # abilities[metadata.get("id")] = metadata
+                    abilities.append(metadata)
            
             except (FileNotFoundError, json.JSONDecodeError):
                 pass
+
+# Helper functions for common responses
+def get_ability(abilityId):
+    for ability in abilities:
+        if ability["id"] == abilityId: return ability
+    return None
 
 def download_ability_dependency(abilityId, dependencyId): 
     import threading
@@ -68,7 +78,7 @@ def download_ability_dependency(abilityId, dependencyId):
     timeout = 60*60*24 # one day in seconds
 
     try:
-        ability = abilities[abilityId]
+        ability = get_ability(abilityId)
         dependency = next((item for item in ability["dependencies"]["resources"] if item["id"] == dependencyId), None)
         url = dependency["url"]
         dependency["localFile"] = os.path.join(abilities_dir, abilityId, dependency["filename"])
@@ -171,7 +181,7 @@ def retrieve_user_by_id(userId):
     return {"error": "User not found"}, 404
 
 def retrieve_ability_by_id(abilityId):
-    ability = abilities.get(abilityId)
+    ability = get_ability(abilityId)
     if ability:
         return ability, 200
     else:
@@ -188,7 +198,7 @@ def retrieve_asset_by_id(assetId):
 # Abilities Management
 def start_ability(abilityId):
     print(f"Starting ability {abilityId}")
-    ability = abilities[abilityId]
+    ability = get_ability(abilityId)
     start_script = ability.get('scripts', {}).get('start')
 
     if start_script is None:
@@ -200,7 +210,7 @@ def start_ability(abilityId):
     return ok()
 
 def stop_ability(abilityId):
-    ability = abilities.get(abilityId)
+    ability = get_ability(abilityId)
     if not ability: return {"error": "Ability not found"}, 404
     if 'pid' in ability:
         # Terminate the subprocess

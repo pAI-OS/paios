@@ -632,7 +632,7 @@ paths:
       servers:
         - url: 'http://localhost:3000'
           description: ''
-  '/abilities/{abilityId}/dependencies/{dependencyId}/download':
+  '/abilities/{abilityId}/dependencies/resources/{dependencyId}/download':
     post:
       tags:
         - Abilities Management
