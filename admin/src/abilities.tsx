@@ -87,9 +87,9 @@ export const AbilityShow = () => (
 export const AbilityDependencies = () => {
     const record = useRecordContext();
 
-    if (!record) {
-        return null; // or any other fallback UI
-    }
+    if (!record) { return null; }
+    if (!record.dependencies) { return null; }
+    // or any other fallback UI
 
     const dependencies = record.dependencies;
 
