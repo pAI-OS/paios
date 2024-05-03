@@ -45,7 +45,6 @@ for subdir in os.listdir(abilities_dir):
                 with open(metadata_path) as f:
                     metadata = json.load(f)
 
-                    # dependencies
                     if 'dependencies' in metadata:
                         if 'resources' in metadata['dependencies']:
                             for resource in metadata['dependencies']['resources']:
@@ -53,9 +52,9 @@ for subdir in os.listdir(abilities_dir):
                                 resource_path = os.path.join(abilities_dir, subdir, resource['filename'])
                                 print(resource_path)
                                 if os.path.exists(resource_path):
-                                    resource['sizeLocal'] = os.path.getsize(resource_path)
-                                if 'size' in resource and 'sizeLocal' in resource:
-                                    resource['percentComplete'] = int((resource['sizeLocal'] / resource['size']) * 100)
+                                    resource['localSize'] = os.path.getsize(resource_path)
+                                if 'remoteSize' in resource and 'sizeLocal' in resource:
+                                    resource['percentComplete'] = int((resource['localSize'] / resource['remoteSize']) * 100)
 
                     abilities.append(metadata)
            
