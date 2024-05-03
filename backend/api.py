@@ -48,9 +48,7 @@ for subdir in os.listdir(abilities_dir):
                     if 'dependencies' in metadata:
                         if 'resources' in metadata['dependencies']:
                             for resource in metadata['dependencies']['resources']:
-                                print(json.dumps(resource))
                                 resource_path = os.path.join(abilities_dir, subdir, resource['filename'])
-                                print(resource_path)
                                 if os.path.exists(resource_path):
                                     resource['localSize'] = os.path.getsize(resource_path)
                                 if 'remoteSize' in resource and 'localSize' in resource:
@@ -59,6 +57,37 @@ for subdir in os.listdir(abilities_dir):
            
             except (FileNotFoundError, json.JSONDecodeError):
                 pass
+
+def download_ability_dependency(abilityId, dependencyId): 
+    import threading
+    import requests
+    import time
+
+    def download_file(url, filename):
+        local_filename = filename
+        with requests.get(url, stream=True) as r:
+            r.raise_for_status()
+            with open(local_filename, 'wb') as f:
+                for chunk in r.iter_content(chunk_size=8192): 
+                    if chunk: 
+                        f.write(chunk)
+
+    def update_progress(abilityId, dependencyId, filename):
+        while True:
+            local_size = os.path.getsize(filename)
+            metadata = next((item for item in abilities if item["id"] == abilityId), None)
+            if metadata:
+                dependency = next((item for item in metadata['dependencies']['resources'] if item["id"] == dependencyId), None)
+                if dependency:
+                    dependency['localSize'] = local_size
+                    if 'remoteSize' in dependency and 'localSize' in dependency:
+                        dependency['percentComplete'] = round((dependency['localSize'] / dependency['remoteSize']) * 100, 2)
+            time.sleep(1)
+
+    threading.Thread(target=download_file, args=(dependency['url'], dependency['filename'])).start()
+    threading.Thread(target=update_progress, args=(abilityId, dependencyId, dependency['filename'])).start()
+    
+    # return not_implemented()
 
 # List of assets
 # TODO: These should be read from storage sources like local directory, S3, NAS, Solid pod, etc.
