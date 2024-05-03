@@ -68,7 +68,14 @@ def get_ability(abilityId):
         if ability["id"] == abilityId: return ability
     return None
 
-def download_ability_dependency(abilityId, dependencyId): 
+def get_ability_dependency(abilityId, dependencyId):
+    ability = get_ability(abilityId)
+    if not ability: return None
+    for dependency in ability["dependencies"]["resources"]:
+        if dependency["id"] == dependencyId: return dependency
+    return None
+
+def ability_dependency_download_start(abilityId, dependencyId): 
     import threading
     import requests
     import time
@@ -119,11 +126,30 @@ def download_ability_dependency(abilityId, dependencyId):
         # give up and exit thread after timeout
         if time.time() - start_time > timeout: return
         # exit thread if keepDownloading is False or removed
-        if not next((item for item in ability["dependencies"]["resources"] if item["id"] == dependencyId), None).get('keepDownloading'): return
+        dependency = get_ability_dependency(abilityId, dependencyId)
+        if not dependency or not dependency.get('keepDownloading'): return
 
     start_time = time.time()
     threading.Thread(target=download_file).start()
     threading.Thread(target=update_progress).start()
+
+
+def ability_dependency_download_stop(abilityId, dependencyId): 
+    # sets keepDownloading to False to stop download thread
+    dependency = get_ability_dependency(abilityId, dependencyId)
+    if dependency:
+        dependency["keepDownloading"] = False
+
+
+def ability_dependency_download_delete(abilityId, dependencyId): 
+    # deletes local file
+    dependency = get_ability_dependency(abilityId, dependencyId)
+    if dependency:
+        try:
+            os.remove(dependency["localFile"])
+        except FileNotFoundError:
+            pass
+
 
 # List of assets
 # TODO: These should be read from storage sources like local directory, S3, NAS, Solid pod, etc.
@@ -157,7 +183,9 @@ def options_abilities(): return ok()
 def options_abilities_abilityid(): return ok()
 def options_abilities_abilityid_start(): return ok()
 def options_abilities_abilityid_stop(): return ok()
-def options_abilies_dependencies(): return ok()
+def options_ability_dependency_download_start(): return ok()
+def options_ability_dependency_download_stop(): return ok()
+def options_ability_dependency_download_delete(): return ok()
 def options_assets(): return ok()
 def options_assets_assetid(): return ok()
 def options_config(): return ok()

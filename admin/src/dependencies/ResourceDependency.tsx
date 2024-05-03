@@ -11,11 +11,11 @@ const DownloadButton = ({ abilityId }: { abilityId: string }) => {
     const notify = useNotify();
     const refresh = useRefresh();
 
-    const handleDownloadClick = (event: React.MouseEvent) => {
+    const handleStartDownloadClick = (event: React.MouseEvent) => {
         // prevent the click event propagating to the row and calling show
         event.stopPropagation();
 
-        httpClient(`${apiBase}/abilities/${abilityId}/dependencies/resources/${record.id}/download`, { method: 'POST' })
+        httpClient(`${apiBase}/abilities/${abilityId}/dependencies/resources/${record.id}/download/start`, { method: 'POST' })
             .then(() => {
                 notify('Download started');
                 refresh();
@@ -25,17 +25,33 @@ const DownloadButton = ({ abilityId }: { abilityId: string }) => {
             });
     };
 
-    const handleDeleteClick = (event: React.MouseEvent) => {
+
+    const handleStopDownloadClick = (event: React.MouseEvent) => {
         // prevent the click event propagating to the row and calling show
         event.stopPropagation();
 
-        httpClient(`${apiBase}/abilities/${record.id}/stop`, { method: 'POST' })
+        httpClient(`${apiBase}/abilities/${abilityId}/dependencies/resources/${record.id}/download/start`, { method: 'POST' })
             .then(() => {
-                notify('Ability stopped');
+                notify('Download started');
                 refresh();
             })
             .catch((e) => {
-                notify('Error: ability not stopped', { type: 'warning' })
+                notify('Error: download not started', { type: 'warning' })
+            });
+    };
+
+
+    const handleDeleteDownloadClick = (event: React.MouseEvent) => {
+        // prevent the click event propagating to the row and calling show
+        event.stopPropagation();
+
+        httpClient(`${apiBase}/abilities/${abilityId}/dependencies/resources/${record.id}/download/delete`, { method: 'POST' })
+            .then(() => {
+                notify('Deletion requested');
+                refresh();
+            })
+            .catch((e) => {
+                notify('Error: deletion not requested', { type: 'warning' })
             });
     };
 
@@ -43,7 +59,7 @@ const DownloadButton = ({ abilityId }: { abilityId: string }) => {
     // file is downloaded, show delete button
     if ((record.localSize || 0) === (record.remoteSize || 0)) {
         return (
-        <Button label="Delete" onClick={handleDeleteClick}>
+        <Button label="Delete" onClick={handleDeleteDownloadClick}>
             <DeleteIcon />
         </Button>
         );
@@ -53,7 +69,7 @@ const DownloadButton = ({ abilityId }: { abilityId: string }) => {
     //if (((record.localSize || 0) > 0) && ((record.localSize || 0) < (record.remoteSize || 0))) {
     if (record.keepDownloading) {
         return (
-        <Button label="Downloading">
+        <Button label="Downloading" onClick={handleStopDownloadClick}>
             <DownloadingIcon />
         </Button>
         );
@@ -62,7 +78,7 @@ const DownloadButton = ({ abilityId }: { abilityId: string }) => {
     // file is not downloaded, show download button
     if ((record.localSize || 0) === 0) {
         return (
-        <Button label="Download" onClick={handleDownloadClick}>
+        <Button label="Download" onClick={handleStartDownloadClick}>
             <DownloadIcon />
         </Button>
         );
