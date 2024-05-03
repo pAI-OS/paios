@@ -102,10 +102,13 @@ def download_ability_dependency(abilityId, dependencyId):
         while time.time() - start_time < timeout: # give up after timeout
             try:
                 if os.path.exists(dependency["localFile"]):
+                    # sleep first so thread doesn't exit immediately on first loop (e.g. re-downloading)
+                    time.sleep(1)
                     dependency["localSize"] = os.path.getsize(dependency["localFile"])
                     dependency["percentComplete"] = round((dependency["localSize"] / dependency["remoteSize"]) * 100, 2)
-                    if (dependency["localSize"] == dependency["remoteSize"]): return # download complete so exit thread
-                    time.sleep(1)
+                    if (dependency["localSize"] == dependency["remoteSize"]):
+                        print("Already downloaded " + dependency["localFile"])
+                        return # download complete so exit thread
                     keep_downloading()
             except KeyError as e:
                 print(f"An error occurred updating progress of ability {abilityId} dependency {dependencyId} download: {e}")
