@@ -2,6 +2,7 @@ from flask import jsonify
 import os
 import signal
 import subprocess
+import packaging
 import pkg_resources
 import json
 import db
@@ -41,9 +42,9 @@ data_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data")
 abilities_data_dir = os.path.abspath(os.path.join(data_dir, "abilities"))
 abilities_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "abilities"))
 
-for subdir in os.listdir(abilities_dir):
-    if os.path.isdir(os.path.join(abilities_dir, subdir)):
-        metadata_path = os.path.join(abilities_dir, subdir, "metadata.json")
+for ability in os.listdir(abilities_dir):
+    if os.path.isdir(os.path.join(abilities_dir, ability)):
+        metadata_path = os.path.join(abilities_dir, ability, "metadata.json")
         if os.path.exists(metadata_path):
             try:
                 with open(metadata_path) as f:
@@ -53,29 +54,32 @@ for subdir in os.listdir(abilities_dir):
                     if 'dependencies' in metadata:
                         if 'resources' in metadata['dependencies']:
                             for resource in metadata['dependencies']['resources']:
-                                resource_path = os.path.join(abilities_data_dir, subdir, resource['filename'])
-                                print(resource_path)
+                                resource_path = os.path.join(abilities_data_dir, ability, resource['filename'])
                                 if os.path.exists(resource_path):
                                     resource['localSize'] = os.path.getsize(resource_path)
                                 if 'remoteSize' in resource and 'localSize' in resource:
                                     resource['percentComplete'] = round((resource['localSize'] / resource['remoteSize']) * 100, 2)
 
+                        from packaging.specifiers import SpecifierSet
                         if 'python' in metadata['dependencies']:
                             for dependency in metadata['dependencies']['python']:
                                 package_name = dependency['id']
                                 version_requirement = dependency['version']
-
-                                dependency['installed'] = True
-                                dependency['satisfied'] = True
+                                specifier = SpecifierSet(version_requirement)
 
                                 try:
-                                    package_version = pkg_resources.get_distribution(package_name).version
-                                    if pkg_resources.parse_version(package_version) < pkg_resources.parse_version(version_requirement):
-                                        dependency['satisfied'] = False
-                                except pkg_resources.DistributionNotFound:
+                                    package_version = pkg_resources.get_distribution('ansible').version
+                                    if package_version: dependency['installed'] = True
+                                    dependency['version-installed'] = package_version
+                                    if specifier.contains(package_version):
+                                        dependency['satisfied'] = True
+                                except (packaging.specifiers.InvalidSpecifier):
+                                    print(f"Invalid specifier for {ability}: {version_requirement}")
+                                except (packaging.version.InvalidVersion, pkg_resources.DistributionNotFound) as e:
                                         dependency['installed'] = False
                                         dependency['satisfied'] = False
-
+                                        if 'version-installed' in dependency:
+                                            del dependency['version-installed']
 
                     # dictionary of abilities keyed by id needs to be converted to list of objects for react-admin's Datagrid
                     # abilities[metadata.get("id")] = metadata
@@ -97,7 +101,34 @@ def get_ability_dependency(abilityId, dependencyId):
         if dependency["id"] == dependencyId: return dependency
     return None
 
-def ability_dependency_download_start(abilityId, dependencyId): 
+def ability_python_dependency_install(abilityId, dependencyId):
+    import subprocess
+    import sys
+
+    def install_python_package(package):
+        try:
+            result = subprocess.run(
+                [sys.executable, '-m', 'pip', 'install', package],
+                check=True,
+                text=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE
+            )
+            return {"message": f"Successfully installed {package}.", "details": result.stdout}, 200
+        except subprocess.CalledProcessError as e:
+            return {"error": f"Failed to install {package}.", "details": e.stderr}, 500
+
+    dependency = get_ability_dependency(abilityId, dependencyId)
+    if not dependency:
+        return {"error": "Dependency not found"}, 404
+    package_id = dependency.get('id')
+    if not package_id:
+        return {"error": "Package ID not found for dependency"}, 404
+
+    return install_python_package(package_id)
+
+
+def ability_resource_dependency_download_start(abilityId, dependencyId): 
     import threading
     import requests
     import time
@@ -112,6 +143,7 @@ def ability_dependency_download_start(abilityId, dependencyId):
         dependency = get_ability_dependency(abilityId, dependencyId)
         url = dependency["url"]
         local_file = os.path.join(ability_data_dir, dependency["filename"])
+
         dependency["keepDownloading"] = True
     except KeyError:
         print(f"An error occurred downloading ability {abilityId} dependency {dependencyId}")
@@ -158,7 +190,7 @@ def ability_dependency_download_start(abilityId, dependencyId):
     threading.Thread(target=update_progress).start()
 
 
-def ability_dependency_download_stop(abilityId, dependencyId): 
+def ability_resource_dependency_download_stop(abilityId, dependencyId): 
     # sets keepDownloading to False to stop download thread
     dependency = get_ability_dependency(abilityId, dependencyId)
     if dependency:
@@ -166,7 +198,7 @@ def ability_dependency_download_stop(abilityId, dependencyId):
             del dependency["keepDownloading"]
 
 
-def ability_dependency_download_delete(abilityId, dependencyId): 
+def ability_resource_dependency_download_delete(abilityId, dependencyId): 
     # deletes local file
     dependency = get_ability_dependency(abilityId, dependencyId)
     ability_data_dir = os.path.join(abilities_data_dir, abilityId)
@@ -212,9 +244,10 @@ def options_abilities(): return ok()
 def options_abilities_abilityid(): return ok()
 def options_abilities_abilityid_start(): return ok()
 def options_abilities_abilityid_stop(): return ok()
-def options_ability_dependency_download_start(): return ok()
-def options_ability_dependency_download_stop(): return ok()
-def options_ability_dependency_download_delete(): return ok()
+def options_ability_resource_dependency_download_start(): return ok()
+def options_ability_resource_dependency_download_stop(): return ok()
+def options_ability_resource_dependency_download_delete(): return ok()
+def options_ability_python_dependency_install(): return ok()
 def options_assets(): return ok()
 def options_assets_assetid(): return ok()
 def options_config(): return ok()

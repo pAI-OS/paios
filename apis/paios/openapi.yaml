@@ -638,7 +638,7 @@ paths:
         - Abilities Management
       summary: Start download
       description: Downloads an ability's dependency.
-      operationId: api.ability_dependency_download_start
+      operationId: api.ability_resource_dependency_download_start
       parameters:
         - name: abilityId
           in: path
@@ -663,7 +663,7 @@ paths:
         - Abilities Management
       summary: Options
       description: Respond to OPTIONS requests.
-      operationId: api.options_ability_dependency_download_start
+      operationId: api.options_ability_resource_dependency_download_start
       parameters:
         - name: abilityId
           in: path
@@ -689,7 +689,7 @@ paths:
         - Abilities Management
       summary: Stop download
       description: Stops download of an ability's dependency.
-      operationId: api.ability_dependency_download_stop
+      operationId: api.ability_resource_dependency_download_stop
       parameters:
         - name: abilityId
           in: path
@@ -714,7 +714,7 @@ paths:
         - Abilities Management
       summary: Options
       description: Respond to OPTIONS requests.
-      operationId: api.options_ability_dependency_download_stop
+      operationId: api.options_ability_resource_dependency_download_stop
       parameters:
         - name: abilityId
           in: path
@@ -740,7 +740,7 @@ paths:
         - Abilities Management
       summary: Delete download
       description: Deletes download of an ability's dependency.
-      operationId: api.ability_dependency_download_delete
+      operationId: api.ability_resource_dependency_download_delete
       parameters:
         - name: abilityId
           in: path
@@ -765,7 +765,58 @@ paths:
         - Abilities Management
       summary: Options
       description: Respond to OPTIONS requests.
-      operationId: api.options_ability_dependency_download_delete
+      operationId: api.options_ability_resource_dependency_download_delete
+      parameters:
+        - name: abilityId
+          in: path
+          description: 'ID of an existing ability (e.g., optical-character-recognition)'
+          required: true
+          schema:
+            type: string
+        - name: dependencyId
+          in: path
+          description: 'ID of an ability''s dependency (e.g., pandas)'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+  '/abilities/{abilityId}/dependencies/python/{dependencyId}/install':
+    post:
+      tags:
+        - Abilities Management
+      summary: Start install
+      description: Installs an ability's dependency.
+      operationId: api.ability_python_dependency_install
+      parameters:
+        - name: abilityId
+          in: path
+          description: 'ID of an existing ability (e.g., optical-character-recognition)'
+          required: true
+          schema:
+            type: string
+        - name: dependencyId
+          in: path
+          description: 'ID of an ability''s dependency (e.g., pandas)'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Install started
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+    options:
+      tags:
+        - Abilities Management
+      summary: Options
+      description: Respond to OPTIONS requests.
+      operationId: api.options_ability_python_dependency_install
       parameters:
         - name: abilityId
           in: path
