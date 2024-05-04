@@ -63,12 +63,13 @@ for ability in os.listdir(abilities_dir):
                         from packaging.specifiers import SpecifierSet
                         if 'python' in metadata['dependencies']:
                             for dependency in metadata['dependencies']['python']:
+                                
                                 package_name = dependency['id']
                                 version_requirement = dependency['version']
                                 specifier = SpecifierSet(version_requirement)
 
                                 try:
-                                    package_version = pkg_resources.get_distribution('ansible').version
+                                    package_version = pkg_resources.get_distribution(package_name).version
                                     if package_version: dependency['installed'] = True
                                     dependency['version-installed'] = package_version
                                     if specifier.contains(package_version):
@@ -159,7 +160,7 @@ def ability_python_dependency_install(abilityId, dependencyId):
             package_version = get_installed_package_version(package_name)
             dependency['version-installed'] = package_version
             dependency['satisfied'] = True
-            
+
             return {"message": f"Successfully installed {package_with_version} ({package_version})."}, 200
         except (subprocess.CalledProcessError, pkg_resources.DistributionNotFound, ImportError) as e:
             return {"error": f"Failed to install {package_with_version}.", "details": e.stderr}, 500
