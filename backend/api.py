@@ -158,7 +158,8 @@ def ability_python_dependency_install(abilityId, dependencyId):
             #package_version = pkg_resources.get_distribution(package_name).version
             package_version = get_installed_package_version(package_name)
             dependency['version-installed'] = package_version
-
+            dependency['satisfied'] = True
+            
             return {"message": f"Successfully installed {package_with_version} ({package_version})."}, 200
         except (subprocess.CalledProcessError, pkg_resources.DistributionNotFound, ImportError) as e:
             return {"error": f"Failed to install {package_with_version}.", "details": e.stderr}, 500
