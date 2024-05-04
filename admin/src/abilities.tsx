@@ -99,7 +99,7 @@ export const AbilityDependencies = () => {
     return (
         <TabbedShowLayout >
             {dependencies.debian && (<Tab label="Debian"><DebianDependency dependencies={dependencies.debian} /></Tab>)}
-            {dependencies.python && (<Tab label="Python"><PythonDependency dependencies={dependencies.debian} /></Tab>)}
+            {dependencies.python && (<Tab label="Python"><PythonDependency dependencies={dependencies.python} /></Tab>)}
             {dependencies.resources && (<Tab label="Resource"><ResourceDependency dependencies={dependencies.resources} /></Tab>)}
         </TabbedShowLayout>
     );

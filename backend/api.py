@@ -2,6 +2,7 @@ from flask import jsonify
 import os
 import signal
 import subprocess
+import pkg_resources
 import json
 import db
 
@@ -58,6 +59,23 @@ for subdir in os.listdir(abilities_dir):
                                     resource['localSize'] = os.path.getsize(resource_path)
                                 if 'remoteSize' in resource and 'localSize' in resource:
                                     resource['percentComplete'] = round((resource['localSize'] / resource['remoteSize']) * 100, 2)
+
+                        if 'python' in metadata['dependencies']:
+                            for dependency in metadata['dependencies']['python']:
+                                package_name = dependency['id']
+                                version_requirement = dependency['version']
+
+                                dependency['installed'] = True
+                                dependency['satisfied'] = True
+
+                                try:
+                                    package_version = pkg_resources.get_distribution(package_name).version
+                                    if pkg_resources.parse_version(package_version) < pkg_resources.parse_version(version_requirement):
+                                        dependency['satisfied'] = False
+                                except pkg_resources.DistributionNotFound:
+                                        dependency['installed'] = False
+                                        dependency['satisfied'] = False
+
 
                     # dictionary of abilities keyed by id needs to be converted to list of objects for react-admin's Datagrid
                     # abilities[metadata.get("id")] = metadata
