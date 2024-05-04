@@ -1,0 +1,25 @@
+{
+    "id": "ansible",
+    "title": "Ansible",
+    "description": "IT automation engine that automates provisioning, configuration management, application deployment, orchestration, and many other IT processes.",
+    "author": {
+        "name": "Ansible Project",
+        "url": "https://ansible.com/"
+    },
+    "maintainer": {
+        "name": "Sam Johnston",
+        "email": "samj@samj.net",
+        "url": "http://samjohnston.org"
+    },
+    "language": "python",
+    "license": "GPL-3.0-or-later",
+    "dependencies": {
+        "python": [
+            {
+                "id": "ansible",
+                "name": "Ansible",
+                "version": ">=2.11.4"
+            }
+        ]
+    }
+}
