@@ -94,10 +94,10 @@ def get_ability(abilityId):
         if ability["id"] == abilityId: return ability
     return None
 
-def get_ability_dependency(abilityId, dependencyId):
+def get_ability_dependency(abilityId, dependencyId, dependencyType):
     ability = get_ability(abilityId)
     if not ability: return None
-    for dependency in ability["dependencies"]["resources"]:
+    for dependency in ability["dependencies"][dependencyType]:
         if dependency["id"] == dependencyId: return dependency
     return None
 
@@ -114,11 +114,11 @@ def ability_python_dependency_install(abilityId, dependencyId):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
             )
-            return {"message": f"Successfully installed {package}.", "details": result.stdout}, 200
+            return {"message": f"Successfully installed {package}."}, 200
         except subprocess.CalledProcessError as e:
             return {"error": f"Failed to install {package}.", "details": e.stderr}, 500
 
-    dependency = get_ability_dependency(abilityId, dependencyId)
+    dependency = get_ability_dependency(abilityId, dependencyId, "python")
     if not dependency:
         return {"error": "Dependency not found"}, 404
     package_id = dependency.get('id')
@@ -140,7 +140,7 @@ def ability_resource_dependency_download_start(abilityId, dependencyId):
     local_file = ''
 
     try:
-        dependency = get_ability_dependency(abilityId, dependencyId)
+        dependency = get_ability_dependency(abilityId, dependencyId, "resource")
         url = dependency["url"]
         local_file = os.path.join(ability_data_dir, dependency["filename"])
 
@@ -192,7 +192,7 @@ def ability_resource_dependency_download_start(abilityId, dependencyId):
 
 def ability_resource_dependency_download_stop(abilityId, dependencyId): 
     # sets keepDownloading to False to stop download thread
-    dependency = get_ability_dependency(abilityId, dependencyId)
+    dependency = get_ability_dependency(abilityId, dependencyId, "resource")
     if dependency:
         if "keepDownloading" in dependency:
             del dependency["keepDownloading"]
@@ -200,7 +200,7 @@ def ability_resource_dependency_download_stop(abilityId, dependencyId):
 
 def ability_resource_dependency_download_delete(abilityId, dependencyId): 
     # deletes local file
-    dependency = get_ability_dependency(abilityId, dependencyId)
+    dependency = get_ability_dependency(abilityId, dependencyId, "resource")
     ability_data_dir = os.path.join(abilities_data_dir, abilityId)
     local_file = os.path.join(ability_data_dir, dependency["filename"])
     if dependency:
