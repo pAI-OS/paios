@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from airllm import AutoModel
 
 MAX_LENGTH = 128
