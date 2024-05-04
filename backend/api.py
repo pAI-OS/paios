@@ -38,9 +38,11 @@ users = [
 # ]
 abilities = []
 
-data_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data"))
+# directories
+base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..")) # assumes the backend is in a directory under the repo root
+data_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data")) # puts the data directory in the repo root
+abilities_dir = os.path.abspath(os.path.join(base_dir, "abilities"))
 abilities_data_dir = os.path.abspath(os.path.join(data_dir, "abilities"))
-abilities_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "abilities"))
 
 for ability in os.listdir(abilities_dir):
     if os.path.isdir(os.path.join(abilities_dir, ability)):
@@ -348,19 +350,28 @@ def start_ability(abilityId):
         return {"error": "Ability not found or start script not set"}, 404
 
     # Start the subprocess and store the PID in the ability dictionary
-    start_script = os.path.join(abilities_data_dir, abilityId, start_script)
-    current_permissions = stat.S_IMODE(os.lstat(start_script).st_mode)
+    search_paths = [abilities_dir, abilities_data_dir]
+
+    # find the start script in the ability's directory or the ability's data directory
+    script_found = False
+    for path in search_paths:
+        start_script_path = os.path.join(path, abilityId, start_script)
+        if os.path.exists(start_script_path):
+            script_found = True
+            break
+
+    if not script_found: return {"error": "Start script not found in any base directory"}, 404
 
     if os.name == "posix":    
-        if not os.access(start_script, os.X_OK):
-            current_permissions = stat.S_IMODE(os.lstat(start_script).st_mode)
+        if not os.access(start_script_path, os.X_OK):
+            current_permissions = stat.S_IMODE(os.lstat(start_script_path).st_mode)
             try:
-                print(f"Warning: Setting execute bit on {start_script}")
-                os.chmod(start_script, current_permissions | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+                print(f"Warning: Setting execute bit on {start_script_path}")
+                os.chmod(start_script_path, current_permissions | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
             except Exception as e:
                 print(f"Warning: Failed to set execute bit on start script: {e}")
 
-    process = subprocess.Popen([start_script], shell=True)
+    process = subprocess.Popen([start_script_path], shell=True)
     ability['pid'] = process.pid
     return ok()
 
