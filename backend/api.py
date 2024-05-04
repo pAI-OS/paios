@@ -114,6 +114,11 @@ def ability_python_dependency_install(abilityId, dependencyId):
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
             )
+
+            # update version-installed
+            package_version = pkg_resources.get_distribution('ansible').version
+            dependency['version-installed'] = package_version
+
             return {"message": f"Successfully installed {package}."}, 200
         except subprocess.CalledProcessError as e:
             return {"error": f"Failed to install {package}.", "details": e.stderr}, 500
