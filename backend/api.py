@@ -380,7 +380,10 @@ def stop_ability(abilityId):
     if not ability: return {"error": "Ability not found"}, 404
     if 'pid' in ability:
         # Terminate the subprocess
-        os.kill(ability['pid'], signal.SIGTERM)
+        try:
+            os.kill(ability['pid'], signal.SIGTERM)
+        except ProcessLookupError:
+            return {"error": "Ability not running"}, 404
         del ability['pid']  # Remove the pid from the ability dictionary
         return ok()
     else:

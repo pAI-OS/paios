@@ -22,6 +22,11 @@
                 "id": "airllm",
                 "name": "AirLLM",
                 "version": ">=2.8"
+            },
+            {
+                "id": "mlx",
+                "name": "MLX",
+                "version": ">=0.12"
             }
         ]
     }
