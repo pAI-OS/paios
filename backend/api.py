@@ -102,35 +102,76 @@ def get_ability_dependency(abilityId, dependencyId, dependencyType):
     return None
 
 def ability_python_dependency_install(abilityId, dependencyId):
+    import importlib
     import subprocess
     import sys
 
-    def install_python_package(package):
+    # reloads newly installed package into memory without updating 
+    def reload_package(package_name):
+        try:
+            package_module = importlib.import_module(package_name)
+            importlib.reload(package_module)
+        except ImportError as e:
+            print(f"Error importing {package_name}: {e}")
+        except Exception as e:
+            print(f"Error reloading {package_name}: {e}")
+
+
+    def get_installed_package_version(package_name):
+        try:
+            result = subprocess.run([sys.executable, '-m', 'pip', 'show', package_name], text=True, stdout=subprocess.PIPE)
+            for line in result.stdout.split('\n'):
+                if line.startswith('Version:'):
+                    return line.split('Version:')[1].strip()
+        except subprocess.CalledProcessError as e:
+            print(f"Failed to retrieve package version for {package_name}: {e}")
+        except Exception as e:
+            print(f"Unexpected error occurred while retrieving package version for {package_name}: {e}")
+        return None
+
+
+    def install_python_package(package_name, version_specifier=None):
+        # Ensure the version specifier is properly formatted
+        if version_specifier:
+            if not version_specifier.startswith(('==', '>=', '<=', '~=', '!=')):
+                version_specifier = '==' + version_specifier  # Default to exact version if no relational operator is specified
+        else:
+            version_specifier = ''  # If no version is specified, install the latest available version
+
+        # Construct the package installation command with version specifier
+        package_with_version = f"{package_name}{version_specifier}"
         try:
             result = subprocess.run(
-                [sys.executable, '-m', 'pip', 'install', package],
+                [sys.executable, '-m', 'pip', 'install', package_with_version],
                 check=True,
                 text=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE
             )
+            print(result.stdout)
+            print(result.stderr)
 
-            # update version-installed
-            package_version = pkg_resources.get_distribution('ansible').version
+            # reload package in running interpreter (or it will return the old version on upgrades)
+            reload_package(package_name)
+
+            # Update version-installed
+            #package_version = pkg_resources.get_distribution(package_name).version
+            package_version = get_installed_package_version(package_name)
             dependency['version-installed'] = package_version
 
-            return {"message": f"Successfully installed {package}."}, 200
-        except subprocess.CalledProcessError as e:
-            return {"error": f"Failed to install {package}.", "details": e.stderr}, 500
+            return {"message": f"Successfully installed {package_with_version} ({package_version})."}, 200
+        except (subprocess.CalledProcessError, pkg_resources.DistributionNotFound, ImportError) as e:
+            return {"error": f"Failed to install {package_with_version}.", "details": e.stderr}, 500
 
     dependency = get_ability_dependency(abilityId, dependencyId, "python")
     if not dependency:
         return {"error": "Dependency not found"}, 404
     package_id = dependency.get('id')
+    version_specifier = dependency.get('version', None)
     if not package_id:
         return {"error": "Package ID not found for dependency"}, 404
 
-    return install_python_package(package_id)
+    return install_python_package(package_id, version_specifier)
 
 
 def ability_resource_dependency_download_start(abilityId, dependencyId): 
