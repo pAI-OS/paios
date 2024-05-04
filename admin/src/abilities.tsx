@@ -4,6 +4,7 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StopIcon from '@mui/icons-material/Stop';
 import { apiBase, httpClient } from "./apiBackend";
 import { DebianDependency } from './dependencies/DebianDependency';
+import { PythonDependency } from './dependencies/PythonDependency';
 import { ResourceDependency } from './dependencies/ResourceDependency';
 
 const StartStopButton = () => {
@@ -40,7 +41,9 @@ const StartStopButton = () => {
             });
     };
 
-    return isStarted ? (
+    const hasStartScript = Boolean(record.scripts?.start);
+
+    return hasStartScript && (isStarted ? (
         <Button label="Stop" onClick={handleStopClick}>
             <StopIcon />
         </Button>
@@ -48,7 +51,7 @@ const StartStopButton = () => {
         <Button label="Start" onClick={handleStartClick}>
             <PlayArrowIcon />
         </Button>
-    );
+    ));
 };
 
 const AbilityTitle = () => {
@@ -96,6 +99,7 @@ export const AbilityDependencies = () => {
     return (
         <TabbedShowLayout >
             {dependencies.debian && (<Tab label="Debian"><DebianDependency dependencies={dependencies.debian} /></Tab>)}
+            {dependencies.python && (<Tab label="Python"><PythonDependency dependencies={dependencies.debian} /></Tab>)}
             {dependencies.resources && (<Tab label="Resource"><ResourceDependency dependencies={dependencies.resources} /></Tab>)}
         </TabbedShowLayout>
     );
