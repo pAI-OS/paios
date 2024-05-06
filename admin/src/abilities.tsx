@@ -75,8 +75,9 @@ export const AbilityList = () => (
 export const AbilityShow = () => (
     <Show title={<AbilityTitle />}>
         <SimpleShowLayout>
-            <TextField source="id" />
-            <TextField source="title" />
+            <WrapperField label="Ability">
+                <TextField source="title" /> (<TextField source="id" />)
+            </WrapperField>
             <WrapperField label="Author">
                 <Link href="author.url">
                     <TextField source="author.name" />
