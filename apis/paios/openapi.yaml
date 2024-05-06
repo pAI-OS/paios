@@ -65,7 +65,7 @@ paths:
     get:
       tags:
         - Abilities Management
-      summary: Get Abilities by ID
+      summary: Retrieve ability by ID
       description: Retrieve the information of the ability with the matching ability ID.
       operationId: api.retrieve_ability_by_id
       parameters:
@@ -285,6 +285,98 @@ paths:
           required: true
           schema:
             type: integer
+      responses:
+        '200':
+          description: OK
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+  /channels:
+    get:
+      tags:
+        - Channel Management
+      summary: Retrieve all channels
+      description: Retrieve the information of all channels.
+      operationId: api.retrieve_all_channels
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Channel'
+              examples:
+                Example 1:
+                  value:
+                    - id: llm-api
+                      name: Large Language Model API
+                      uri: 'https://localhost:8080/v1'
+          headers:
+            X-Total-Count:
+              schema:
+                type: string
+                example: '2'
+              description: Count of results required by jsonServer Data Provider for pagination
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+    options:
+      tags:
+        - Channel Management
+      summary: Options
+      description: Respond to OPTIONS requests.
+      operationId: api.options_channels
+      responses:
+        '200':
+          description: OK
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+  '/channels/{channelId}':
+    get:
+      tags:
+        - Channel Management
+      summary: Retrieve channel by ID
+      description: Retrieve the information of the channel with the matching channel ID.
+      operationId: api.retrieve_channel_by_id
+      parameters:
+        - name: channelId
+          in: path
+          description: ID of an existing channel
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Channel'
+              examples:
+                Example 1:
+                  value:
+                    id: llm-api
+                    name: Large Language Model API
+                    uri: 'https://localhost:8080/v1'
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+    options:
+      tags:
+        - Channel Management
+      summary: Options
+      description: Respond to OPTIONS requests.
+      operationId: api.options_channels_channelid
+      parameters:
+        - name: channelId
+          in: path
+          description: ID of an existing channel
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: OK
@@ -841,6 +933,8 @@ tags:
     description: Installation and configuration of abilities
   - name: Asset Management
     description: Management of assets
+  - name: Channel Management
+    description: Discovery and configuration of input/output interfaces/channels
   - name: Configuration Management
     description: Management of configuration
   - name: User Management
@@ -878,6 +972,17 @@ components:
         subject:
           type: string
         description:
+          type: string
+    Channel:
+      type: object
+      title: Channel
+      description: Channels (input/output)
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        uri:
           type: string
     Config:
       title: Config

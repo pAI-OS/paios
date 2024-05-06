@@ -91,10 +91,29 @@ for ability in os.listdir(abilities_dir):
             except (FileNotFoundError, json.JSONDecodeError):
                 pass
 
+# List of channels
+channels = [
+    {
+        "id": "llm-api",
+        "name": "Large Language Model API",
+        "uri": "https://localhost:8080/v1"
+    },
+    {
+        "id": "imap-sync",
+        "name": "E-mail Sync (IMAP)",
+        "uri": "imap://imap.gmail.com:993"
+    }
+]
+
 # Helper functions for common responses
 def get_ability(abilityId):
     for ability in abilities:
         if ability["id"] == abilityId: return ability
+    return None
+
+def get_channel(channelId):
+    for channel in channels:
+        if channel["id"] == channelId: return channel
     return None
 
 def get_ability_dependency(abilityId, dependencyId, dependencyType):
@@ -301,6 +320,8 @@ def options_ability_resource_dependency_download_delete(): return ok()
 def options_ability_python_dependency_install(): return ok()
 def options_assets(): return ok()
 def options_assets_assetid(): return ok()
+def options_channels(): return ok()
+def options_channels_channelid(): return ok()
 def options_config(): return ok()
 def options_user(): return ok()
 def options_users(): return ok()
@@ -314,6 +335,7 @@ def create_new_user(): return not_implemented()
 def retrieve_all_users(): return retrieve_all(users)
 def retrieve_all_abilities(): return retrieve_all(abilities)
 def retrieve_all_assets(): return retrieve_all(assets)
+def retrieve_all_channels(): return retrieve_all(channels)
 
 # Retrieve by ID
 def retrieve_user_by_id(userId):
@@ -330,6 +352,13 @@ def retrieve_ability_by_id(abilityId):
         return ability, 200
     else:
         return {"error": "Ability not found"}, 404
+
+def retrieve_channel_by_id(channelId):
+    channel = get_channel(channelId)
+    if channel:
+        return channel, 200
+    else:
+        return {"error": "Channel not found"}, 404
 
 def retrieve_asset_by_id(assetId):
 
