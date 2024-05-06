@@ -56,7 +56,7 @@ const StartStopButton = () => {
 
 const AbilityTitle = () => {
     const record = useRecordContext();
-    return <span>Abilities {record ? `- ${record.id}` : ""}</span>;
+    return <span>Abilities {record ? `- ${record.title} (${record.id})` : ""}</span>;
 };
 
 const abilityFilters = [
