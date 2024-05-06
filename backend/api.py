@@ -115,7 +115,8 @@ def ability_python_dependency_install(abilityId, dependencyId):
             package_module = importlib.import_module(package_name)
             importlib.reload(package_module)
         except ImportError as e:
-            print(f"Error importing {package_name}: {e}")
+            # print(f"Error importing {package_name}: {e}") # which is to be expected if the module was not already loaded before updating
+            pass
         except Exception as e:
             print(f"Error reloading {package_name}: {e}")
 
