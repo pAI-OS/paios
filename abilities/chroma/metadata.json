@@ -1,8 +1,29 @@
 {
     "id": "chroma",
     "title": "Chroma embedding database",
-    "description": "The fastest way to build Python or JavaScript LLM apps with memory!",
-    "author": "Chroma <hello@trychroma.com>",
+    "description": "The open-source embedding database. The fastest way to build Python or JavaScript LLM apps with memory!",
+    "author": {
+        "name": "Chroma",
+        "url": "https://www.trychroma.com/"
+    },
+    "maintainer": {
+        "name": "Sam Johnston",
+        "email": "samj@samj.net",
+        "url": "http://samjohnston.org"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/chroma-core/chroma.git"
+    },
     "language": "python",
-    "license": "Apache-2.0"
+    "license": "Apache-2.0",
+    "dependencies": {
+        "python": [
+            {
+                "id": "chromadb",
+                "name": "ChromaDB",
+                "version": ">=0.5.0"
+            }
+        ]
+    }
 }
