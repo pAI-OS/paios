@@ -30,16 +30,17 @@
                 "priority": "recommended"
             }
         ],
-        "debian": [
+        "linux": [
             {
-                "name": "libssl-dev",
+                "name": "ssl-development",
                 "version": "1.1.1",
-                "priority": "required"
-            },
-            {
-                "name": "libffi-dev",
-                "version": "3.3-1",
-                "priority": "optional"
+                "priority": "required",
+                "packages": [
+                    {
+                        "debian": "libssl-dev",
+                        "fedora": "openssl-devel"
+                    }
+                ]
             }
         ],
         "python": [
