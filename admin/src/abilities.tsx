@@ -1,5 +1,5 @@
-import { useNotify, useRefresh, useRecordContext, TabbedShowLayout, Tab } from "react-admin";
-import { Button, List, Datagrid, TextField, TextInput, Show, SimpleShowLayout, ShowButton } from "react-admin";
+import { useNotify, useRefresh, useRecordContext, TabbedShowLayout, Tab, UrlField } from "react-admin";
+import { Button, List, Datagrid, TextField, WrapperField, Show, SimpleShowLayout, ShowButton } from "react-admin";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StopIcon from '@mui/icons-material/Stop';
 import { apiBase, httpClient } from "./apiBackend";
@@ -71,17 +71,25 @@ export const AbilityList = () => (
     </List>
 );
 
-export const AbilityShow = () => (
+export const AbilityShow = () => {
+    const record = useRecordContext();
 
-    <Show title={<AbilityTitle />}>
+    return (
+        <Show title={<AbilityTitle />}>
             <SimpleShowLayout>
                 <TextField source="id" />
                 <TextField source="title" />
+                {record && record.author && record.url && (
+                    <WrapperField label="Author">
+                        <a href={record.author.url}>{record.author.name}</a>
+                    </WrapperField>
+                )}
                 <TextField source="description" />
                 <AbilityDependencies />
             </SimpleShowLayout>
         </Show>
     );
+};
 
 export const AbilityDependencies = () => {
     const record = useRecordContext();
