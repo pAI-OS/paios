@@ -82,7 +82,9 @@ export const AbilityShow = () => (
                 <TextField source="author.name" />
             </WrapperField>
             <TextField source="description" />
-            <AbilityDependencies />
+            <WrapperField label="Dependencies">
+                <AbilityDependencies />
+            </WrapperField>
         </SimpleShowLayout>
     </Show>
 );
