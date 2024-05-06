@@ -1,0 +1,29 @@
+{
+    "id": "beautifulsoup",
+    "title": "Beautiful Soup",
+    "description": "Screen-scraping library",
+    "author": {
+        "name": "Leonard Richardson",
+        "url": "https://www.crummy.com/software/BeautifulSoup/"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://git.launchpad.net/beautifulsoup"
+      },
+    "maintainer": {
+        "name": "Sam Johnston",
+        "email": "samj@samj.net",
+        "url": "http://samjohnston.org"
+    },
+    "language": "python",
+    "license": "MIT",
+    "dependencies": {
+        "python": [
+            {
+                "id": "beautifulsoup4",
+                "name": "Beautiful Soup",
+                "version": ">=4"
+            }
+        ]
+    }
+}
