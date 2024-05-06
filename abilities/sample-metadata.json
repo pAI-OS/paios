@@ -3,10 +3,10 @@
     "version": "1.0.0",
     "description": "A sample ability",
     "main": "main.py",
-    "scripts": {
-        "start": "python3 main.py arg1 arg2",
-        "test": "pytest"
-    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/username/repository.git"
+      },
     "author": {
         "name": "Your Name",
         "email": "your.email@example.com",
@@ -18,6 +18,10 @@
         "url": "http://your-website.com"
     },
     "license": "MIT",
+    "scripts": {
+        "start": "python3 main.py arg1 arg2",
+        "test": "pytest"
+    },
     "dependencies": {
         "container": [
             {
