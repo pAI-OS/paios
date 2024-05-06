@@ -59,12 +59,8 @@ const AbilityTitle = () => {
     return <span>Abilities {record ? `- ${record.title} (${record.id})` : ""}</span>;
 };
 
-const abilityFilters = [
-    <TextInput source="q" label="Search" alwaysOn />
-];
-
 export const AbilityList = () => (
-    <List filters={abilityFilters}>
+    <List>
         <Datagrid rowClick="show">
             <TextField source="id" label="Name" />
             <TextField source="title" />
