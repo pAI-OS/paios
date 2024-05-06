@@ -79,9 +79,7 @@ export const AbilityShow = () => (
                 <TextField source="title" /> (<TextField source="id" />)
             </WrapperField>
             <WrapperField label="Author">
-                <Link href="author.url">
-                    <TextField source="author.name" />
-                </Link>
+                <TextField source="author.name" />
             </WrapperField>
             <TextField source="description" />
             <AbilityDependencies />
