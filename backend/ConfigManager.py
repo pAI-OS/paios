@@ -4,28 +4,29 @@ from pathlib import Path
 from alembic import command
 from alembic.config import Config as AlembicConfig
 from EncryptionManager import EncryptionManager
+from paths import root_dir, db_path
 
 class ConfigManager:
     def __init__(self, tenant=None):
         self.em = EncryptionManager()
         self.tenant = tenant
-        self.backend_path = Path(__file__).resolve().parent
-        self.base_path = self.backend_path.parent
-        self.db_path = self.base_path / 'data' / (self.tenant if self.tenant else '')
-        self.db_path = self.db_path / 'config.db'
-        os.makedirs(self.db_path, exist_ok=True)
+        #self.backend_path = Path(__file__).resolve().parent
+        #self.base_path = self.backend_path.parent
+        #self.db_path = self.base_path / 'data' / (self.tenant if self.tenant else '')
+        #self.db_path = self.db_path / 'paios.db'
+        os.makedirs(db_path.parent, exist_ok=True)
 
         # use alembic to create the database or migrate to the latest schema
         self.init_db()
 
     def init_db(self):
         alembic_cfg = AlembicConfig()
-        alembic_cfg.set_main_option("script_location", str(self.base_path / "migrations"))
-        alembic_cfg.set_main_option("sqlalchemy.url", f"sqlite:///{self.db_path}")
+        alembic_cfg.set_main_option("script_location", str(root_dir / "migrations"))
+        alembic_cfg.set_main_option("sqlalchemy.url", f"sqlite:///{db_path}")
         command.upgrade(alembic_cfg, "head")
 
     def execute_query(self, query, params=None):
-        conn = sqlite3.connect(self.db_path)
+        conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
         try:
