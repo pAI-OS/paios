@@ -6,3 +6,5 @@ connexion[flask,swagger-ui,uvicorn]==3.0.6
 cryptography
 setuptools
 alembic
+sqlmodel
+
