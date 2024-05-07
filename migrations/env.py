@@ -5,6 +5,9 @@ from sqlalchemy import pool
 from pathlib import Path
 from sqlmodel import SQLModel
 
+# import the models so SQLModel.metadata is populated
+from backend.models import Config
+
 from alembic import context
 
 # this is the Alembic Config object, which provides
