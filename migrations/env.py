@@ -4,9 +4,19 @@ from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from pathlib import Path
 from sqlmodel import SQLModel
+from pathlib import Path
+import sys
 
+# add the backend directory to the python path
+repo_root = Path(__file__).resolve().parent.parent
+backend_path = repo_root / 'backend'
+sys.path.append(str(backend_path))
+
+# get the db path from the backend
+from paths import db_path
+print("db_path: ", db_path)
 # import the models so SQLModel.metadata is populated
-from backend.models import Config
+from models import Config
 
 from alembic import context
 
@@ -14,10 +24,10 @@ from alembic import context
 # access to the values within the .ini file in use.
 config = context.config
 
-migrations_dir = Path(__file__).resolve().parent
-data_dir = migrations_dir.parent / "data"
+#migrations_dir = Path(__file__).resolve().parent
+#data_dir = migrations_dir.parent / "data"
 
-config.set_main_option("sqlalchemy.url", f"sqlite:///{data_dir / 'db.sqlite'}")
+config.set_main_option("sqlalchemy.url", f"sqlite:///{db_path}")
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
