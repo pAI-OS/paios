@@ -14,7 +14,7 @@ sys.path.append(str(backend_path))
 
 # get the db path from the backend
 from paths import db_path
-print("db_path: ", db_path)
+
 # import the models so SQLModel.metadata is populated
 from models import Config
 
