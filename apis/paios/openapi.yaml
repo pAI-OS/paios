@@ -244,7 +244,7 @@ paths:
     get:
       tags:
         - Asset Management
-      summary: Get Asset by ID
+      summary: Retrieve asset by ID
       description: Retrieve the information of the asset with the matching asset ID.
       operationId: api.retrieve_asset_by_id
       parameters:
@@ -364,6 +364,49 @@ paths:
       servers:
         - url: 'http://localhost:3000'
           description: ''
+    post:
+      tags:
+        - Channel Management
+      summary: Update channel by key
+      description: Update a channel with the specified ID.
+      operationId: ChannelAPIAdapter.update_channel_by_id
+      parameters:
+        - name: channelId
+          in: path
+          description: ID of channel
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Channel'
+      responses:
+        '200':
+          description: OK
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+    delete:
+      tags:
+        - Channel Management
+      summary: Delete channel by key
+      description: Delete a channel with the specified ID.
+      operationId: ChannelAPIAdapter.delete_channel_by_id
+      parameters:
+        - name: channelId
+          in: path
+          description: ID of channel
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
     options:
       tags:
         - Channel Management
@@ -387,7 +430,7 @@ paths:
     get:
       tags:
         - Configuration Management
-      summary: Get Config by Key
+      summary: Retrieve config by key
       description: Retrieve the config item with the specified key.
       operationId: ConfigAPIAdapter.retrieve_config_by_key
       parameters:
@@ -418,7 +461,7 @@ paths:
     post:
       tags:
         - Configuration Management
-      summary: Update Config by Key
+      summary: Update config by key
       description: Set a config item with the specified key.
       operationId: ConfigAPIAdapter.update_config_by_key
       parameters:
@@ -442,7 +485,7 @@ paths:
     delete:
       tags:
         - Configuration Management
-      summary: Delete Config by Key
+      summary: Delete config by key
       description: Delete a config item with the specified key.
       operationId: ConfigAPIAdapter.delete_config_by_key
       parameters:
