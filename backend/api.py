@@ -6,10 +6,7 @@ import shlex
 import packaging
 import pkg_resources
 import json
-import ConfigManager
 from paths import venv_bin_dir, abilities_dir, abilities_data_dir
-
-cm = ConfigManager.ConfigManager()
 
 # List of users
 # TODO: We're not implementing multi-user yet so this is subject to change
