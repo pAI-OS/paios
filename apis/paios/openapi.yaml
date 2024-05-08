@@ -433,9 +433,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Config'
-          text/plain:
-            schema:
-              $ref: '#/components/schemas/Config'
       responses:
         '200':
           description: OK
@@ -992,6 +989,13 @@ components:
         - type: number
         - type: string
         - type: object
+        - type: array
+          items:
+            oneOf:
+              - type: string
+              - type: number
+              - type: boolean
+              - type: object
     User:
       type: object
       title: User
