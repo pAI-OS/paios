@@ -1,0 +1,11 @@
+POST http://localhost:3000/config/openapi-key
+Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
+Content-Type: application/json
+
+"abc123"
+
+###
+
+GET http://localhost:3000/config/openapi-key
+Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
+Content-Type: application/json

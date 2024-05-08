@@ -1,0 +1,38 @@
+POST http://localhost:3000/channels/llm-api
+Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
+Content-Type: application/json
+
+{
+    "id": "llm-api",
+    "name": "LLM API",
+    "uri": "http://localhost:3000/channels/llm-api"
+}
+
+###
+POST http://localhost:3000/channels/imap-sync
+Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
+Content-Type: application/json
+
+{
+    "id": "imap-sync",
+    "name": "E-mail Sync (IMAP)",
+    "uri": "imap://imap.gmail.com:993"
+}
+
+###
+
+DELETE http://localhost:3000/channels/llm-api
+Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
+Content-Type: application/json
+
+###
+
+GET http://localhost:3000/channels/llm-api
+Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
+Content-Type: application/json
+
+###
+
+GET http://localhost:3000/channels
+Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
+Content-Type: application/json
