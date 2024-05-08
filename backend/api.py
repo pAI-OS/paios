@@ -2,10 +2,12 @@ from flask import jsonify
 import os
 import signal
 import subprocess
+import shlex
 import packaging
 import pkg_resources
 import json
 import ConfigManager
+from paths import venv_bin_dir, abilities_dir, abilities_data_dir
 
 cm = ConfigManager.ConfigManager()
 
@@ -39,12 +41,6 @@ users = [
 #     }
 # ]
 abilities = []
-
-# directories
-base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..")) # assumes the backend is in a directory under the repo root
-data_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data")) # puts the data directory in the repo root
-abilities_dir = os.path.abspath(os.path.join(base_dir, "abilities"))
-abilities_data_dir = os.path.abspath(os.path.join(data_dir, "abilities"))
 
 for ability in os.listdir(abilities_dir):
     if os.path.isdir(os.path.join(abilities_dir, ability)):
@@ -93,29 +89,10 @@ for ability in os.listdir(abilities_dir):
             except (FileNotFoundError, json.JSONDecodeError):
                 pass
 
-# List of channels
-channels = [
-    {
-        "id": "llm-api",
-        "name": "Large Language Model API",
-        "uri": "https://localhost:8080/v1"
-    },
-    {
-        "id": "imap-sync",
-        "name": "E-mail Sync (IMAP)",
-        "uri": "imap://imap.gmail.com:993"
-    }
-]
-
 # Helper functions for common responses
 def get_ability(abilityId):
     for ability in abilities:
         if ability["id"] == abilityId: return ability
-    return None
-
-def get_channel(channelId):
-    for channel in channels:
-        if channel["id"] == channelId: return channel
     return None
 
 def get_ability_dependency(abilityId, dependencyId, dependencyType):
@@ -337,7 +314,6 @@ def create_new_user(): return not_implemented()
 def retrieve_all_users(): return retrieve_all(users)
 def retrieve_all_abilities(): return retrieve_all(abilities)
 def retrieve_all_assets(): return retrieve_all(assets)
-def retrieve_all_channels(): return retrieve_all(channels)
 
 # Retrieve by ID
 def retrieve_user_by_id(userId):
@@ -355,13 +331,6 @@ def retrieve_ability_by_id(abilityId):
     else:
         return {"error": "Ability not found"}, 404
 
-def retrieve_channel_by_id(channelId):
-    channel = get_channel(channelId)
-    if channel:
-        return channel, 200
-    else:
-        return {"error": "Channel not found"}, 404
-
 def retrieve_asset_by_id(assetId):
 
     for asset in assets:
@@ -376,23 +345,26 @@ def start_ability(abilityId):
 
     print(f"Starting ability {abilityId}")
     ability = get_ability(abilityId)
-    start_script = ability.get('scripts', {}).get('start')
+    start_script = ability.get('scripts', {}).get('start', '')
+    start_script_parts = start_script.split(' ')
+    start_script_executable = start_script_parts[0] if start_script_parts else None
+    start_script_args = start_script_parts[1:] if len(start_script_parts) > 1 else ''
 
-    if start_script is None:
+    if start_script_executable is None:
         return {"error": "Ability not found or start script not set"}, 404
 
     # Start the subprocess and store the PID in the ability dictionary
-    search_paths = [abilities_dir, abilities_data_dir]
+    search_paths = [abilities_dir / abilityId, abilities_data_dir / abilityId, venv_bin_dir ]
 
     # find the start script in the ability's directory or the ability's data directory
     script_found = False
     for path in search_paths:
-        start_script_path = os.path.join(path, abilityId, start_script)
+        start_script_path = os.path.join(path, start_script_executable)
         if os.path.exists(start_script_path):
             script_found = True
             break
 
-    if not script_found: return {"error": "Start script not found in any base directory"}, 404
+    if not script_found: return {"error": f"Start script {start_script_executable} not found in {search_paths}"}, 404
 
     if os.name == "posix":    
         if not os.access(start_script_path, os.X_OK):
@@ -403,7 +375,11 @@ def start_ability(abilityId):
             except Exception as e:
                 print(f"Warning: Failed to set execute bit on start script: {e}")
 
-    process = subprocess.Popen([start_script_path], shell=True)
+
+    #command = f"{start_script_path} {shlex.quotes(start_script_args)}"
+    command = shlex.join([start_script_path] + start_script_args)
+    print(command)
+    process = subprocess.Popen(command, shell=True)
     ability['pid'] = process.pid
     return ok()
 
