@@ -1,4 +1,5 @@
 import os
+import json
 from dotenv import set_key
 from cryptography.fernet import Fernet
 
@@ -17,6 +18,8 @@ class EncryptionManager:
     # Encrypt a value using Fernet encryption
     def encrypt_value(self, value):
         f = Fernet(self.encryption_key)
+        if type(value) in (dict, list):
+           value = json.dumps(value)
         encrypted_value = f.encrypt(value.encode())
         return encrypted_value
 
