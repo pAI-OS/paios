@@ -526,7 +526,7 @@ paths:
         - User Management
       summary: Create New User
       description: Create a new user.
-      operationId: api.create_new_user
+      operationId: UserAPIAdapter.create_user
       requestBody:
         description: Post the necessary fields for the API to create a new user.
         content:
@@ -584,7 +584,7 @@ paths:
         - User Management
       summary: Retrieve all users
       description: Get all users.
-      operationId: api.retrieve_all_users
+      operationId: UserAPIAdapter.retrieve_all_users
       responses:
         '200':
           description: OK
@@ -630,7 +630,7 @@ paths:
         - User Management
       summary: Get User by User ID
       description: Retrieve the information of the user with the matching user ID.
-      operationId: api.retrieve_user_by_id
+      operationId: UserAPIAdapter.retrieve_user_by_id
       responses:
         '200':
           description: User Found
@@ -654,7 +654,7 @@ paths:
         - User Management
       summary: Update User Information
       description: Update the information of an existing user.
-      operationId: api.update_user_by_id
+      operationId: UserAPIAdapter.update_user_by_id
       requestBody:
         description: Patch user properties to update.
         content:
