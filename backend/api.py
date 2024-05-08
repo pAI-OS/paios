@@ -285,6 +285,7 @@ def ok(): return {"message": "OK"}, 200
 def not_implemented(): return {"message": "This operation is not implemented yet."}, 501
 def retrieve_all(payload, status_code=200): return jsonify(payload), status_code, {'X-Total-Count': len(payload)}
 
+# TODO: we need a better way to deal with OPTIONS requests required by CORS; can't automate this with connexion apparently
 # OPTIONS are required for CORS preflight requests
 def options_abilities(): return ok()
 def options_abilities_abilityid(): return ok()
