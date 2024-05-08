@@ -12,20 +12,14 @@ from paths import venv_bin_dir, abilities_dir, abilities_data_dir
 # TODO: We're not implementing multi-user yet so this is subject to change
 users = [
     {
-        "id": 142,
-        "firstName": "Alice",
-        "lastName": "Smith",
+        "id": "5bae4a90-ce69-4483-86ef-d723258f21e5",
+        "name": "Alice Smith",
         "email": "alice.smith@gmail.com",
-        "dateOfBirth": "1997-10-31",
-        "signUpDate": "2019-08-24"
     },
     {
-        "id": 351,
-        "firstName": "Bob",
-        "lastName": "Jones",
+        "id": "1cbb0bc5-bae2-4b9d-9555-f2282f767047",
+        "name": "Bob Jones",
         "email": "bob.jones@gmail.com",
-        "dateOfBirth": "1975-11-02",
-        "signUpDate": "2022-10-02"
     },
 ]
 
@@ -264,7 +258,7 @@ assets = [
   {
     "id": 523,
     "title": "Attention Is All You Need",
-    "userId": 142,
+    "userId": "5bae4a90-ce69-4483-86ef-d723258f21e5",
     "creator": "Ashish Vaswani et al",
     "subject": "Artificial Intelligence",
     "description": "We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely."
@@ -272,7 +266,7 @@ assets = [
   {
     "id": 952,
     "title": "Generative Adversarial Networks",
-    "userId": 351,
+    "userId": "1cbb0bc5-bae2-4b9d-9555-f2282f767047",
     "creator": "Goodfellow et al",
     "subject": "Artificial Intelligence",
     "description": "We propose a new framework for estimating generative models via an adversarial process, in which we simultaneously train two models: a generative model G that captures the data distribution, and a discriminative model D that estimates the probability that a sample came from the training data rather than G."

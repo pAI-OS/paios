@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   version: '0.1'
   title: Kwaai pAI-OS API
-  description: 'API for pAI-OS frontend interfaces (web, app) to backend services.'
+  description: 'API for pAI-OS admin interfaces (web, app) to backend services.'
   termsOfService: 'https://paios.org'
   contact:
     name: Kwaai
@@ -208,13 +208,13 @@ paths:
                 Example 1:
                   value:
                     - id: 523
-                      userId: 142
+                      userId: 5bae4a90-ce69-4483-86ef-d723258f21e5
                       title: Attention Is All You Need
                       creator: Ashish Vaswani et al
                       subject: Artificial Intelligence
                       description: 'We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.'
                     - id: 952
-                      userId: 351
+                      userId: 1cbb0bc5-bae2-4b9d-9555-f2282f767047
                       title: Generative Adversarial Networks
                       creator: Goodfellow et al
                       subject: Artificial Intelligence
@@ -534,27 +534,18 @@ paths:
             schema:
               type: object
               properties:
-                firstName:
-                  type: string
-                lastName:
+                name:
                   type: string
                 email:
                   type: string
-                dateOfBirth:
-                  type: string
-                  format: date
               required:
-                - firstName
-                - lastName
+                - name
                 - email
-                - dateOfBirth
             examples:
               Create User Bob Fellow:
                 value:
-                  firstName: Bob
-                  lastName: Fellow
+                  name: Bob Fellow
                   email: bob.fellow@gmail.com
-                  dateOfBirth: '1996-08-24'
       responses:
         '200':
           description: User Created
@@ -565,13 +556,9 @@ paths:
               examples:
                 New User Bob Fellow:
                   value:
-                    id: 12
-                    firstName: Bob
-                    lastName: Fellow
+                    id: 1cbb0bc5-bae2-4b9d-9555-f2282f767047
+                    name: Bob Fellow
                     email: bob.fellow@gmail.com
-                    dateOfBirth: '1996-08-24'
-                    emailVerified: false
-                    createDate: '2020-11-18'
         '400':
           description: Missing Required Information
         '409':
@@ -610,20 +597,12 @@ paths:
               examples:
                 Example 1:
                   value:
-                    - id: 142
-                      firstName: Alice
-                      lastName: Smith
+                    - id: 5bae4a90-ce69-4483-86ef-d723258f21e5
+                      name: Alice Smith
                       email: alice.smith@gmail.com
-                      dateOfBirth: '1997-10-31'
-                      emailVerified: true
-                      signUpDate: '2019-08-24'
-                    - id: 351
-                      firstName: Bob
-                      lastName: Jones
+                    - id: 1cbb0bc5-bae2-4b9d-9555-f2282f767047
+                      name: Bob Jones
                       email: bob.jones@gmail.com
-                      dateOfBirth: '1975-11-02'
-                      emailVerified: true
-                      signUpDate: '2022-10-02'
           headers:
             X-Total-Count:
               schema:
@@ -652,13 +631,6 @@ paths:
       summary: Get User by User ID
       description: Retrieve the information of the user with the matching user ID.
       operationId: api.retrieve_user_by_id
-      parameters:
-        - name: userId
-          in: path
-          description: Id of an existing user
-          required: true
-          schema:
-            type: integer
       responses:
         '200':
           description: User Found
@@ -669,13 +641,9 @@ paths:
               examples:
                 Get User Alice Smith:
                   value:
-                    id: 142
-                    firstName: Alice
-                    lastName: Smith
+                    id: 5bae4a90-ce69-4483-86ef-d723258f21e5
+                    name: Alice Smith
                     email: alice.smith@gmail.com
-                    dateOfBirth: '1997-10-31'
-                    emailVerified: true
-                    signUpDate: '2019-08-24'
         '404':
           description: User Not Found
       servers:
@@ -687,13 +655,6 @@ paths:
       summary: Update User Information
       description: Update the information of an existing user.
       operationId: api.update_user_by_id
-      parameters:
-        - name: userId
-          in: path
-          description: Id of an existing user
-          required: true
-          schema:
-            type: integer
       requestBody:
         description: Patch user properties to update.
         content:
@@ -701,26 +662,18 @@ paths:
             schema:
               type: object
               properties:
-                firstName:
-                  type: string
-                lastName:
+                name:
                   type: string
                 email:
                   type: string
                   description: 'If a new email is given, the user''s email verified property will be set to false.'
-                dateOfBirth:
-                  type: string
             examples:
-              Update First Name:
+              Update Name:
                 value:
-                  firstName: Rebecca
+                  name: Rebecca Baker
               Update Email:
                 value:
                   email: rebecca@gmail.com
-              Update Last Name & Date of Birth:
-                value:
-                  lastName: Baker
-                  dateOfBirth: '1985-10-02'
       responses:
         '200':
           description: User Updated
@@ -731,13 +684,9 @@ paths:
               examples:
                 Updated User Rebecca Baker:
                   value:
-                    id: 13
-                    firstName: Rebecca
-                    lastName: Baker
+                    id: 08c73f41-a733-4cef-945e-2b0aa978452e
+                    name: Rebecca Baker
                     email: rebecca@gmail.com
-                    dateOfBirth: '1985-10-02'
-                    emailVerified: false
-                    createDate: '2019-08-24'
         '404':
           description: User Not Found
         '409':
@@ -751,19 +700,20 @@ paths:
       summary: Options
       description: Respond to OPTIONS requests.
       operationId: api.options_users_userid
-      parameters:
-        - name: userId
-          in: path
-          description: Id of an existing user
-          required: true
-          schema:
-            type: integer
       responses:
         '200':
           description: OK
       servers:
         - url: 'http://localhost:3000'
           description: ''
+    parameters:
+      - schema:
+          type: string
+          format: uuid
+        name: userId
+        in: path
+        description: UUID of user
+        required: true
   '/abilities/{abilityId}/dependencies/resources/{dependencyId}/download/start':
     post:
       tags:
@@ -1004,7 +954,8 @@ components:
         id:
           type: integer
         userId:
-          type: integer
+          type: string
+          format: uuid
         title:
           type: string
         creator:
@@ -1043,31 +994,17 @@ components:
       type: object
       title: User
       description: pAI-OS users
+      required:
+        - id
+        - name
+        - email
       properties:
         id:
-          type: integer
-          description: Unique identifier for the given user.
-        firstName:
           type: string
-        lastName:
+          description: Unique identifier for the given user.
+          format: uuid
+        name:
           type: string
         email:
           type: string
           format: email
-        dateOfBirth:
-          type: string
-          format: date
-          example: '1997-10-31'
-        emailVerified:
-          type: boolean
-          description: Set to true if the user's email has been verified.
-        createDate:
-          type: string
-          description: The date that the user was created.
-          format: date
-      required:
-        - id
-        - firstName
-        - lastName
-        - email
-        - emailVerified

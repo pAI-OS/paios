@@ -3,7 +3,7 @@ import { List, SimpleList, Show, SimpleShowLayout, Datagrid, TextField, EmailFie
 
 const UserTitle = () => {
     const record = useRecordContext();
-    return <span>Users {record ? `- ${record.firstName} ${record.lastName}` : ""}</span>;
+    return <span>Users {record ? `- ${record.name}` : ""}</span>;
 };
 
 export const UserList = () => {
@@ -12,15 +12,13 @@ export const UserList = () => {
         <List>
             {isSmall ? (
                 <SimpleList
-                    primaryText={(record) => record.firstName}
-                    secondaryText={(record) => record.lastName}
-                    tertiaryText={(record) => record.email}
+                    primaryText={(record) => record.name}
+                    secondaryText={(record) => record.email}
                 />
             ) : (
                 <Datagrid rowClick="show">
                     <TextField source="id" />
-                    <TextField source="firstName" />
-                    <TextField source="lastName" />
+                    <TextField source="name" />
                     <EmailField source="email" />
                 </Datagrid>
             )}
@@ -32,8 +30,7 @@ export const UserShow = () => (
     <Show title={<UserTitle />}>
         <SimpleShowLayout>
                 <TextField source="id" />
-                    <TextField source="firstName" />
-                    <TextField source="lastName" />
+                    <TextField source="name" />
                     <EmailField source="email" />
         </SimpleShowLayout>
     </Show>
