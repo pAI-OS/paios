@@ -526,7 +526,7 @@ paths:
         - User Management
       summary: Retrieve all users
       description: Get all users.
-      operationId: api.retrieve_all_users
+      operationId: UserAPIAdapter.retrieve_all_users
       responses:
         '200':
           description: OK
