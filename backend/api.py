@@ -8,21 +8,6 @@ import pkg_resources
 import json
 from paths import venv_bin_dir, abilities_dir, abilities_data_dir
 
-# List of users
-# TODO: We're not implementing multi-user yet so this is subject to change
-users = [
-    {
-        "id": "5bae4a90-ce69-4483-86ef-d723258f21e5",
-        "name": "Alice Smith",
-        "email": "alice.smith@gmail.com",
-    },
-    {
-        "id": "1cbb0bc5-bae2-4b9d-9555-f2282f767047",
-        "name": "Bob Jones",
-        "email": "bob.jones@gmail.com",
-    },
-]
-
 # List of abilities
 # abilities = [
 #     {
@@ -298,24 +283,11 @@ def options_user(): return ok()
 def options_users(): return ok()
 def options_users_userid(): return ok()
 
-# Not implemented yet
-def update_user_by_id(userId): return not_implemented()
-def create_new_user(): return not_implemented()
-
 # Retrieve all
-def retrieve_all_users(): return retrieve_all(users)
 def retrieve_all_abilities(): return retrieve_all(abilities)
 def retrieve_all_assets(): return retrieve_all(assets)
 
 # Retrieve by ID
-def retrieve_user_by_id(userId):
-
-    for user in users:
-        if user['id'] == userId:
-            return user, 200
-    
-    return {"error": "User not found"}, 404
-
 def retrieve_ability_by_id(abilityId):
     ability = get_ability(abilityId)
     if ability:
