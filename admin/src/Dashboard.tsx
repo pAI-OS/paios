@@ -14,6 +14,6 @@ With the pAI-OS Admin Dashboard, you can:
         <li>Automate complex tasks and workflows across apps with simple natural language commands</li>
         <li>Get personalized insights, recommendations and intelligent assistance to optimize your productivity and digital wellbeing</li>
     </ul>
-The PAIOS Admin Dashboard makes it easy to unleash the full potential of artificial intelligence to streamline and enhance every aspect of your digital experience. Take charge of your AI-driven future with Kwaai's PAIOS.</CardContent>
+The pAI-OS Admin Dashboard makes it easy to unleash the full potential of artificial intelligence to streamline and enhance every aspect of your digital experience. Take charge of your AI-driven future with Kwaai's pAI-OS.</CardContent>
     </Card>
 );
