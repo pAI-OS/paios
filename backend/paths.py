@@ -1,5 +1,11 @@
 from pathlib import Path
 
+# TODO: Implement multi-tenancy e.g.:
+#self.backend_path = Path(__file__).resolve().parent
+#self.base_path = self.backend_path.parent
+#self.db_path = self.base_path / 'data' / (self.tenant if self.tenant else '')
+#self.db_path = self.db_path / 'paios.db'
+
 # directories
 root_dir = Path(__file__).resolve().parent.parent
 venv_dir = root_dir / '.venv'
