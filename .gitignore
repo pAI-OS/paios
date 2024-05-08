@@ -175,7 +175,3 @@ cython_debug/
 data/*
 !data/README.md
 
-# testing
-# VSCode REST Client files can contain keys
-*.http
-
