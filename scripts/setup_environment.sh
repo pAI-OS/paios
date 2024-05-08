@@ -3,7 +3,7 @@
 python3 -m venv .venv
 source .venv/bin/activate
 pip3 install -r backend/requirements.txt
-cd admin
+cd frontend
 npm install
 npm run build
 cd ..

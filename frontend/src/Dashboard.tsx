@@ -5,8 +5,8 @@ export const Dashboard = () => (
     <Card>
         <Title title="Personal Artificial Intelligence Operating System (pAI-OS)" />
         <CardHeader title="Welcome to the Personal Artificial Intelligence Operating System (pAI-OS)" />
-        <CardContent>Take control of your digital life with the revolutionary pAI-OS Admin Dashboard. This intuitive interface puts you in the driver's seat of your own AI-powered operating system.
-With the pAI-OS Admin Dashboard, you can:
+        <CardContent>Take control of your digital life with the revolutionary pAI-OS Dashboard. This intuitive interface puts you in the driver's seat of your own AI-powered operating system.
+With the pAI-OS Dashboard, you can:
     <ul>
         <li>Customize your AI assistant's personality, knowledge, and capabilities to fit your unique needs and preferences</li>
         <li>Seamlessly connect and manage all your smart devices, online accounts, and digital services in one unified hub</li>
@@ -14,6 +14,6 @@ With the pAI-OS Admin Dashboard, you can:
         <li>Automate complex tasks and workflows across apps with simple natural language commands</li>
         <li>Get personalized insights, recommendations and intelligent assistance to optimize your productivity and digital wellbeing</li>
     </ul>
-The pAI-OS Admin Dashboard makes it easy to unleash the full potential of artificial intelligence to streamline and enhance every aspect of your digital experience. Take charge of your AI-driven future with Kwaai's pAI-OS.</CardContent>
+The pAI-OS Dashboard makes it easy to unleash the full potential of artificial intelligence to streamline and enhance every aspect of your digital experience. Take charge of your AI-driven future with Kwaai's pAI-OS.</CardContent>
     </Card>
 );

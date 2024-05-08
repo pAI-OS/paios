@@ -12,8 +12,8 @@ if not os.getenv('PAIOS_BEARER_TOKEN'):
     os.environ['PAIOS_BEARER_TOKEN'] = token
     set_key('.env', 'PAIOS_BEARER_TOKEN', token)
 
-    # Set the token to the admin/.env file as well so the admin app can use it
-    env_file = os.path.join(os.path.dirname(__file__), '..', 'admin', '.env')
+    # Set the token to the frontend/.env file as well so the frontend can use it
+    env_file = os.path.join(os.path.dirname(__file__), '..', 'frontend', '.env')
     set_key(env_file, 'VITE_PAIOS_BEARER_TOKEN', token)
 
 def validate_bearer_token():

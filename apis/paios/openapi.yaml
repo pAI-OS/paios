@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   version: '0.1'
   title: Kwaai pAI-OS API
-  description: 'API for pAI-OS admin interfaces (web, app) to backend services.'
+  description: 'API for pAI-OS frontend interfaces (web, app) to backend services.'
   termsOfService: 'https://paios.org'
   contact:
     name: Kwaai

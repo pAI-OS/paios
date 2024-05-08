@@ -1,5 +1,5 @@
 {
-  "name": "paios-admin",
+  "name": "paios-frontend",
   "private": true,
   "scripts": {
     "dev": "vite",
