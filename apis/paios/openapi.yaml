@@ -617,7 +617,7 @@ paths:
         - User Management
       summary: Retrieve user by id
       description: Retrieve the information of the user with the matching user ID.
-      operationId: api.retrieve_user_by_id
+      operationId: UserAPIAdapter.retrieve_user_by_id
       responses:
         '200':
           description: User Found
@@ -679,6 +679,18 @@ paths:
           description: User Not Found
         '409':
           description: Email Already Taken
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
+    delete:
+      tags:
+        - User Management
+      summary: Delete user by ID
+      description: Delete the user with the specified ID
+      operationId: UserAPIAdapter.delete_user_by_id
+      responses:
+        '200':
+          description: OK
       servers:
         - url: 'http://localhost:3000'
           description: ''
