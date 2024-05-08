@@ -389,7 +389,7 @@ paths:
         - Configuration Management
       summary: Get Config by Key
       description: Retrieve the config item with the specified key.
-      operationId: api.retrieve_config_by_key
+      operationId: ConfigAPIAdapter.retrieve_config_by_key
       parameters:
         - name: key
           in: path
@@ -420,7 +420,7 @@ paths:
         - Configuration Management
       summary: Update Config by Key
       description: Set a config item with the specified key.
-      operationId: api.update_config_by_key
+      operationId: ConfigAPIAdapter.update_config_by_key
       parameters:
         - name: key
           in: path
@@ -447,7 +447,7 @@ paths:
         - Configuration Management
       summary: Delete Config by Key
       description: Delete a config item with the specified key.
-      operationId: api.delete_config_by_key
+      operationId: ConfigAPIAdapter.delete_config_by_key
       parameters:
         - name: key
           in: path
