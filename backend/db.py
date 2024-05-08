@@ -18,6 +18,7 @@ def init_db():
     command.upgrade(alembic_cfg, "head")
 
 def execute_query(query, params=None):
+    print(f"Executing query: {query} with params: {params}")
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
 

@@ -297,7 +297,7 @@ paths:
         - Channel Management
       summary: Retrieve all channels
       description: Retrieve the information of all channels.
-      operationId: api.retrieve_all_channels
+      operationId: ChannelAPIAdapter.retrieve_all_channels
       responses:
         '200':
           description: OK
@@ -340,7 +340,7 @@ paths:
         - Channel Management
       summary: Retrieve channel by ID
       description: Retrieve the information of the channel with the matching channel ID.
-      operationId: api.retrieve_channel_by_id
+      operationId: ChannelAPIAdapter.retrieve_channel_by_id
       parameters:
         - name: channelId
           in: path
