@@ -17,6 +17,9 @@
     },
     "language": "python",
     "license": "Apache-2.0",
+    "scripts": {
+        "start": "chroma run"
+    },
     "dependencies": {
         "python": [
             {
