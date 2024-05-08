@@ -1,0 +1,60 @@
+POST http://localhost:3000/users
+Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
+Content-Type: application/json
+
+{
+    "name": "Tony Rogerson",
+    "email": "tony.rogerson@gmail.com"
+}
+
+###
+PUT http://localhost:3000/users/5bae4a90-ce69-4483-86ef-d723258f21e5
+Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
+Content-Type: application/json
+
+{
+    "id": "5bae4a90-ce69-4483-86ef-d723258f21e5",
+    "name": "Alice Smith",
+    "email": "alice.smith@gmail.com"
+}
+
+###
+PUT http://localhost:3000/users/1cbb0bc5-bae2-4b9d-9555-f2282f767047
+Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
+Content-Type: application/json
+
+{
+    "id": "1cbb0bc5-bae2-4b9d-9555-f2282f767047",
+    "name": "Bob Jones",
+    "email": "bob.jones@gmail.com"
+}
+
+###
+
+DELETE http://localhost:3000/users/5bae4a90-ce69-4483-86ef-d723258f21e5
+Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
+Content-Type: application/json
+
+###
+
+DELETE http://localhost:3000/users/1cbb0bc5-bae2-4b9d-9555-f2282f767047
+Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
+Content-Type: application/json
+
+###
+
+GET http://localhost:3000/users/5bae4a90-ce69-4483-86ef-d723258f21e5
+Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
+Content-Type: application/json
+
+###
+
+GET http://localhost:3000/users/1cbb0bc5-bae2-4b9d-9555-f2282f767047
+Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
+Content-Type: application/json
+
+###
+
+GET http://localhost:3000/users
+Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
+Content-Type: application/json

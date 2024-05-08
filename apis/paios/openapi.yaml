@@ -520,71 +520,13 @@ paths:
       servers:
         - url: 'http://localhost:3000'
           description: ''
-  /user:
-    post:
-      tags:
-        - User Management
-      summary: Create New User
-      description: Create a new user.
-      operationId: UserAPIAdapter.create_user
-      requestBody:
-        description: Post the necessary fields for the API to create a new user.
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                email:
-                  type: string
-              required:
-                - name
-                - email
-            examples:
-              Create User Bob Fellow:
-                value:
-                  name: Bob Fellow
-                  email: bob.fellow@gmail.com
-      responses:
-        '200':
-          description: User Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-              examples:
-                New User Bob Fellow:
-                  value:
-                    id: 1cbb0bc5-bae2-4b9d-9555-f2282f767047
-                    name: Bob Fellow
-                    email: bob.fellow@gmail.com
-        '400':
-          description: Missing Required Information
-        '409':
-          description: Email Already Taken
-      servers:
-        - url: 'http://localhost:3000'
-          description: ''
-    options:
-      tags:
-        - User Management
-      summary: Options
-      description: Respond to OPTIONS requests.
-      operationId: api.options_user
-      responses:
-        '200':
-          description: OK
-      servers:
-        - url: 'http://localhost:3000'
-          description: ''
   /users:
     get:
       tags:
         - User Management
       summary: Retrieve all users
       description: Get all users.
-      operationId: UserAPIAdapter.retrieve_all_users
+      operationId: api.retrieve_all_users
       responses:
         '200':
           description: OK
@@ -612,6 +554,51 @@ paths:
       servers:
         - url: 'http://localhost:3000'
           description: ''
+    post:
+      tags:
+        - User Management
+      summary: Create new user
+      description: Create a new user.
+      operationId: UserAPIAdapter.create_user
+      requestBody:
+        description: Post the necessary fields for the API to create a new user.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+              required:
+                - name
+                - email
+            examples:
+              Create User Bob Fellow:
+                value:
+                  name: Bob Fellow
+                  email: bob.fellow@gmail.com
+      responses:
+        '201':
+          description: User Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+              examples:
+                New User Bob Fellow:
+                  value:
+                    id: 1cbb0bc5-bae2-4b9d-9555-f2282f767047
+                    name: Bob Fellow
+                    email: bob.fellow@gmail.com
+        '400':
+          description: Missing Required Information
+        '409':
+          description: Email Already Taken
+      servers:
+        - url: 'http://localhost:3000'
+          description: ''
     options:
       tags:
         - User Management
@@ -628,9 +615,9 @@ paths:
     get:
       tags:
         - User Management
-      summary: Get User by User ID
+      summary: Retrieve user by id
       description: Retrieve the information of the user with the matching user ID.
-      operationId: UserAPIAdapter.retrieve_user_by_id
+      operationId: api.retrieve_user_by_id
       responses:
         '200':
           description: User Found
@@ -649,14 +636,16 @@ paths:
       servers:
         - url: 'http://localhost:3000'
           description: ''
-    patch:
+    put:
       tags:
         - User Management
-      summary: Update User Information
+      x-stoplight:
+        id: 858fb504a044d
+      summary: Update user
       description: Update the information of an existing user.
       operationId: UserAPIAdapter.update_user_by_id
       requestBody:
-        description: Patch user properties to update.
+        description: User to update.
         content:
           application/json:
             schema:
@@ -666,7 +655,6 @@ paths:
                   type: string
                 email:
                   type: string
-                  description: 'If a new email is given, the user''s email verified property will be set to false.'
             examples:
               Update Name:
                 value:

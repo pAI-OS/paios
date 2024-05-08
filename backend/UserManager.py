@@ -1,3 +1,4 @@
+from uuid import uuid4
 import db
 from paths import db_path
 
@@ -6,8 +7,10 @@ class UserManager:
         db.init_db()
 
     def create_user(self, name, email):
-        query = 'INSERT INTO user (name, email) VALUES (?, ?)'
-        db.execute_query(query, (name, email))
+        id = str(uuid4())
+        query = 'INSERT INTO user (id, name, email) VALUES (?, ?, ?)'
+        db.execute_query(query, (id, name, email))
+        return id
 
     def retrieve_all_users(self):
         query = 'SELECT id, name, email FROM user'
@@ -25,8 +28,9 @@ class UserManager:
         return None
 
     def update_user(self, id, name, email):
-        query = 'UPDATE user SET name = ?, email = ? WHERE id = ?'
-        db.execute_query(query, (name, email, id))
+        query = 'INSERT OR REPLACE INTO user (id, name, email) VALUES (?, ?, ?)'
+        result = db.execute_query(query, (id, name, email))
+        print("result: ", result)
 
     def delete_user(self, id):
         query = 'DELETE FROM user WHERE id = ?'
