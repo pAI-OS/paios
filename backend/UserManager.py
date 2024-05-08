@@ -29,9 +29,8 @@ class UserManager:
 
     def update_user(self, id, name, email):
         query = 'INSERT OR REPLACE INTO user (id, name, email) VALUES (?, ?, ?)'
-        result = db.execute_query(query, (id, name, email))
-        print("result: ", result)
+        return db.execute_query(query, (id, name, email))
 
     def delete_user(self, id):
         query = 'DELETE FROM user WHERE id = ?'
-        db.execute_query(query, (id,))
+        return db.execute_query(query, (id,))
