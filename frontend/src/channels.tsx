@@ -1,6 +1,4 @@
-import React from 'react';
 import { List, Datagrid, TextField, UrlField, Show, SimpleShowLayout } from 'react-admin';
-import SyncAltIcon from '@mui/icons-material/SyncAlt';
 
 export const ChannelList = () => (
   <List>
