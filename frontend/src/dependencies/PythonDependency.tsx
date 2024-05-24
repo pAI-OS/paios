@@ -58,7 +58,7 @@ const InstallButton = ({ abilityId }: { abilityId: string }) => {
                 notify('Python dependency installation requested');
                 refresh();
             })
-            .catch((e) => {
+            .catch((e: any) => {
                 notify('Error: Python dependency not installed', { type: 'warning' });
             })
             .finally(() => {
