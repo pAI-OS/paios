@@ -1,10 +1,12 @@
 from flask import jsonify
 import os
+import sys
 import signal
 import subprocess
 import shlex
 import packaging
 import pkg_resources
+from pathlib import Path
 import json
 from paths import venv_bin_dir, abilities_dir, abilities_data_dir
 
@@ -309,28 +311,32 @@ def start_ability(abilityId):
 
     print(f"Starting ability {abilityId}")
     ability = get_ability(abilityId)
+    if ability is None: return {"error": "Ability not found"}, 404
+
     start_script = ability.get('scripts', {}).get('start', '')
-    start_script_parts = start_script.split(' ')
-    start_script_executable = start_script_parts[0] if start_script_parts else None
-    start_script_args = start_script_parts[1:] if len(start_script_parts) > 1 else ''
+    if start_script is None: return {"error": "Ability start script not set"}, 404
 
-    if start_script_executable is None:
-        return {"error": "Ability not found or start script not set"}, 404
+    start_script_parts = shlex.split(start_script)
+    #start_script_argv0 = start_script_parts[0] # if start_script_parts else None
+    #start_script_args = start_script_parts[1:] if len(start_script_parts) > 1 else []
 
-    # Start the subprocess and store the PID in the ability dictionary
-    search_paths = [abilities_dir / abilityId, abilities_data_dir / abilityId, venv_bin_dir ]
+    if start_script_parts is None:
+        return {"error": "Unable to determine start script executable"}, 500
 
     # find the start script in the ability's directory or the ability's data directory
+    search_paths = [abilities_dir / abilityId, abilities_data_dir / abilityId, venv_bin_dir ]
     script_found = False
     for path in search_paths:
-        start_script_path = os.path.join(path, start_script_executable)
-        if os.path.exists(start_script_path):
+        start_script_candidate = os.path.join(path, start_script_parts[0])
+        if os.path.exists(start_script_candidate):
+            start_script_cwd = path
+            start_script_parts[0] = start_script_candidate
             script_found = True
             break
+    if not script_found: return {"error": f"Start script {start_script_parts[0]} not found in {search_paths}"}, 404
 
-    if not script_found: return {"error": f"Start script {start_script_executable} not found in {search_paths}"}, 404
-
-    if os.name == "posix":    
+    # Set the execute bit on the start script if it's not already set (e.g. fresh clone from git)
+    if os.name == "posix": # Linux, macOS, etc.
         if not os.access(start_script_path, os.X_OK):
             current_permissions = stat.S_IMODE(os.lstat(start_script_path).st_mode)
             try:
@@ -339,11 +345,21 @@ def start_ability(abilityId):
             except Exception as e:
                 print(f"Warning: Failed to set execute bit on start script: {e}")
 
+    # Prepend the Python executable to the start script if it's a Python script rather than relying on associations or shebang
+    if start_script_parts[0].endswith('.py'):
+        python_executable = str(Path(sys.executable))
+        start_script_parts.insert(0, python_executable)
 
-    #command = f"{start_script_path} {shlex.quotes(start_script_args)}"
-    command = shlex.join([start_script_path] + start_script_args)
-    print(command)
-    process = subprocess.Popen(command, shell=True)
+    # Define file paths for stdout and stderr
+    stdout_file_path = Path(start_script_cwd) / f"{abilityId}_stdout.log"
+    stderr_file_path = Path(start_script_cwd) / f"{abilityId}_stderr.log"
+
+    # Open file handles
+    stdout_file = open(stdout_file_path, 'w')
+    stderr_file = open(stderr_file_path, 'w')
+
+    # Start the subprocess and store the PID in the ability dictionary
+    process = subprocess.Popen(start_script_parts, cwd=start_script_cwd, shell=False, stdout=stdout_file, stderr=stderr_file, text=True)
     ability['pid'] = process.pid
     return ok()
 
