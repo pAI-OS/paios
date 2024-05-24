@@ -1,7 +1,7 @@
 // PythonDependency.tsx
 import { Button, Datagrid, TextField } from 'react-admin';
 import { useState, useEffect, useRef } from 'react';
-import { CheckedField } from '../lib/CheckedField';
+import { CheckedField } from '../components/CheckedField';
 import GetAppIcon from '@mui/icons-material/GetApp';
 import { useRecordContext, useNotify, useRefresh } from 'react-admin';
 import { apiBase, httpClient } from '../apiBackend';
