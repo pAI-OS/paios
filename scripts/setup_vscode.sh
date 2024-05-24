@@ -1,3 +1,10 @@
+# setup_vscode.sh
+
+# Description: This script is used to setup the VSCode settings.json file by
+# substituting the PAIOS_BEARER_TOKEN value from the .env file in the backend
+# directory. This allows the REST Client extension to use the PAIOS_BEARER_TOKEN
+# value to authenticate requests to the PAIOS API.
+
 # Get the absolute path to the script's parent directory
 PARENT_DIR=$(dirname "$(dirname "$(realpath "$0")")")
 
