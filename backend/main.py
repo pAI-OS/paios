@@ -15,4 +15,4 @@ app.app.before_request(validate_bearer_token)
 app.add_api('openapi.yaml')
 
 if __name__ == '__main__':
-    app.run(port=3000)
+    app.run(host='localhost', port=3080)

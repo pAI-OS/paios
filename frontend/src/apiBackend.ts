@@ -1,6 +1,6 @@
 import { fetchUtils } from 'react-admin';
 
-export const apiBase = import.meta.env.VITE_JSON_SERVER_URL || 'http://localhost:3000';
+export const apiBase = import.meta.env.VITE_JSON_SERVER_URL || 'http://localhost:3080';
 
 export const httpClient = (url: string, options: any = {}) => {
     if (!options.headers) {
