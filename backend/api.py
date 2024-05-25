@@ -74,9 +74,15 @@ def get_ability(abilityId):
     return None
 
 def get_ability_dependency(abilityId, dependencyId, dependencyType):
+    # print(f"Getting dependency {dependencyId} of type {dependencyType} for ability {abilityId}")
     ability = get_ability(abilityId)
+    # print(f"Ability: {ability}")
     if not ability: return None
+    if dependencyType not in ability["dependencies"]:
+        # print(f"Dependency type {dependencyType} not found for ability {abilityId}")
+        return None
     for dependency in ability["dependencies"][dependencyType]:
+        # print(f"Dependency: {dependency}")
         if dependency["id"] == dependencyId: return dependency
     return None
 
@@ -166,15 +172,15 @@ def ability_resource_dependency_download_start(abilityId, dependencyId):
     ability_data_dir = os.path.join(abilities_data_dir, abilityId)
     local_file = ''
 
-    try:
-        dependency = get_ability_dependency(abilityId, dependencyId, "resource")
-        url = dependency["url"]
-        local_file = os.path.join(ability_data_dir, dependency["filename"])
+    #try:
+    dependency = get_ability_dependency(abilityId, dependencyId, "resources")
+    url = dependency["url"]
+    local_file = os.path.join(ability_data_dir, dependency["filename"])
 
-        dependency["keepDownloading"] = True
-    except KeyError:
-        print(f"An error occurred downloading ability {abilityId} dependency {dependencyId}")
-        return
+    dependency["keepDownloading"] = True
+    #except KeyError:
+    #    print(f"An error occurred downloading ability {abilityId} dependency {dependencyId}")
+    #    return
 
     def download_file():
         #print("Downloading " + url + " to " + dependency["localFile"])
@@ -209,7 +215,7 @@ def ability_resource_dependency_download_start(abilityId, dependencyId):
         # give up and exit thread after timeout
         if time.time() - start_time > timeout: return
         # exit thread if keepDownloading is False or removed
-        dependency = get_ability_dependency(abilityId, dependencyId)
+        dependency = get_ability_dependency(abilityId, dependencyId, "resources")
         if not dependency or not dependency.get('keepDownloading'): return
 
     start_time = time.time()
@@ -219,7 +225,7 @@ def ability_resource_dependency_download_start(abilityId, dependencyId):
 
 def ability_resource_dependency_download_stop(abilityId, dependencyId): 
     # sets keepDownloading to False to stop download thread
-    dependency = get_ability_dependency(abilityId, dependencyId, "resource")
+    dependency = get_ability_dependency(abilityId, dependencyId, "resources")
     if dependency:
         if "keepDownloading" in dependency:
             del dependency["keepDownloading"]
@@ -227,7 +233,7 @@ def ability_resource_dependency_download_stop(abilityId, dependencyId):
 
 def ability_resource_dependency_download_delete(abilityId, dependencyId): 
     # deletes local file
-    dependency = get_ability_dependency(abilityId, dependencyId, "resource")
+    dependency = get_ability_dependency(abilityId, dependencyId, "resources")
     ability_data_dir = os.path.join(abilities_data_dir, abilityId)
     local_file = os.path.join(ability_data_dir, dependency["filename"])
     if dependency:
