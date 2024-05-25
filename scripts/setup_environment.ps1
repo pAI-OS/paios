@@ -60,11 +60,8 @@ if ($env:OS -eq "Windows_NT") {
 }
 
 Write-Host "Installing Python dependencies using venv's pip."
-& $venvPip install -r "$basePath/backend/requirements.txt"
+& $venvPip install -r "$basePath\backend\requirements.txt"
 
-# Install Python packages from requirements.txt
-Write-Host "Installing Python dependencies."
-pip install -r backend\requirements.txt
 # Check if npm is available
 $npmInstalled = $null
 try {
