@@ -12,7 +12,7 @@ info:
     url: 'https://github.com/pAI-OS/paios/blob/main/LICENSE'
     name: MIT
 servers:
-  - url: 'http://localhost:3000'
+  - url: '/api/v1'
     description: ''
 paths:
   /abilities:
@@ -21,7 +21,6 @@ paths:
         - Abilities Management
       summary: Retrieve all abilities
       description: Retrieve the information of all abilities.
-      operationId: api.retrieve_all_abilities
       responses:
         '200':
           description: OK
@@ -46,28 +45,20 @@ paths:
                 type: string
                 example: '2'
               description: Count of results required by jsonServer Data Provider for pagination
-      servers:
-        - url: 'http://localhost:3000'
-          description: ''
     options:
       tags:
         - Abilities Management
       summary: Options
       description: Respond to OPTIONS requests.
-      operationId: api.options_abilities
       responses:
         '200':
           description: OK
-      servers:
-        - url: 'http://localhost:3000'
-          description: ''
   '/abilities/{abilityId}':
     get:
       tags:
         - Abilities Management
       summary: Retrieve ability by ID
       description: Retrieve the information of the ability with the matching ability ID.
-      operationId: api.retrieve_ability_by_id
       parameters:
         - name: abilityId
           in: path
@@ -88,15 +79,11 @@ paths:
                     id: optical-character-recognition
                     name: Optical Character Recognition
                     description: Conversion of images to text
-      servers:
-        - url: 'http://localhost:3000'
-          description: ''
     options:
       tags:
         - Abilities Management
       summary: Options
       description: Respond to OPTIONS requests.
-      operationId: api.options_abilities_abilityid
       parameters:
         - name: abilityId
           in: path
@@ -107,16 +94,12 @@ paths:
       responses:
         '200':
           description: OK
-      servers:
-        - url: 'http://localhost:3000'
-          description: ''
   '/abilities/{abilityId}/start':
     post:
       tags:
         - Abilities Management
       summary: Start ability
       description: Starts the ability with the matching ability ID.
-      operationId: api.start_ability
       parameters:
         - name: abilityId
           in: path
@@ -127,15 +110,11 @@ paths:
       responses:
         '200':
           description: OK
-      servers:
-        - url: 'http://localhost:3000'
-          description: ''
     options:
       tags:
         - Abilities Management
       summary: Options
       description: Respond to OPTIONS requests.
-      operationId: api.options_abilities_abilityid_start
       parameters:
         - name: abilityId
           in: path
@@ -146,16 +125,12 @@ paths:
       responses:
         '200':
           description: OK
-      servers:
-        - url: 'http://localhost:3000'
-          description: ''
   '/abilities/{abilityId}/stop':
     post:
       tags:
         - Abilities Management
       summary: Stop ability
       description: Stops the ability with the matching ability ID.
-      operationId: api.stop_ability
       parameters:
         - name: abilityId
           in: path
@@ -166,15 +141,11 @@ paths:
       responses:
         '200':
           description: OK
-      servers:
-        - url: 'http://localhost:3000'
-          description: ''
     options:
       tags:
         - Abilities Management
       summary: Options
       description: Respond to OPTIONS requests.
-      operationId: api.options_abilities_abilityid_stop
       parameters:
         - name: abilityId
           in: path
@@ -185,16 +156,12 @@ paths:
       responses:
         '200':
           description: OK
-      servers:
-        - url: 'http://localhost:3000'
-          description: ''
   /assets:
     get:
       tags:
         - Asset Management
       summary: Retrieve all assets
       description: Retrieve the information of all assets.
-      operationId: api.retrieve_all_assets
       responses:
         '200':
           description: OK
@@ -226,19 +193,18 @@ paths:
                 example: '2'
               description: Count of results required by jsonServer Data Provider for pagination
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
     options:
       tags:
         - Asset Management
       summary: Options
       description: Respond to OPTIONS requests.
-      operationId: api.options_assets
       responses:
         '200':
           description: OK
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
   '/assets/{assetId}':
     get:
@@ -246,7 +212,6 @@ paths:
         - Asset Management
       summary: Retrieve asset by ID
       description: Retrieve the information of the asset with the matching asset ID.
-      operationId: api.retrieve_asset_by_id
       parameters:
         - name: assetId
           in: path
@@ -270,14 +235,13 @@ paths:
                     subject: Artificial Intelligence
                     description: 'We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.'
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
     options:
       tags:
         - Asset Management
       summary: Options
       description: Respond to OPTIONS requests.
-      operationId: api.options_assets_assetid
       parameters:
         - name: assetId
           in: path
@@ -289,7 +253,7 @@ paths:
         '200':
           description: OK
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
   /channels:
     get:
@@ -297,7 +261,6 @@ paths:
         - Channel Management
       summary: Retrieve all channels
       description: Retrieve the information of all channels.
-      operationId: ChannelAPIAdapter.retrieve_all_channels
       responses:
         '200':
           description: OK
@@ -320,19 +283,18 @@ paths:
                 example: '2'
               description: Count of results required by jsonServer Data Provider for pagination
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
     options:
       tags:
         - Channel Management
       summary: Options
       description: Respond to OPTIONS requests.
-      operationId: api.options_channels
       responses:
         '200':
           description: OK
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
   '/channels/{channelId}':
     get:
@@ -340,7 +302,6 @@ paths:
         - Channel Management
       summary: Retrieve channel by ID
       description: Retrieve the information of the channel with the matching channel ID.
-      operationId: ChannelAPIAdapter.retrieve_channel_by_id
       parameters:
         - name: channelId
           in: path
@@ -362,14 +323,13 @@ paths:
                     name: Large Language Model API
                     uri: 'https://localhost:8080/v1'
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
     post:
       tags:
         - Channel Management
       summary: Update channel by key
       description: Update a channel with the specified ID.
-      operationId: ChannelAPIAdapter.update_channel_by_id
       parameters:
         - name: channelId
           in: path
@@ -386,14 +346,13 @@ paths:
         '200':
           description: OK
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
     delete:
       tags:
         - Channel Management
       summary: Delete channel by key
       description: Delete a channel with the specified ID.
-      operationId: ChannelAPIAdapter.delete_channel_by_id
       parameters:
         - name: channelId
           in: path
@@ -405,14 +364,13 @@ paths:
         '200':
           description: OK
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
     options:
       tags:
         - Channel Management
       summary: Options
       description: Respond to OPTIONS requests.
-      operationId: api.options_channels_channelid
       parameters:
         - name: channelId
           in: path
@@ -424,7 +382,7 @@ paths:
         '200':
           description: OK
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
   '/config/{key}':
     get:
@@ -432,7 +390,6 @@ paths:
         - Configuration Management
       summary: Retrieve config by key
       description: Retrieve the config item with the specified key.
-      operationId: ConfigAPIAdapter.retrieve_config_by_key
       parameters:
         - name: key
           in: path
@@ -456,14 +413,13 @@ paths:
                   value:
                     x: 'y'
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
     post:
       tags:
         - Configuration Management
       summary: Update config by key
       description: Set a config item with the specified key.
-      operationId: ConfigAPIAdapter.update_config_by_key
       parameters:
         - name: key
           in: path
@@ -480,14 +436,13 @@ paths:
         '200':
           description: OK
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
     delete:
       tags:
         - Configuration Management
       summary: Delete config by key
       description: Delete a config item with the specified key.
-      operationId: ConfigAPIAdapter.delete_config_by_key
       parameters:
         - name: key
           in: path
@@ -499,14 +454,13 @@ paths:
         '200':
           description: OK
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
     options:
       tags:
         - Configuration Management
       summary: Options
       description: Respond to OPTIONS requests.
-      operationId: api.options_config
       parameters:
         - name: key
           in: path
@@ -518,7 +472,7 @@ paths:
         '200':
           description: OK
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
   /users:
     get:
@@ -526,7 +480,6 @@ paths:
         - User Management
       summary: Retrieve all users
       description: Get all users.
-      operationId: UserAPIAdapter.retrieve_all_users
       responses:
         '200':
           description: OK
@@ -552,14 +505,13 @@ paths:
                 example: 2
               description: Count of results required by jsonServer Data Provider for pagination
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
     post:
       tags:
         - User Management
       summary: Create new user
       description: Create a new user.
-      operationId: UserAPIAdapter.create_user
       requestBody:
         description: Post the necessary fields for the API to create a new user.
         content:
@@ -597,19 +549,18 @@ paths:
         '409':
           description: Email Already Taken
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
     options:
       tags:
         - User Management
       summary: Options
       description: Respond to OPTIONS requests.
-      operationId: api.options_users
       responses:
         '200':
           description: OK
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
   '/users/{userId}':
     get:
@@ -617,7 +568,14 @@ paths:
         - User Management
       summary: Retrieve user by id
       description: Retrieve the information of the user with the matching user ID.
-      operationId: UserAPIAdapter.retrieve_user_by_id
+      parameters:
+        - name: userId
+          in: path
+          description: UUID of user
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         '200':
           description: User Found
@@ -634,16 +592,21 @@ paths:
         '404':
           description: User Not Found
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
     put:
       tags:
         - User Management
-      x-stoplight:
-        id: 858fb504a044d
       summary: Update user
       description: Update the information of an existing user.
-      operationId: UserAPIAdapter.update_user_by_id
+      parameters:
+        - name: userId
+          in: path
+          description: UUID of user
+          required: true
+          schema:
+            type: string
+            format: uuid
       requestBody:
         description: User to update.
         content:
@@ -680,47 +643,52 @@ paths:
         '409':
           description: Email Already Taken
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
     delete:
       tags:
         - User Management
       summary: Delete user by ID
       description: Delete the user with the specified ID
-      operationId: UserAPIAdapter.delete_user_by_id
+      parameters:
+        - name: userId
+          in: path
+          description: UUID of user
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         '200':
           description: OK
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
     options:
       tags:
         - User Management
       summary: Options
       description: Respond to OPTIONS requests.
-      operationId: api.options_users_userid
+      parameters:
+        - name: userId
+          in: path
+          description: UUID of user
+          required: true
+          schema:
+            type: string
+            format: uuid
       responses:
         '200':
           description: OK
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
-    parameters:
-      - schema:
-          type: string
-          format: uuid
-        name: userId
-        in: path
-        description: UUID of user
-        required: true
   '/abilities/{abilityId}/dependencies/resources/{dependencyId}/download/start':
     post:
       tags:
         - Abilities Management
       summary: Start download
       description: Downloads an ability's dependency.
-      operationId: api.ability_resource_dependency_download_start
       parameters:
         - name: abilityId
           in: path
@@ -738,14 +706,13 @@ paths:
         '200':
           description: Download started
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
     options:
       tags:
         - Abilities Management
       summary: Options
       description: Respond to OPTIONS requests.
-      operationId: api.options_ability_resource_dependency_download_start
       parameters:
         - name: abilityId
           in: path
@@ -763,7 +730,7 @@ paths:
         '200':
           description: OK
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
   '/abilities/{abilityId}/dependencies/resources/{dependencyId}/download/stop':
     post:
@@ -771,7 +738,6 @@ paths:
         - Abilities Management
       summary: Stop download
       description: Stops download of an ability's dependency.
-      operationId: api.ability_resource_dependency_download_stop
       parameters:
         - name: abilityId
           in: path
@@ -789,14 +755,13 @@ paths:
         '200':
           description: Download stopped
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
     options:
       tags:
         - Abilities Management
       summary: Options
       description: Respond to OPTIONS requests.
-      operationId: api.options_ability_resource_dependency_download_stop
       parameters:
         - name: abilityId
           in: path
@@ -814,7 +779,7 @@ paths:
         '200':
           description: OK
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
   '/abilities/{abilityId}/dependencies/resources/{dependencyId}/download/delete':
     post:
@@ -822,7 +787,6 @@ paths:
         - Abilities Management
       summary: Delete download
       description: Deletes download of an ability's dependency.
-      operationId: api.ability_resource_dependency_download_delete
       parameters:
         - name: abilityId
           in: path
@@ -840,14 +804,13 @@ paths:
         '200':
           description: Download deleted
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
     options:
       tags:
         - Abilities Management
       summary: Options
       description: Respond to OPTIONS requests.
-      operationId: api.options_ability_resource_dependency_download_delete
       parameters:
         - name: abilityId
           in: path
@@ -865,7 +828,7 @@ paths:
         '200':
           description: OK
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
   '/abilities/{abilityId}/dependencies/python/{dependencyId}/install':
     post:
@@ -873,7 +836,6 @@ paths:
         - Abilities Management
       summary: Start install
       description: Installs an ability's dependency.
-      operationId: api.ability_python_dependency_install
       parameters:
         - name: abilityId
           in: path
@@ -891,14 +853,13 @@ paths:
         '200':
           description: Install started
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
     options:
       tags:
         - Abilities Management
       summary: Options
       description: Respond to OPTIONS requests.
-      operationId: api.options_ability_python_dependency_install
       parameters:
         - name: abilityId
           in: path
@@ -916,7 +877,7 @@ paths:
         '200':
           description: OK
       servers:
-        - url: 'http://localhost:3000'
+        - url: 'http://localhost:3080/api/v1'
           description: ''
 tags:
   - name: Abilities Management
@@ -994,10 +955,6 @@ components:
       type: object
       title: User
       description: pAI-OS users
-      required:
-        - id
-        - name
-        - email
       properties:
         id:
           type: string
@@ -1008,3 +965,7 @@ components:
         email:
           type: string
           format: email
+      required:
+        - id
+        - name
+        - email
