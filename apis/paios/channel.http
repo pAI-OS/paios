@@ -1,15 +1,15 @@
-POST http://localhost:3000/channels/llm-api
+POST http://localhost:3080/channels/llm-api
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
 {
     "id": "llm-api",
     "name": "LLM API",
-    "uri": "http://localhost:3000/channels/llm-api"
+    "uri": "http://localhost:3080/channels/llm-api"
 }
 
 ###
-POST http://localhost:3000/channels/imap-sync
+POST http://localhost:3080/channels/imap-sync
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
@@ -21,18 +21,18 @@ Content-Type: application/json
 
 ###
 
-DELETE http://localhost:3000/channels/llm-api
+DELETE http://localhost:3080/channels/llm-api
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
 ###
 
-GET http://localhost:3000/channels/llm-api
+GET http://localhost:3080/channels/llm-api
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
 ###
 
-GET http://localhost:3000/channels
+GET http://localhost:3080/channels
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
