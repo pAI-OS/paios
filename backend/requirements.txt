@@ -8,3 +8,6 @@ packaging
 alembic
 sqlmodel
 aiosqlite
+asyncio
+aiohttp
+aioftp
