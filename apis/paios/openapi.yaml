@@ -195,6 +195,42 @@ paths:
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
+    post:
+      summary: Create new asset
+      tags:
+        - Asset Management
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Missing Required Information
+      x-stoplight:
+        id: xk3th6kh2xaea
+      description: Creates a new asset.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+              properties:
+                title:
+                  type: string
+                  x-stoplight:
+                    id: ewm2l63kcoemr
+                creator:
+                  type: string
+                  x-stoplight:
+                    id: z31hnyze67lcw
+                subject:
+                  type: string
+                  x-stoplight:
+                    id: wpa1675fg6r1s
+                description:
+                  type: string
+                  x-stoplight:
+                    id: fth78lwtn3nw3
     options:
       tags:
         - Asset Management
@@ -287,7 +323,8 @@ paths:
           description: ''
     post:
       summary: Create new channel
-      tags: []
+      tags:
+        - Channel Management
       responses:
         '200':
           description: OK
@@ -437,6 +474,8 @@ paths:
     put:
       tags:
         - Configuration Management
+      x-stoplight:
+        id: 90bb04de57693
       summary: Update config by key
       description: Set a config item with the specified key.
       parameters:
@@ -537,14 +576,14 @@ paths:
           application/json:
             schema:
               type: object
+              required:
+                - name
+                - email
               properties:
                 name:
                   type: string
                 email:
                   type: string
-              required:
-                - name
-                - email
             examples:
               Create User Bob Fellow:
                 value:
