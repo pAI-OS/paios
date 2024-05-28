@@ -1,13 +1,20 @@
+import sys
 from pathlib import Path
 from starlette.staticfiles import StaticFiles
 
+# Ensure the parent directory is in sys.path so relative imports work.
+base_dir = Path(__file__).parent
+if base_dir not in sys.path:
+    sys.path.append(str(base_dir))
+
 # Conditional import based on the running context (module or script)
-try:
-    from paios.backend.__main__ import create_backend_app
-except ImportError:
-    from backend.__main__ import create_backend_app
+#try:
+#    from paios.backend.__main__ import create_backend_app
+#except ImportError:
+#from paios.backend.__main__ import create_backend_app
 
 def create_app():
+    from backend.__main__ import create_backend_app
     app = create_backend_app()
 
 
