@@ -3,7 +3,7 @@ import json
 from dotenv import set_key
 from cryptography.fernet import Fernet
 
-class EncryptionManager:
+class Encryption:
     def __init__(self, encryption_key=None):
         self.encryption_key = encryption_key if encryption_key else self.get_encryption_key()
 
