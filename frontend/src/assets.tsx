@@ -14,9 +14,8 @@ const assetFilters = [
 export const AssetList = () => (
     <List filters={assetFilters}>
         <Datagrid rowClick="edit">
-            <TextField source="id" />
-            <ReferenceField source="userId" reference="users" link="show" />
             <TextField source="title" />
+            <ReferenceField source="userId" reference="users" link="show" />
             <EditButton />
         </Datagrid>
     </List>
@@ -25,7 +24,6 @@ export const AssetList = () => (
 export const AssetEdit = () => (
     <Edit title={<AssetTitle />}>
         <SimpleForm>
-            <TextInput source="id" InputProps={{ disabled: true }}/>
             <ReferenceInput source="userId" reference="users" optionText="name" />
             <TextInput source="title" />
             <TextInput source="description" multiline rows={5} />

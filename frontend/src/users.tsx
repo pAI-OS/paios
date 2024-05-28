@@ -17,7 +17,6 @@ export const UserList = () => {
                 />
             ) : (
                 <Datagrid rowClick="show">
-                    <TextField source="id" />
                     <TextField source="name" />
                     <EmailField source="email" />
                 </Datagrid>
@@ -29,9 +28,9 @@ export const UserList = () => {
 export const UserShow = () => (
     <Show title={<UserTitle />}>
         <SimpleShowLayout>
-                <TextField source="id" />
-                    <TextField source="name" />
-                    <EmailField source="email" />
+            <TextField source="id" />
+            <TextField source="name" />
+            <EmailField source="email" />
         </SimpleShowLayout>
     </Show>
 );
