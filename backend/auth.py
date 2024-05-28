@@ -1,6 +1,7 @@
 import os
 import secrets
-from flask import request, jsonify
+from starlette.requests import Request
+from starlette.responses import JSONResponse
 from dotenv import load_dotenv, set_key
 
 # Load the environment variables from the .env file
@@ -16,12 +17,12 @@ if not os.getenv('PAIOS_BEARER_TOKEN'):
     env_file = os.path.join(os.path.dirname(__file__), '..', 'frontend', '.env')
     set_key(env_file, 'VITE_PAIOS_BEARER_TOKEN', token)
 
-def validate_bearer_token():
+def validate_bearer_token(request: Request):
     if request.method == 'OPTIONS':
         return  # Allow OPTIONS requests to pass through without a token
 
     token = request.headers.get('Authorization')
     if not token:
-        return jsonify({'error': 'Missing token'}), 401
+        return JSONResponse({'error': 'Missing token'}, status_code=401)
     if token.split(" ")[1] != os.environ['PAIOS_BEARER_TOKEN']:  # Replace 'valid_token' with your actual token validation logic
-        return jsonify({'error': 'Invalid token'}), 403
+        return JSONResponse({'error': 'Invalid token'}, status_code=403)
