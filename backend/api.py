@@ -249,25 +249,6 @@ def ok(): return {"message": "OK"}, 200
 def not_implemented(): return {"message": "This operation is not implemented yet."}, 501
 def retrieve_all(payload, status_code=200): return jsonify(payload), status_code, {'X-Total-Count': len(payload)}
 
-# TODO: we need a better way to deal with OPTIONS requests required by CORS; can't automate this with connexion apparently
-# OPTIONS are required for CORS preflight requests
-def options_abilities(): return ok()
-def options_abilities_abilityid(): return ok()
-def options_abilities_abilityid_start(): return ok()
-def options_abilities_abilityid_stop(): return ok()
-def options_ability_resource_dependency_download_start(): return ok()
-def options_ability_resource_dependency_download_stop(): return ok()
-def options_ability_resource_dependency_download_delete(): return ok()
-def options_ability_python_dependency_install(): return ok()
-def options_assets(): return ok()
-def options_assets_assetid(): return ok()
-def options_channels(): return ok()
-def options_channels_channelid(): return ok()
-def options_config(): return ok()
-def options_user(): return ok()
-def options_users(): return ok()
-def options_users_userid(): return ok()
-
 # Retrieve all
 def retrieve_all_abilities(): return retrieve_all(abilities)
 
