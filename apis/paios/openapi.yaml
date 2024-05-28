@@ -12,7 +12,7 @@ info:
     url: 'https://github.com/pAI-OS/paios/blob/main/LICENSE'
     name: MIT
 servers:
-  - url: '/api/v1'
+  - url: /api/v1
     description: ''
 paths:
   /abilities:
@@ -285,6 +285,23 @@ paths:
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
+    post:
+      summary: Create new channel
+      tags: []
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Missing Required Information
+      operationId: ''
+      x-stoplight:
+        id: 7kb6p8nsmdmcz
+      description: Create a new channel.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Channel'
     options:
       tags:
         - Channel Management
@@ -325,9 +342,11 @@ paths:
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
-    post:
+    put:
       tags:
         - Channel Management
+      x-stoplight:
+        id: ecf6d452243db
       summary: Update channel by key
       description: Update a channel with the specified ID.
       parameters:
