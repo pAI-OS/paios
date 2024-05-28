@@ -26,7 +26,7 @@ export const AssetEdit = () => (
     <Edit title={<AssetTitle />}>
         <SimpleForm>
             <TextInput source="id" InputProps={{ disabled: true }}/>
-            <ReferenceInput source="userId" reference="users" />
+            <ReferenceInput source="userId" reference="users" optionText="name" />
             <TextInput source="title" />
             <TextInput source="description" multiline rows={5} />
         </SimpleForm>
@@ -36,7 +36,7 @@ export const AssetEdit = () => (
 export const AssetCreate = () => (
     <Create>
         <SimpleForm>
-            <ReferenceInput source="userId" reference="users" />
+            <ReferenceInput source="userId" reference="users" optionText="name" />
             <TextInput source="title" />
             <TextInput source="description" multiline rows={5} />
         </SimpleForm>
