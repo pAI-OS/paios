@@ -57,7 +57,7 @@ paths:
     get:
       tags:
         - Abilities Management
-      summary: Retrieve ability by ID
+      summary: Retrieve ability by id
       description: Retrieve the information of the ability with the matching ability ID.
       parameters:
         - name: abilityId
@@ -202,6 +202,10 @@ paths:
       responses:
         '201':
           description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
         '400':
           description: Missing Required Information
       x-stoplight:
@@ -215,6 +219,10 @@ paths:
               required:
                 - title
               properties:
+                userId:
+                  type: string
+                  x-stoplight:
+                    id: tcrecsxwclhod
                 title:
                   type: string
                   x-stoplight:
@@ -246,7 +254,7 @@ paths:
     get:
       tags:
         - Asset Management
-      summary: Retrieve asset by ID
+      summary: Retrieve asset by id
       description: Retrieve the information of the asset with the matching asset ID.
       parameters:
         - name: assetId
@@ -254,7 +262,7 @@ paths:
           description: Id of an existing asset.
           required: true
           schema:
-            type: integer
+            type: string
       responses:
         '200':
           description: OK
@@ -273,6 +281,38 @@ paths:
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
+    put:
+      summary: Update asset by id
+      tags:
+        - Asset Management
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Asset'
+      operationId: ''
+      x-stoplight:
+        id: y45hktoao8x1p
+      description: Updates the asset with the given id.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Asset'
+    delete:
+      summary: Delete asset by id
+      description: Deletes the asset with the specified id.
+      tags:
+        - Asset Management
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+      x-stoplight:
+        id: qzbqf3cyubxfh
     options:
       tags:
         - Asset Management
@@ -281,16 +321,23 @@ paths:
       parameters:
         - name: assetId
           in: path
-          description: Id of an existing asset.
+          description: id of an existing asset.
           required: true
           schema:
-            type: integer
+            type: string
       responses:
         '200':
           description: OK
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
+    parameters:
+      - schema:
+          type: string
+        name: assetId
+        description: id of an existing asset.
+        in: path
+        required: true
   /channels:
     get:
       tags:
@@ -330,7 +377,6 @@ paths:
           description: OK
         '400':
           description: Missing Required Information
-      operationId: ''
       x-stoplight:
         id: 7kb6p8nsmdmcz
       description: Create a new channel.
@@ -354,7 +400,7 @@ paths:
     get:
       tags:
         - Channel Management
-      summary: Retrieve channel by ID
+      summary: Retrieve channel by id
       description: Retrieve the information of the channel with the matching channel ID.
       parameters:
         - name: channelId
@@ -385,7 +431,7 @@ paths:
       x-stoplight:
         id: ecf6d452243db
       summary: Update channel by key
-      description: Update a channel with the specified ID.
+      description: Updates the channel with the specified id.
       parameters:
         - name: channelId
           in: path
@@ -417,8 +463,10 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: OK
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
@@ -509,8 +557,10 @@ paths:
           schema:
             type: string
       responses:
-        '200':
-          description: OK
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
@@ -706,7 +756,7 @@ paths:
     delete:
       tags:
         - User Management
-      summary: Delete user by ID
+      summary: Delete user by id
       description: Delete the user with the specified ID
       parameters:
         - name: userId
@@ -717,8 +767,10 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
-          description: OK
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
@@ -971,7 +1023,8 @@ components:
       title: Asset
       properties:
         id:
-          type: integer
+          type: string
+          format: uuid
         userId:
           type: string
           format: uuid

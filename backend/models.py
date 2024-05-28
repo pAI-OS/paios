@@ -16,7 +16,7 @@ class User(SQLModel, table=True):
 
 class Asset(SQLModel, table=True):
     id: str = Field(default=None, primary_key=True)
-    user_id: str = Field(nullable=False)
+    user_id: str = Field(nullable=True)
     title: str = Field(nullable=False)
     creator: str = Field(nullable=True)
     subject: str = Field(nullable=True)
