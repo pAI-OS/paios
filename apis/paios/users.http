@@ -43,7 +43,7 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:30308000/api/v1/users/5bae4a90-ce69-4483-86ef-d723258f21e5
+GET http://localhost:3080/api/v1/users/5bae4a90-ce69-4483-86ef-d723258f21e5
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
