@@ -1,6 +1,5 @@
 # database helper functions
 import os
-import sqlite3
 import aiosqlite
 from alembic import command
 from alembic.config import Config as AlembicConfig
