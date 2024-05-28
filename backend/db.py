@@ -3,7 +3,7 @@ import os
 import aiosqlite
 from alembic import command
 from alembic.config import Config as AlembicConfig
-from paths import base_dir, db_path
+from backend.paths import base_dir, db_path
 
 # use alembic to create the database or migrate to the latest schema
 def init_db():

@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from paths import abilities_dir
+from backend.paths import abilities_dir
 
 class AbilitiesManager:
     _instance = None

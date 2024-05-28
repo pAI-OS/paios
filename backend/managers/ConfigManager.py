@@ -1,7 +1,6 @@
 from uuid import uuid4
 import backend.db as db
 from backend.encryption import Encryption
-from paths import db_path
 
 class ConfigManager:
     def __init__(self, tenant=None):

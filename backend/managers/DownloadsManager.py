@@ -4,7 +4,7 @@ import aioftp
 import os
 from urllib.parse import urlparse
 from pathlib import Path
-from paths import data_dir
+from backend.paths import data_dir
 
 class DownloadsManager:
     def __init__(self, max_concurrent_downloads=5):

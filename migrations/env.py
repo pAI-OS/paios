@@ -9,14 +9,14 @@ import sys
 
 # add the backend directory to the python path
 repo_root = Path(__file__).resolve().parent.parent
-backend_path = repo_root / 'backend'
-sys.path.append(str(backend_path))
+#backend_path = repo_root / 'backend'
+sys.path.append(str(repo_root))
 
 # get the db path from the backend
-from paths import db_path
+from backend.paths import db_path
 
 # import the models so SQLModel.metadata is populated
-from models import Config
+from backend.models import Config
 
 from alembic import context
 
