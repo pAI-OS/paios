@@ -1,0 +1,4 @@
+OPTIONS http://localhost:3080/api/v1/users
+Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
+Origin: http://localhost
+Access-Control-Request-Method: GET

@@ -45,14 +45,6 @@ paths:
                 type: string
                 example: '2'
               description: Count of results required by jsonServer Data Provider for pagination
-    options:
-      tags:
-        - Abilities Management
-      summary: Options
-      description: Respond to OPTIONS requests.
-      responses:
-        '200':
-          description: OK
   '/abilities/{abilityId}':
     get:
       tags:
@@ -79,21 +71,6 @@ paths:
                     id: optical-character-recognition
                     name: Optical Character Recognition
                     description: Conversion of images to text
-    options:
-      tags:
-        - Abilities Management
-      summary: Options
-      description: Respond to OPTIONS requests.
-      parameters:
-        - name: abilityId
-          in: path
-          description: ID of an existing ability
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
   '/abilities/{abilityId}/start':
     post:
       tags:
@@ -110,42 +87,12 @@ paths:
       responses:
         '200':
           description: OK
-    options:
-      tags:
-        - Abilities Management
-      summary: Options
-      description: Respond to OPTIONS requests.
-      parameters:
-        - name: abilityId
-          in: path
-          description: ID of an existing ability
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
   '/abilities/{abilityId}/stop':
     post:
       tags:
         - Abilities Management
       summary: Stop ability
       description: Stops the ability with the matching ability ID.
-      parameters:
-        - name: abilityId
-          in: path
-          description: ID of an existing ability
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-    options:
-      tags:
-        - Abilities Management
-      summary: Options
-      description: Respond to OPTIONS requests.
       parameters:
         - name: abilityId
           in: path
@@ -239,17 +186,6 @@ paths:
                   type: string
                   x-stoplight:
                     id: fth78lwtn3nw3
-    options:
-      tags:
-        - Asset Management
-      summary: Options
-      description: Respond to OPTIONS requests.
-      responses:
-        '200':
-          description: OK
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
   '/assets/{assetId}':
     get:
       tags:
@@ -313,24 +249,6 @@ paths:
           description: Not Found
       x-stoplight:
         id: qzbqf3cyubxfh
-    options:
-      tags:
-        - Asset Management
-      summary: Options
-      description: Respond to OPTIONS requests.
-      parameters:
-        - name: assetId
-          in: path
-          description: id of an existing asset.
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
     parameters:
       - schema:
           type: string
@@ -385,17 +303,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Channel'
-    options:
-      tags:
-        - Channel Management
-      summary: Options
-      description: Respond to OPTIONS requests.
-      responses:
-        '200':
-          description: OK
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
   '/channels/{channelId}':
     get:
       tags:
@@ -467,24 +374,6 @@ paths:
           description: No Content
         '404':
           description: Not Found
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
-    options:
-      tags:
-        - Channel Management
-      summary: Options
-      description: Respond to OPTIONS requests.
-      parameters:
-        - name: channelId
-          in: path
-          description: ID of an existing channel
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
@@ -561,24 +450,6 @@ paths:
           description: No Content
         '404':
           description: Not Found
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
-    options:
-      tags:
-        - Configuration Management
-      summary: Options
-      description: Respond to OPTIONS requests.
-      parameters:
-        - name: key
-          in: path
-          description: Key for Config item
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
@@ -659,17 +530,6 @@ paths:
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
-    options:
-      tags:
-        - User Management
-      summary: Options
-      description: Respond to OPTIONS requests.
-      responses:
-        '200':
-          description: OK
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
   '/users/{userId}':
     get:
       tags:
@@ -699,6 +559,27 @@ paths:
                     email: alice.smith@gmail.com
         '404':
           description: User Not Found
+      servers:
+        - url: 'http://localhost:3080/api/v1'
+          description: ''
+    delete:
+      tags:
+        - User Management
+      summary: Delete user by id
+      description: Delete the user with the specified ID
+      parameters:
+        - name: userId
+          in: path
+          description: UUID of user
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
@@ -753,46 +634,6 @@ paths:
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
-    delete:
-      tags:
-        - User Management
-      summary: Delete user by id
-      description: Delete the user with the specified ID
-      parameters:
-        - name: userId
-          in: path
-          description: UUID of user
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '204':
-          description: No Content
-        '404':
-          description: Not Found
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
-    options:
-      tags:
-        - User Management
-      summary: Options
-      description: Respond to OPTIONS requests.
-      parameters:
-        - name: userId
-          in: path
-          description: UUID of user
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: OK
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
   '/abilities/{abilityId}/dependencies/resources/{dependencyId}/download/start':
     post:
       tags:
@@ -815,30 +656,6 @@ paths:
       responses:
         '200':
           description: Download started
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
-    options:
-      tags:
-        - Abilities Management
-      summary: Options
-      description: Respond to OPTIONS requests.
-      parameters:
-        - name: abilityId
-          in: path
-          description: 'ID of an existing ability (e.g., optical-character-recognition)'
-          required: true
-          schema:
-            type: string
-        - name: dependencyId
-          in: path
-          description: 'ID of an ability''s dependency (e.g., pandas)'
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
@@ -867,30 +684,6 @@ paths:
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
-    options:
-      tags:
-        - Abilities Management
-      summary: Options
-      description: Respond to OPTIONS requests.
-      parameters:
-        - name: abilityId
-          in: path
-          description: 'ID of an existing ability (e.g., optical-character-recognition)'
-          required: true
-          schema:
-            type: string
-        - name: dependencyId
-          in: path
-          description: 'ID of an ability''s dependency (e.g., pandas)'
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
   '/abilities/{abilityId}/dependencies/resources/{dependencyId}/download/delete':
     post:
       tags:
@@ -916,30 +709,6 @@ paths:
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
-    options:
-      tags:
-        - Abilities Management
-      summary: Options
-      description: Respond to OPTIONS requests.
-      parameters:
-        - name: abilityId
-          in: path
-          description: 'ID of an existing ability (e.g., optical-character-recognition)'
-          required: true
-          schema:
-            type: string
-        - name: dependencyId
-          in: path
-          description: 'ID of an ability''s dependency (e.g., pandas)'
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
   '/abilities/{abilityId}/dependencies/python/{dependencyId}/install':
     post:
       tags:
@@ -962,30 +731,6 @@ paths:
       responses:
         '200':
           description: Install started
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
-    options:
-      tags:
-        - Abilities Management
-      summary: Options
-      description: Respond to OPTIONS requests.
-      parameters:
-        - name: abilityId
-          in: path
-          description: 'ID of an existing ability (e.g., optical-character-recognition)'
-          required: true
-          schema:
-            type: string
-        - name: dependencyId
-          in: path
-          description: 'ID of an ability''s dependency (e.g., pandas)'
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
