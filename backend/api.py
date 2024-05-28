@@ -244,29 +244,6 @@ def ability_resource_dependency_download_delete(abilityId, dependencyId):
         except FileNotFoundError:
             pass
 
-
-# List of assets
-# TODO: These should be read from storage sources like local directory, S3, NAS, Solid pod, etc.
-assets = [
-  {
-    "id": 523,
-    "title": "Attention Is All You Need",
-    "userId": "5bae4a90-ce69-4483-86ef-d723258f21e5",
-    "creator": "Ashish Vaswani et al",
-    "subject": "Artificial Intelligence",
-    "description": "We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely."
-  },
-  {
-    "id": 952,
-    "title": "Generative Adversarial Networks",
-    "userId": "1cbb0bc5-bae2-4b9d-9555-f2282f767047",
-    "creator": "Goodfellow et al",
-    "subject": "Artificial Intelligence",
-    "description": "We propose a new framework for estimating generative models via an adversarial process, in which we simultaneously train two models: a generative model G that captures the data distribution, and a discriminative model D that estimates the probability that a sample came from the training data rather than G."
-  }
-]
-
-
 # Helper functions for common responses
 def ok(): return {"message": "OK"}, 200
 def not_implemented(): return {"message": "This operation is not implemented yet."}, 501
@@ -293,7 +270,6 @@ def options_users_userid(): return ok()
 
 # Retrieve all
 def retrieve_all_abilities(): return retrieve_all(abilities)
-def retrieve_all_assets(): return retrieve_all(assets)
 
 # Retrieve by ID
 def retrieve_ability_by_id(abilityId):
@@ -302,14 +278,6 @@ def retrieve_ability_by_id(abilityId):
         return ability, 200
     else:
         return {"error": "Ability not found"}, 404
-
-def retrieve_asset_by_id(assetId):
-
-    for asset in assets:
-        if asset['id'] == assetId:
-            return asset, 200
-
-    return {"error": "Asset not found"}, 404
 
 # Abilities Management
 def start_ability(abilityId):
