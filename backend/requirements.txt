@@ -8,3 +8,4 @@ setuptools
 packaging
 alembic
 sqlmodel
+aiosqlite
