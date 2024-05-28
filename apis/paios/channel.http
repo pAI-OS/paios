@@ -1,4 +1,14 @@
-POST http://localhost:3080/api/v1/channels/llm-api
+POST http://localhost:3080/api/v1/channels
+Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
+Content-Type: application/json
+
+{
+    "name": "My Channel",
+    "uri": "http://localhost:3080/channels/my-channel"
+}
+
+###
+PUT http://localhost:3080/api/v1/channels/llm-api
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
@@ -9,7 +19,7 @@ Content-Type: application/json
 }
 
 ###
-POST http://localhost:3080/api/v1/channels/imap-sync
+PUT http://localhost:3080/api/v1/channels/imap-sync
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
