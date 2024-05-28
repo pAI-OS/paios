@@ -6,7 +6,7 @@ from urllib.parse import urlparse
 from pathlib import Path
 from paths import data_dir
 
-class DownloadManager:
+class DownloadsManager:
     def __init__(self, max_concurrent_downloads=5):
         self.max_concurrent_downloads = max_concurrent_downloads
         self.semaphore = asyncio.Semaphore(max_concurrent_downloads)
@@ -121,7 +121,7 @@ class DownloadManager:
         await asyncio.gather(*tasks, return_exceptions=True)
 
 if __name__ == "__main__":
-    manager = DownloadManager()
+    manager = DownloadsManager()
     try:
         asyncio.run(manager.start_download('http://example.com/largefile.zip', 'largefile.zip'))
     except KeyboardInterrupt:

@@ -1,9 +1,9 @@
 from starlette.responses import JSONResponse
-from backend.managers.UserManager import UserManager
+from backend.managers.UsersManager import UsersManager
 
 class UsersView:
     def __init__(self):
-        self.um = UserManager()
+        self.um = UsersManager()
 
     async def get(self, userId: str):
         user = await self.um.retrieve_user(userId)
