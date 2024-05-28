@@ -1,7 +1,7 @@
 from uuid import uuid4
 import backend.db as db
 
-class AssetManager:
+class AssetsManager:
     def __init__(self):
         db.init_db()
 

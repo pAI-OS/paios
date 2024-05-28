@@ -1,9 +1,9 @@
 from starlette.responses import JSONResponse
-from backend.managers.AssetManager import AssetManager
+from backend.managers.AssetsManager import AssetsManager
 
 class AssetsView:
     def __init__(self):
-        self.am = AssetManager()
+        self.am = AssetsManager()
 
     async def get(self, assetId: str):
         asset = await self.am.retrieve_asset(assetId)

@@ -1,9 +1,9 @@
 from starlette.responses import JSONResponse
-from backend.managers.ChannelManager import ChannelManager
+from backend.managers.ChannelsManager import ChannelsManager
 
 class ChannelsView:
     def __init__(self):
-        self.cm = ChannelManager()
+        self.cm = ChannelsManager()
 
     async def get(self, channelId: str):
         channel = await self.cm.retrieve_channel(channelId)
