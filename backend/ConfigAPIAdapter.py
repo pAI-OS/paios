@@ -1,9 +1,9 @@
 # ConfigAPIAdapter.py
 import json
 from flask import jsonify
-import ConfigManager
+from backend.managers.ConfigManager import ConfigManager
 
-cm = ConfigManager.ConfigManager()
+cm = ConfigManager()
 
 def retrieve_config_by_key(key):
     value = cm.retrieve_config_item(key)

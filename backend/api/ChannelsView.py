@@ -1,5 +1,5 @@
 from starlette.responses import JSONResponse
-from backend.ChannelManager import ChannelManager
+from backend.managers.ChannelManager import ChannelManager
 
 class ChannelsView:
     def __init__(self):

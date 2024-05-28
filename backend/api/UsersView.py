@@ -1,5 +1,5 @@
 from starlette.responses import JSONResponse
-from backend.UserManager import UserManager
+from backend.managers.UserManager import UserManager
 
 class UsersView:
     def __init__(self):
