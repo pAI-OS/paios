@@ -7,12 +7,12 @@ from pathlib import Path
 #self.db_path = self.db_path / 'paios.db'
 
 # directories
-root_dir = Path(__file__).resolve().parent.parent
-venv_dir = root_dir / '.venv'
+base_dir = Path(__file__).resolve().parent
+venv_dir = base_dir / '.venv'
 venv_bin_dir = venv_dir / 'bin'
-data_dir = root_dir / 'data'
+data_dir = base_dir / 'data'
 abilities_subdir = 'abilities'
-abilities_dir = root_dir / abilities_subdir
+abilities_dir = base_dir / abilities_subdir
 abilities_data_dir = data_dir / abilities_subdir
 
 # paths
