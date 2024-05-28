@@ -1,28 +1,27 @@
-import connexion
-from connexion.resolver import MethodResolver
+import sys
 from pathlib import Path
 
+# Ensure the parent directory is in sys.path so relative imports work.
+base_dir = Path(__file__).parent.parent
+if base_dir not in sys.path:
+    sys.path.append(str(base_dir))
+
 def create_backend_app():
+    import connexion
+    from connexion.resolver import MethodResolver
+    from pathlib import Path
+
     apis_dir = Path(__file__).parent.parent / 'apis' / 'paios'
     connexion_app = connexion.AsyncApp(__name__, specification_dir=apis_dir)
 
-    # Connexion API resolver allows for:
-    #  - python -m paios
-    #  - python -m backend
-    #  - python __main__.py
-    if __package__ == 'paios.backend':
-        api_resolver = 'paios.backend.api'
-    elif __package__ == 'backend':
-        api_resolver = 'backend.api'
-    else:
-        api_resolver = 'api'
-    print("api_resolver: ", api_resolver)
-
-    connexion_app.add_api('openapi.yaml', resolver=MethodResolver(api_resolver), resolver_error=501)
+    connexion_app.add_api('openapi.yaml', resolver=MethodResolver('backend.api'), resolver_error=501)
 
     return connexion_app
 
 if __name__ == '__main__':
+    from backend.env import check_env
+    check_env()
+
     import uvicorn
     try:
         uvicorn.run("__main__:create_backend_app", host="localhost", port=3080, factory=True, workers=1)
