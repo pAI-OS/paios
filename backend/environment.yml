@@ -1,7 +1,7 @@
 # conda/miniforge environment file
 # Usage: conda env create -f environment.yml
 #       conda activate paios-backend
-# Note: python venv (requirements.txt) is the default for this project
+# Note: python venv (requirements.txt) is the default for this project so update this from there
 name: paios-backend
 channels:
   - defaults
