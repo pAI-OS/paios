@@ -434,7 +434,7 @@ paths:
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
-    post:
+    put:
       tags:
         - Configuration Management
       summary: Update config by key

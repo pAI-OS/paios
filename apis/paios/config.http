@@ -1,4 +1,4 @@
-POST http://localhost:3080/api/v1/config/openapi-key
+PUT http://localhost:3080/api/v1/config/openapi-key
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
