@@ -13,3 +13,11 @@ class User(SQLModel, table=True):
     id: str = Field(default=None, primary_key=True)
     name: str = Field(nullable=False)
     email: str = Field(nullable=False)
+
+class Asset(SQLModel, table=True):
+    id: str = Field(default=None, primary_key=True)
+    title: str = Field(nullable=False)
+    creator: str
+    subject: str
+    description: str
+
