@@ -24,5 +24,5 @@ def validate_bearer_token(request: Request):
     token = request.headers.get('Authorization')
     if not token:
         return JSONResponse({'error': 'Missing token'}, status_code=401)
-    if token.split(" ")[1] != os.environ['PAIOS_BEARER_TOKEN']:  # Replace 'valid_token' with your actual token validation logic
+    if token.split(" ")[1] != os.environ['PAIOS_BEARER_TOKEN']:
         return JSONResponse({'error': 'Invalid token'}, status_code=403)
