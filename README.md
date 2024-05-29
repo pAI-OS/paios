@@ -26,7 +26,7 @@ Setup and run the server:
 _POSIX (Linux/macOS/etc.)_
 
 ```sh
-python3 paios/scripts/setup_environment.py` (only on first run)
+python3 paios/scripts/setup_environment.py (only on first run)
 source paios/.venv/bin/activate
 python3 -m paios
 ```
