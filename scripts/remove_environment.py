@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
+import sys
 import shutil
 from pathlib import Path
 
-# Determine the base directory relative to this script
-script_dir = Path(__file__).parent
-base_dir = script_dir.parent
-ignore_errors = False
+# Ensure the parent directory is in sys.path so relative imports work.
+base_dir = Path(__file__).parent.parent
+if base_dir not in sys.path:
+    sys.path.append(str(base_dir))
+
+ignore_errors = True
 
 # Remove the virtual environment directory and node_modules
 shutil.rmtree(base_dir / '.venv', ignore_errors=ignore_errors)
