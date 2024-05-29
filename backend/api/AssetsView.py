@@ -1,4 +1,4 @@
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, Response
 from backend.managers.AssetsManager import AssetsManager
 
 class AssetsView:
@@ -37,7 +37,7 @@ class AssetsView:
 
     async def delete(self, assetId: str):
         await self.am.delete_asset(assetId)
-        return JSONResponse('', status_code=204)
+        return Response(status_code=204)
     
     async def search(self, limit=100):
         assets = await self.am.retrieve_all_assets(limit)

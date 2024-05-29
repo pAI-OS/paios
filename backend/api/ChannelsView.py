@@ -1,4 +1,4 @@
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, Response
 from backend.managers.ChannelsManager import ChannelsManager
 
 class ChannelsView:
@@ -21,7 +21,7 @@ class ChannelsView:
 
     async def delete(self, channelId: str):
         await self.cm.delete_channel(channelId)
-        return JSONResponse('', status_code=204)
+        return Response(status_code=204)
 
     async def search(self, limit=100):
         channels = await self.cm.retrieve_all_channels(limit)

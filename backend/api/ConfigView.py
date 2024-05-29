@@ -1,4 +1,4 @@
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, Response
 from backend.managers.ConfigManager import ConfigManager
 
 class ConfigView:
@@ -18,4 +18,4 @@ class ConfigView:
 
     async def delete(self, key: str):
         await self.cm.delete_config_item(key)
-        return JSONResponse('', status_code=204)
+        return Response(status_code=204)

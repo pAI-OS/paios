@@ -1,4 +1,4 @@
-from starlette.responses import JSONResponse
+from starlette.responses import JSONResponse, Response
 from backend.managers.UsersManager import UsersManager
 
 class UsersView:
@@ -21,7 +21,7 @@ class UsersView:
 
     async def delete(self, userId: str):
         await self.um.delete_user(userId)
-        return JSONResponse('', status_code=204)
+        return Response(status_code=204)
     
     async def search(self, limit=100):
         users = await self.um.retrieve_all_users(limit)
