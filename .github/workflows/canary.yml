@@ -29,19 +29,12 @@ jobs:
       working-directory: frontend
       run: npm run build
 
-    - name: Temporarily remove dist from .gitignore
-      working-directory: frontend
-      run: |
-        cat .gitignore
-        sed -i '/^dist$/d' .gitignore
-        cat .gitignore
-
     - name: Commit and push to canary branch
       run: |
         git config --global user.name 'github-actions[bot]'
         git config --global user.email 'github-actions[bot]@users.noreply.github.com'
         git checkout -b canary
-        git add frontend/dist
+        git add -f frontend/dist
         git commit -m "Update canary with latest build from main"
         git push origin canary --force
       env:
