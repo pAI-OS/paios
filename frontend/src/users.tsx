@@ -1,5 +1,5 @@
 import { useMediaQuery, Theme } from "@mui/material";
-import { List, SimpleList, Show, SimpleShowLayout, Datagrid, TextField, EmailField, useRecordContext } from "react-admin";
+import { Create, Edit, List, SimpleList, Show, SimpleForm, SimpleShowLayout, Datagrid, TextField, TextInput, ReferenceInput, EmailField, useRecordContext } from "react-admin";
 
 const UserTitle = () => {
     const record = useRecordContext();
@@ -16,7 +16,7 @@ export const UserList = () => {
                     secondaryText={(record) => record.email}
                 />
             ) : (
-                <Datagrid rowClick="show">
+                <Datagrid rowClick="edit">
                     <TextField source="name" />
                     <EmailField source="email" />
                 </Datagrid>
@@ -33,4 +33,22 @@ export const UserShow = () => (
             <EmailField source="email" />
         </SimpleShowLayout>
     </Show>
+);
+
+export const UserEdit = () => (
+    <Edit title={<UserTitle />}>
+        <SimpleForm>
+            <TextInput source="name" />
+            <TextInput source="email" />
+        </SimpleForm>
+    </Edit>
+);
+
+export const UserCreate = () => (
+    <Create>
+        <SimpleForm>
+            <TextInput source="name" />
+            <TextInput source="email" />
+        </SimpleForm>
+    </Create>
 );

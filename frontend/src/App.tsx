@@ -3,7 +3,7 @@ import {
   Resource,
   Menu
 } from "react-admin";
-import { UserList, UserShow } from "./users";
+import { UserList, UserCreate, UserEdit, UserShow } from "./users";
 import { AbilityList, AbilityShow } from "./abilities";
 import { AssetList, AssetCreate, AssetEdit } from "./assets";
 import { ChannelList, ChannelShow } from "./channels";
@@ -44,7 +44,7 @@ export const App = () => (
     menu={CustomMenu}
   >
     <Resource name="assets" list={AssetList} create={AssetCreate} edit={AssetEdit} recordRepresentation='title' icon={DocIcon} />
-    <Resource name="users" list={UserList} show={UserShow} recordRepresentation='name' icon={UserIcon} />
+    <Resource name="users" list={UserList} create={UserCreate} edit={UserEdit} show={UserShow} recordRepresentation='name' icon={UserIcon} />
     <Resource name="abilities" list={AbilityList} show={AbilityShow} recordRepresentation='id' icon={ExtensionIcon} />
     <Resource name="channels" list={ChannelList} show={ChannelShow} recordRepresentation='id' icon={SyncAltIcon} />
   </Admin>
