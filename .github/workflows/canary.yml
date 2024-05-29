@@ -31,7 +31,10 @@ jobs:
 
     - name: Temporarily remove dist from .gitignore
       working-directory: frontend
-      run: sed -i'' '/^dist$/d' .gitignore
+      run: |
+        cat .gitignore
+        sed -i '/^dist$/d' .gitignore
+        cat .gitignore
 
     - name: Commit and push to canary branch
       run: |
