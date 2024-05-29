@@ -2,7 +2,6 @@
 
 ## Getting Started
 
-## Notice
 |❗ The server binds to localhost without authentication for the time being; this is a security issue that will be fixed before release to end users. You can use any username and password for the time being.|
 |--|
 
@@ -12,15 +11,19 @@ An easy to use release is coming soon, but for now you can follow the instructio
 
 ### Early Adopters
 
-Clone only the canary branch from the repository:
+> 💡 **Tip:** Download and install [Python](https://www.python.org/downloads/) if you can't run it from the terminal.
+
+Open the Terminal application.
+
+Clone the canary branch from the repository:
 
 ```sh
 git clone --branch canary --single-branch https://github.com/pAI-OS/paios.git
 ```
 
-Setup the environment:
+Setup and run the server:
 
-POSIX (Linux/macOS/etc.):
+_POSIX (Linux/macOS/etc.)_
 
 ```sh
 python3 paios/scripts/setup_environment.py` (only on first run)
@@ -28,7 +31,7 @@ source paios/.venv/bin/activate
 python3 -m paios
 ```
 
-Windows:
+_Windows_
 
 ```sh
 python .\paios\scripts\setup_environment.py (only on first run)
@@ -40,7 +43,7 @@ Visit [http://localhost:3080/](http://localhost:3080/)
 
 ### Developers
 
-Clone the entire repository:
+Clone the entire repository
 
 ```sh
 git clone https://github.com/Kwaai-AI-Lab/paios.git
