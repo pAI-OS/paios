@@ -2,12 +2,57 @@
 
 ## Getting Started
 
-Clone the repository:
+### Users
 
-    git clone https://github.com/Kwaai-AI-Lab/paios.git
+An easy to use release is coming soon, but for now you can follow the instructions below to get started.
 
-Start the backend per [backend/README.md](backend/README.md).
+### Early Adopters
 
-Start the frontend per [frontend/README.md](frontend/README.md)
+Clone only the canary branch from the repository:
 
-Visit [http://localhost:5173/](http://localhost:5173/)
+```sh
+git clone --branch canary --single-branch https://github.com/pAI-OS/paios.git
+```
+
+Setup the environment:
+
+POSIX (Linux/macOS/etc.):
+
+```sh
+python3 paios/scripts/setup_environment.py` (only on first run)
+source paios/.venv/bin/activate
+python3 -m paios
+```
+
+Windows:
+
+```sh
+python .\paios\scripts\setup_environment.py (only on first run)
+.\paios\.venv\Scripts\Activate.ps1
+python -m paios
+```
+
+Visit [http://localhost:3080/](http://localhost:3080/)
+
+### Developers
+
+Clone the entire repository:
+
+```sh
+git clone https://github.com/Kwaai-AI-Lab/paios.git
+```
+Build the frontend:
+
+```sh
+cd frontend
+npm run build
+cd ..
+```
+
+Run the uvicorn server:
+
+```sh
+python -m paios
+```
+
+Visit [http://localhost:3080/](http://localhost:3080/)
