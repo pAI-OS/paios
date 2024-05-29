@@ -2,6 +2,11 @@
 
 ## Getting Started
 
+## Notice
+|❗ The server binds to localhost without authentication for the time being; this is a security issue that
+will be fixed before release to end users. You can use any username and password for the time being.
+|--|
+
 ### Users
 
 An easy to use release is coming soon, but for now you can follow the instructions below to get started.
