@@ -3,8 +3,7 @@
 ## Getting Started
 
 ## Notice
-|❗ The server binds to localhost without authentication for the time being; this is a security issue that
-will be fixed before release to end users. You can use any username and password for the time being.
+|❗ The server binds to localhost without authentication for the time being; this is a security issue that will be fixed before release to end users. You can use any username and password for the time being.|
 |--|
 
 ### Users
