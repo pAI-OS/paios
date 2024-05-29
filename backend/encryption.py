@@ -1,10 +1,23 @@
 import os
 import json
-from dotenv import set_key
+from dotenv import load_dotenv, set_key
 from cryptography.fernet import Fernet
 
 class Encryption:
+    _instance = None
+
+    # Singleton pattern so we only read from .env once for the life of the application
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super(Encryption, cls).__new__(cls)
+            cls._instance._initialized = False
+        return cls._instance
+
     def __init__(self, encryption_key=None):
+        if self._initialized:
+            return
+        self._initialized = True
+        load_dotenv()
         self.encryption_key = encryption_key if encryption_key else self.get_encryption_key()
 
     # Helper function to get the encryption key from environment variables or generate a new one and save it to .env
