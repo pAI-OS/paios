@@ -30,6 +30,7 @@ jobs:
       run: npm run build
 
     - name: Temporarily remove dist from .gitignore
+      working-directory: frontend
       run: sed -i '/^dist$/d' .gitignore
 
     - name: Commit and push to canary branch
