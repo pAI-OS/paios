@@ -23,7 +23,7 @@ git clone --branch canary --single-branch https://github.com/pAI-OS/paios.git
 
 Setup and run the server:
 
-> 💡 **Tip:** No need to build the frontend because it's built automatically for the canary branch on every commit to main.
+> 🤖 **Tip:** No need to build the frontend because it's built automatically for the canary branch on every commit to main.
 
 _POSIX (Linux/macOS/etc.)_
 
