@@ -19,6 +19,20 @@ class DownloadsManager:
     def _is_valid_path(self, path):
         return Path(path).resolve().is_relative_to(data_dir)
 
+    async def retrieve_all_downloads(self, limit=None):
+        all_downloads = [
+            {
+                "url": url,
+                "dest": download["dest"],
+                "total_size": download["total_size"],
+                "downloaded": download["downloaded"],
+                "progress": download["progress"],
+                "status": "paused" if download["paused"] else "downloading"
+            }
+            for url, download in self.downloads.items()
+        ]
+        return all_downloads if limit is None else all_downloads[:limit]
+
     async def download_file_http(self, url, dest, start_byte=0):
         headers = {'Range': f'bytes={start_byte}-'} if start_byte > 0 else {}
         async with aiohttp.ClientSession() as session:
