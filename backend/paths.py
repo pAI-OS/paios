@@ -1,5 +1,8 @@
 from pathlib import Path
 
+# api
+api_base_url = '/api/v1'
+
 # paios
 base_dir = Path(__file__).resolve().parent.parent
 backend_dir = base_dir / 'backend'
