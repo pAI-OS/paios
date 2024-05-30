@@ -11,11 +11,11 @@ class AbilitiesView:
     async def put(self, body: dict):
         return self.error_immutable()
     
-    async def delete(self, abilityId: str):
+    async def delete(self, ability_id: str):
         return self.error_immutable()
 
-    def get(self, abilityId=None):
-        return JSONResponse(status_code=200, content=AbilitiesManager().get_ability(abilityId))
+    def get(self, ability_id=None):
+        return JSONResponse(status_code=200, content=AbilitiesManager().get_ability(ability_id))
 
     def search(self, limit=100):
         abilities = AbilitiesManager().get_all_abilities(limit)
