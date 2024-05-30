@@ -12,3 +12,4 @@ aiosqlite
 asyncio
 aiohttp
 aioftp
+aiofiles
