@@ -23,6 +23,12 @@
         "test": "pytest"
     },
     "dependencies": {
+        "abilities": [
+            {
+                "name": "chroma",
+                "version": "1.0.0"
+            }
+        ],
         "container": [
             {
                 "name": "tensorflow/tensorflow",
