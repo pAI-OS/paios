@@ -98,6 +98,7 @@ class DownloadsManager:
             raise ValueError(f"Invalid destination path: {dest}")
 
         temp_dest = self.downloads_dir / Path(dest).name
+
         parsed_url = urlparse(url)
         if parsed_url.scheme in ('http', 'https'):
             await self.download_file_http(id, url, temp_dest, start_byte)
@@ -126,7 +127,13 @@ class DownloadsManager:
             else:
                 target_dir_path = self.downloads_dir
 
-            dest = target_dir_path / (target_file or Path(source_url).name)
+            filename = target_file or Path(source_url).name
+            dest = target_dir_path / filename
+
+            # Check if the destination file already exists
+            if dest.exists():
+                raise FileExistsError(f"Destination file already exists: {filename}")
+
             download_task = asyncio.create_task(self.download_file(id, source_url, dest, hash_type=hash_type, expected_hash=expected_hash))
             self.downloads[id] = {
                 "task": download_task,
@@ -140,7 +147,7 @@ class DownloadsManager:
                 "progress": 0.0,
                 "start_time": time.time()
             }
-            await download_task
+            
             return id
 
     def pause_download(self, id):
