@@ -1,5 +1,6 @@
 from starlette.responses import JSONResponse, Response
 from backend.managers.UsersManager import UsersManager
+from backend.paths import api_base_url
 
 class UsersView:
     def __init__(self):
@@ -13,7 +14,7 @@ class UsersView:
 
     async def post(self, body: dict):
         user_id = await self.um.create_user(body['name'], body['email'])
-        return JSONResponse({"id": user_id}, status_code=201, headers={'Location': f'/users/{user_id}'})
+        return JSONResponse({"id": user_id}, status_code=201, headers={'Location': f'{api_base_url}/users/{user_id}'})
     
     async def put(self, userId: str, body: dict):
         await self.um.update_user(userId, body['name'], body['email'])
