@@ -1,6 +1,7 @@
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 from backend.managers.DownloadsManager import DownloadsManager
+from backend.paths import api_base_url
 
 class DownloadsView:
     def __init__(self):
@@ -25,7 +26,7 @@ class DownloadsView:
                 source_url, target_file=target_file, target_dir=target_dir, 
                 hash_type=hash_type, expected_hash=expected_hash
             )
-            return JSONResponse(status_code=200, content={"id": download_id}, headers={'Location': f'/downloads/{download_id}'})
+            return JSONResponse(status_code=200, content={"id": download_id}, headers={'Location': f'{api_base_url}/downloads/{download_id}'})
         except Exception as e:
             return JSONResponse(status_code=400, content={"message": str(e)})
 
@@ -42,10 +43,10 @@ class DownloadsView:
 
 # custom functions
 
-    async def pause(self, id: str):
-        self.manager.pause_download(id)
+    async def pause(self, download_id: str):
+        self.manager.pause_download(download_id)
         return JSONResponse(status_code=200, content={"message": "Download paused"})
 
-    async def resume(self, id: str):
-        await self.manager.resume_download(id)
+    async def resume(self, download_id: str):
+        await self.manager.resume_download(download_id)
         return JSONResponse(status_code=200, content={"message": "Download resumed"})

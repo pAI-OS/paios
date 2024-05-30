@@ -24,28 +24,38 @@ class DownloadsManager:
     def _is_valid_path(self, path):
         return Path(path).resolve().is_relative_to(data_dir)
 
-    def _calculate_hash(self, file_path, hash_type):
+    async def _calculate_hash(self, file_path, hash_type):
         hash_func = getattr(hashlib, hash_type)()
-        with open(file_path, 'rb') as f:
-            for chunk in iter(lambda: f.read(4096), b""):
+        async with aiofiles.open(file_path, 'rb') as f:
+            while True:
+                chunk = await f.read(4096)
+                if not chunk:
+                    break
                 hash_func.update(chunk)
         return hash_func.hexdigest()
 
-    async def retrieve_all_downloads(self, limit=None):
-        all_downloads = [
-            {
-                "id": download_id,
-                "source_url": download["source_url"],
-                "target_file": download["target_file"],
-                "target_dir": download["target_dir"],
-                "total_size": download["total_size"],
-                "downloaded": download["downloaded"],
-                "progress": download["progress"],
-                "status": "paused" if download["paused"] else "downloading",
-                "download_rate": self._calculate_download_rate(download)
-            }
-            for download_id, download in self.downloads.items()
-        ]
+    async def retrieve_all_downloads(self, limit=None, retention_period=600):
+        current_time = time.time()
+        all_downloads = []
+
+        for download_id, download in list(self.downloads.items()):
+            if "finish_time" in download and (current_time - download["finish_time"] > retention_period):
+                del self.downloads[download_id]
+            else:
+                all_downloads.append({
+                    "id": download_id,
+                    "source_url": download["source_url"],
+                    "target_file": download["target_file"],
+                    "target_dir": download["target_dir"],
+                    "total_size": download["total_size"],
+                    "downloaded": download["downloaded"],
+                    "progress": download["progress"],
+                    "start_time": download.get("start_time", None),
+                    "finish_time": download.get("finish_time", None),
+                    "status": "paused" if download["paused"] else "downloading",
+                    "download_rate": self._calculate_download_rate(download)
+                })
+
         return all_downloads if limit is None else all_downloads[:limit]
 
     def _calculate_download_rate(self, download):
@@ -59,7 +69,7 @@ class DownloadsManager:
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers=headers) as response:
                 if response.status in [200, 206]:
-                    total_size = int(response.headers.get('Content-Length', 0)) + start_byte
+                    total_size = int(response.headers.get('Content-Length', -1)) + start_byte
                     self.downloads[id]["total_size"] = total_size
                     mode = 'ab' if start_byte > 0 else 'wb'
                     with open(temp_dest, mode) as f:
@@ -69,9 +79,12 @@ class DownloadsManager:
                                 break
                             f.write(chunk)
                             self.downloads[id]["downloaded"] += len(chunk)
-                            self.downloads[id]["progress"] = round(
-                                (self.downloads[id]["downloaded"] / self.downloads[id]["total_size"]) * 100, 2
-                            )
+                            if self.downloads[id]["total_size"] > 0:
+                                self.downloads[id]["progress"] = round(
+                                    (self.downloads[id]["downloaded"] / self.downloads[id]["total_size"]) * 100, 2
+                                )
+                            else:
+                                self.downloads[id]["progress"] = -1
                 else:
                     raise Exception(f"Failed to download {url}")
 
@@ -106,9 +119,11 @@ class DownloadsManager:
             await self.download_file_ftp(id, url, temp_dest, start_byte)
         else:
             raise ValueError(f"Unsupported URL scheme: {parsed_url.scheme}")
+        
+        self.downloads[id]["finish_time"] = time.time()
 
         if hash_type and expected_hash:
-            actual_hash = self._calculate_hash(temp_dest, hash_type)
+            actual_hash = await self._calculate_hash(temp_dest, hash_type)
             if actual_hash != expected_hash:
                 raise ValueError(f"Hash mismatch: expected {expected_hash}, got {actual_hash}")
 
@@ -117,7 +132,7 @@ class DownloadsManager:
             raise FileExistsError(f"Destination file already exists: {final_dest}")
 
         temp_dest.rename(final_dest)
-
+        
     async def start_download(self, source_url, target_file=None, target_dir=None, hash_type=None, expected_hash=None):
         async with self.semaphore:
             id = str(uuid4())

@@ -12,6 +12,16 @@ POST http://localhost:3080/api/v1/downloads
 Content-Type: application/json
 
 {
+    "source_url": "https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.5.0-amd64-netinst.iso",
+    "target_file": "debian-12.5.0-amd64-netinst.iso"
+}
+
+###
+
+POST http://localhost:3080/api/v1/downloads
+Content-Type: application/json
+
+{
     "source_url": "https://releases.ubuntu.com/24.04/ubuntu-24.04-desktop-amd64.iso",
     "target_file": "ubuntu-24.04-desktop-amd64.iso",
 }
@@ -36,5 +46,15 @@ Content-Type: application/json
 ###
 
 POST http://localhost:3080/api/v1/downloads/ac56536c-96a1-4dda-a664-d2262cbf5c7e/resume
+Content-Type: application/json
+
+###
+
+GET http://localhost:3080/api/v1/downloads/4fd98231-02ab-4321-ac57-d9dc96fa6d01
+Content-Type: application/json
+
+###
+
+DELETE http://localhost:3080/api/v1/downloads/83bdac3a-e5de-4783-a9b9-dabdcae2a1d2
 Content-Type: application/json
 
