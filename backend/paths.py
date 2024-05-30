@@ -20,3 +20,4 @@ abilities_data_dir = data_dir / abilities_subdir
 
 # paths
 db_path = data_dir / 'paios.db'
+downloads_dir = data_dir / 'downloads'

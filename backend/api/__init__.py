@@ -4,4 +4,5 @@ from .AbilitiesView import AbilitiesView
 from .AssetsView import AssetsView
 from .ChannelsView import ChannelsView
 from .ConfigView import ConfigView
+from .DownloadsView import DownloadsView
 from .UsersView import UsersView

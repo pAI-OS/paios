@@ -121,13 +121,13 @@ paths:
               examples:
                 Example 1:
                   value:
-                    - id: 523
+                    - id: 43c03b22-dbc5-449d-9618-39ce35af9926
                       userId: 5bae4a90-ce69-4483-86ef-d723258f21e5
                       title: Attention Is All You Need
                       creator: Ashish Vaswani et al
                       subject: Artificial Intelligence
                       description: 'We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.'
-                    - id: 952
+                    - id: 9df36f59-a1d0-454c-8cbb-da8c64b94ebc
                       userId: 1cbb0bc5-bae2-4b9d-9555-f2282f767047
                       title: Generative Adversarial Networks
                       creator: Goodfellow et al
@@ -209,7 +209,7 @@ paths:
               examples:
                 Example 1:
                   value:
-                    id: 523
+                    id: 43c03b22-dbc5-449d-9618-39ce35af9926
                     title: Attention Is All You Need
                     creator: Vaswani et al
                     subject: Artificial Intelligence
@@ -453,6 +453,144 @@ paths:
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
+  /downloads:
+    get:
+      tags:
+        - Downloads Management
+      summary: Retrieve all downloads
+      description: Retrieve the information of all downloads.
+      parameters:
+        - name: limit
+          in: query
+          description: Limit the number of downloads returned
+          required: false
+          schema:
+            type: integer
+            default: 100
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Download'
+              examples:
+                Example 1:
+                  value:
+                    - url: http://example.com/file1.zip
+                      dest: downloads/file1.zip
+                      total_size: 1024
+                      downloaded: 512
+                      progress: 50
+                      status: downloading
+                    - url: http://example.com/file2.zip
+                      dest: downloads/file2.zip
+                      total_size: 2048
+                      downloaded: 2048
+                      progress: 100
+                      status: completed
+          headers:
+            X-Total-Count:
+              schema:
+                type: string
+                example: '2'
+              description: Count of results required by jsonServer Data Provider for pagination
+    post:
+      tags:
+        - Downloads Management
+      summary: Start a new download
+      description: Initiates a new download.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - source_url
+              properties:
+                source_url:
+                  type: string
+                  description: The URL of the file to download.
+                target_file:
+                  type: string
+                  description: The optional filename for the downloaded file.
+                target_dir:
+                  type: string
+                  description: The optional target directory for the downloaded file (default is 'downloads').
+                hash_type:
+                  type: string
+                  description: The type of hash to validate (e.g., md5, sha256).
+                expected_hash:
+                  type: string
+                  description: The expected hash value for validation.
+      responses:
+        '200':
+          description: Download started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  download_id:
+                    type: string
+        '400':
+          description: Invalid request
+  '/downloads/{download_id}':
+    delete:
+      tags:
+        - Downloads Management
+      summary: Delete download
+      description: Deletes the download with the specified ID and removes the file.
+      parameters:
+        - name: download_id
+          in: path
+          description: ID of the download
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Download Not Found
+  '/downloads/{download_id}/pause':
+    post:
+      tags:
+        - Downloads Management
+      summary: Pause download
+      description: Pauses the download with the specified ID.
+      operationId: backend.api.DownloadsView.pause
+      parameters:
+        - name: download_id
+          in: path
+          description: ID of the download
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Download paused
+  '/downloads/{download_id}/resume':
+    post:
+      tags:
+        - Downloads Management
+      summary: Resume download
+      description: Resumes the download with the specified ID.
+      operationId: backend.api.DownloadsView.resume
+      parameters:
+        - name: download_id
+          in: path
+          description: ID of the download
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Download resumed
   /users:
     get:
       tags:
@@ -743,6 +881,8 @@ tags:
     description: Discovery and configuration of input/output interfaces/channels
   - name: Configuration Management
     description: Management of configuration
+  - name: Downloads Management
+    description: Management of downloads
   - name: User Management
     description: Management of user accounts
 components:
@@ -807,6 +947,26 @@ components:
               - type: number
               - type: boolean
               - type: object
+    Download:
+      type: object
+      properties:
+        url:
+          type: string
+        dest:
+          type: string
+        total_size:
+          type: integer
+        downloaded:
+          type: integer
+        progress:
+          type: number
+        status:
+          type: string
+          enum:
+            - downloading
+            - paused
+            - completed
+            - error
     User:
       type: object
       title: User

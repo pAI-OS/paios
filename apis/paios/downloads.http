@@ -1,0 +1,40 @@
+POST http://localhost:3080/api/v1/downloads
+Content-Type: application/json
+
+{
+    "source_url": "https://releases.ubuntu.com/24.04/ubuntu-24.04-desktop-amd64.iso",
+    "target_file": "ubuntu-24.04-desktop-amd64.iso"
+}
+
+###
+
+POST http://localhost:3080/api/v1/downloads
+Content-Type: application/json
+
+{
+    "source_url": "https://releases.ubuntu.com/24.04/ubuntu-24.04-desktop-amd64.iso",
+    "target_file": "ubuntu-24.04-desktop-amd64.iso",
+}
+
+###
+
+POST http://localhost:3080/api/v1/downloads
+Content-Type: application/json
+
+{
+    "source_url": "https://releases.ubuntu.com/24.04/ubuntu-24.04-desktop-amd64.iso",
+    "target_file": "ubuntu-24.04-desktop-amd64.iso",
+    "hash_type": "md5",
+    "expected_hash": "insert_expected_md5_hash_here"
+}
+
+###
+
+POST http://localhost:3080/api/v1/downloads/ac56536c-96a1-4dda-a664-d2262cbf5c7e/pause
+Content-Type: application/json
+
+###
+
+POST http://localhost:3080/api/v1/downloads/ac56536c-96a1-4dda-a664-d2262cbf5c7e/resume
+Content-Type: application/json
+
