@@ -197,6 +197,7 @@ class DownloadsManager:
                 target_directory_path = self.downloads_dir
 
             # Check for existing download with the same parameters
+            # TODO: Failures in one file should not affect all files.
             for existing_download in self.downloads.values():
                 if (existing_download["source_url"] == download.get('source_url') and
                     existing_download["target_filename"] == download.get('target_filename') and
