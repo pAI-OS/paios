@@ -188,36 +188,40 @@ class DownloadsManager:
 
     async def queue_downloads(self, downloads: list):
         download_ids = []
-        async with self.semaphore:
-            for download in downloads:
-                download_id = str(uuid4())
-                target_directory = download.get('target_directory')
-                if target_directory:
-                    target_directory_path = data_dir / Path(target_directory)
-                else:
-                    target_directory_path = self.downloads_dir
+        for download in downloads:
+            download_id = str(uuid4())
+            target_directory = download.get('target_directory')
+            if target_directory:
+                target_directory_path = data_dir / Path(target_directory)
+            else:
+                target_directory_path = self.downloads_dir
 
-                self.downloads[download_id] = {
-                    "source_url": download.get('source_url'),
-                    "target_filename": download.get('target_filename'),
-                    "target_directory": target_directory,
-                    "target_directory_path": target_directory_path,
-                    "status": DownloadStatus.DOWNLOADING,
-                    "start_byte": 0,
-                    "total_size": 0,
-                    "downloaded": 0,
-                    "progress": 0.0,
-                    "start_time": time.time(),
-                    "hash_type": download.get('hash_type'),
-                    "expected_hash": download.get('expected_hash')
-                }
+            # Check for existing download with the same parameters
+            for existing_download in self.downloads.values():
+                if (existing_download["source_url"] == download.get('source_url') and
+                    existing_download["target_filename"] == download.get('target_filename') and
+                    existing_download["target_directory"] == download.get('target_directory')):
+                    raise ValueError("Download with the same parameters already exists")
 
-                download_task = asyncio.create_task(self.download_file(download_id))
-                self.downloads[download_id]["task"] = download_task
-                download_ids.append(download_id)
-            
-            # Await all tasks to ensure exceptions are handled
-            await asyncio.gather(*[self.downloads[download_id]["task"] for download_id in download_ids], return_exceptions=True)
+            self.downloads[download_id] = {
+                "source_url": download.get('source_url'),
+                "target_filename": download.get('target_filename'),
+                "target_directory": target_directory,
+                "target_directory_path": target_directory_path,
+                "status": DownloadStatus.DOWNLOADING,
+                "start_byte": 0,
+                "total_size": 0,
+                "downloaded": 0,
+                "progress": 0.0,
+                "start_time": time.time(),
+                "hash_type": download.get('hash_type'),
+                "expected_hash": download.get('expected_hash')
+            }
+
+            download_task = asyncio.create_task(self.download_file(download_id))
+            self.downloads[download_id]["task"] = download_task
+            download_ids.append(download_id)
+        
         return download_ids
 
     async def pause_download(self, download_id):

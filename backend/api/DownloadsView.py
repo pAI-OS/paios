@@ -42,4 +42,3 @@ class DownloadsView:
     async def resume(self, download_id: str):
         await self.manager.resume_download(download_id)
         return JSONResponse(status_code=200, content={"message": "Download resumed"})
-    
