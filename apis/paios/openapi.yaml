@@ -500,43 +500,45 @@ paths:
     post:
       tags:
         - Downloads Management
-      summary: Start a new download
-      description: Initiates a new download.
+      summary: Start new downloads
+      description: Initiates new downloads.
       requestBody:
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - source_url
-              properties:
-                source_url:
-                  type: string
-                  description: The URL of the file to download.
-                target_file:
-                  type: string
-                  description: The optional filename for the downloaded file.
-                target_dir:
-                  type: string
-                  description: The optional target directory for the downloaded file (default is 'downloads').
-                hash_type:
-                  type: string
-                  description: The type of hash to validate (e.g., md5, sha256).
-                expected_hash:
-                  type: string
-                  description: The expected hash value for validation.
+              type: array
+              items:
+                type: object
+                required:
+                  - source_url
+                properties:
+                  source_url:
+                    type: string
+                    description: The URL of the file to download.
+                  target_file:
+                    type: string
+                    description: The optional filename for the downloaded file.
+                  target_dir:
+                    type: string
+                    description: The optional target directory for the downloaded file (default is 'downloads').
+                  hash_type:
+                    type: string
+                    description: The type of hash to validate (e.g., md5, sha256).
+                  expected_hash:
+                    type: string
+                    description: The expected hash value for validation.
       responses:
         '200':
-          description: Download started
+          description: Downloads started
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                  download_id:
-                    type: string
+                type: array
+                items:
+                  type: object
+                  properties:
+                    download_id:
+                      type: string
         '400':
           description: Invalid request
   '/downloads/{download_id}':
@@ -950,6 +952,10 @@ components:
     Download:
       type: object
       properties:
+        download_id:
+          type: string
+          description: Unique identifier for the given download.
+          format: uuid
         url:
           type: string
         dest:

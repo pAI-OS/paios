@@ -11,37 +11,29 @@ class DownloadsView:
         downloads = await self.manager.retrieve_all_downloads()
         return JSONResponse(status_code=200, content=downloads)
 
-    async def post(self, body: dict):
-        source_url = body.get('source_url')
-        target_file = body.get('target_file')
-        target_dir = body.get('target_dir', 'downloads')
-        hash_type = body.get('hash_type')
-        expected_hash = body.get('expected_hash')
-        
-        if not source_url:
-            return JSONResponse(status_code=400, content={"message": "Invalid request: 'source_url' is required"})
-        
+    async def post(self, body: list):
+        if not body or not isinstance(body, list):
+            return JSONResponse(status_code=400, content={"message": "Invalid request: body must be a list of download details"})
+
         try:
-            download_id = await self.manager.start_download(
-                source_url, target_file=target_file, target_dir=target_dir, 
-                hash_type=hash_type, expected_hash=expected_hash
-            )
-            return JSONResponse(status_code=200, content={"id": download_id}, headers={'Location': f'{api_base_url}/downloads/{download_id}'})
+            download_ids = await self.manager.queue_downloads(body)
+            return JSONResponse(status_code=200, content=[{"download_id": download_id} for download_id in download_ids])
         except Exception as e:
+            # TODO: Log and conceal error details
             return JSONResponse(status_code=400, content={"message": str(e)})
 
     async def put(self):
         return JSONResponse(status_code=501, content={"message": "Not Implemented"})
 
-    async def delete(self, id: str):
-        await self.manager.delete_download(id)
+    async def delete(self, download_id: str):
+        await self.manager.delete_download(download_id)
         return JSONResponse(status_code=204)
 
     async def search(self, limit=100):
         downloads = await self.manager.retrieve_all_downloads(limit)
         return JSONResponse(status_code=200, content=downloads, headers={'X-Total-Count': str(len(downloads))})
 
-# custom functions
+    # custom functions
 
     async def pause(self, download_id: str):
         self.manager.pause_download(download_id)
@@ -50,3 +42,4 @@ class DownloadsView:
     async def resume(self, download_id: str):
         await self.manager.resume_download(download_id)
         return JSONResponse(status_code=200, content={"message": "Download resumed"})
+    

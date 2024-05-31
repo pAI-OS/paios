@@ -3,12 +3,14 @@ import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { apiBase, httpClient } from "./apiBackend";
+import FormattedSizeField from './components/FormattedSizeField';
+import ProgressField from './components/ProgressField';
 
 interface Download {
-    id: string;
+    download_id: string;
     source_url: string;
-    target_file: string;
-    target_dir: string;
+    target_filename: string;
+    target_directory: string;
     total_size: number;
     downloaded: number;
     progress: number;
@@ -54,34 +56,36 @@ const DownloadActions = () => {
     return (
         <div>
             {record.status === 'downloading' ? (
-                <Button label="Pause" onClick={() => handlePauseClick(record.id)}>
+                <Button label="Pause" onClick={() => handlePauseClick(record.download_id)}>
                     <PauseIcon />
                 </Button>
             ) : (
-                <Button label="Resume" onClick={() => handleResumeClick(record.id)}>
+                <Button label="Resume" onClick={() => handleResumeClick(record.download_id)}>
                     <PlayArrowIcon />
                 </Button>
             )}
-            <Button label="Delete" onClick={() => handleDeleteClick(record.id)}>
+            <Button label="Delete" onClick={() => handleDeleteClick(record.download_id)}>
                 <DeleteIcon />
             </Button>
         </div>
     );
 };
 
-export const DownloadsList = () => (
-    <List filters={downloadFilters}>
-        <Datagrid rowClick="edit">
-            <TextField source="source_url" />
-            <TextField source="target_file" />
-            <TextField source="target_dir" />
-            <TextField source="total_size" />
-            <TextField source="downloaded" />
-            <TextField source="progress" />
-            <TextField source="status" />
-            <DownloadActions />
-        </Datagrid>
-    </List>
-);
+export const DownloadsList = () => {
+    return (
+        <List filters={downloadFilters}>
+            <Datagrid rowClick="edit">
+                <TextField source="source_url" />
+                <TextField source="target_filename" />
+                <TextField source="target_directory" />
+                <FormattedSizeField source="total_size" />
+                <FormattedSizeField source="downloaded" />
+                <ProgressField source="progress" />
+                <TextField source="status" />
+                <DownloadActions />
+            </Datagrid>
+        </List>
+    );
+};
 
 export default DownloadsList;
