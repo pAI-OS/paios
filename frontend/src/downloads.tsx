@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { List, Datagrid, TextField, TextInput, useRecordContext, useNotify, useRefresh, Button } from 'react-admin';
 import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -22,10 +22,9 @@ const downloadFilters = [
     <TextInput source="q" label="Search" alwaysOn />,
 ];
 
-const DownloadActions = () => {
+const DownloadActions = ({ refresh }: { refresh: () => void }) => {
     const record = useRecordContext<Download>();
     const notify = useNotify();
-    const refresh = useRefresh();
 
     const handlePauseClick = (id: string) => {
         httpClient(`${apiBase}/downloads/${encodeURIComponent(id)}/pause`, { method: 'POST' })
@@ -56,11 +55,12 @@ const DownloadActions = () => {
 
     return (
         <div>
-            {record.status === 'downloading' ? (
+            {record.status === 'downloading' && (
                 <Button label="Pause" onClick={() => handlePauseClick(record.download_id)}>
                     <PauseIcon />
                 </Button>
-            ) : (
+            )}
+            {record.status === 'paused' && (
                 <Button label="Resume" onClick={() => handleResumeClick(record.download_id)}>
                     <PlayArrowIcon />
                 </Button>
@@ -74,21 +74,32 @@ const DownloadActions = () => {
 
 export const DownloadsList = () => {
     const refresh = useRefresh();
+    const notify = useNotify();
     const intervalId = useRef<NodeJS.Timeout | null>(null);
+    const [hasError, setHasError] = useState(false);
 
     useEffect(() => {
-        // Set an interval to refresh the list every few seconds
-        intervalId.current = setInterval(() => {
-            refresh();
-        }, 5000);
+        const refreshWithErrorHandling = async () => {
+            try {
+                await refresh();
+            } catch (error) {
+                notify('Error: could not refresh downloads', { type: 'warning' });
+                setHasError(true);
+            }
+        };
+
+        if (!hasError) {
+            intervalId.current = setInterval(() => {
+                refreshWithErrorHandling();
+            }, 5000);
+        }
 
         return () => {
-            // Clear the interval when the component is unmounted
             if (intervalId.current) {
                 clearInterval(intervalId.current);
             }
         };
-    }, [refresh]);
+    }, [refresh, hasError, notify]);
 
     return (
         <List filters={downloadFilters}>
@@ -100,7 +111,7 @@ export const DownloadsList = () => {
                 <FormattedSizeField source="downloaded" />
                 <ProgressField source="progress" />
                 <TextField source="status" />
-                <DownloadActions />
+                <DownloadActions refresh={refresh} />
             </Datagrid>
         </List>
     );

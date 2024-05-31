@@ -1,5 +1,5 @@
 from starlette.requests import Request
-from starlette.responses import JSONResponse
+from starlette.responses import Response, JSONResponse
 from backend.managers.DownloadsManager import DownloadsManager
 from backend.paths import api_base_url
 
@@ -27,7 +27,7 @@ class DownloadsView:
 
     async def delete(self, download_id: str):
         await self.manager.delete_download(download_id)
-        return JSONResponse(status_code=204)
+        return Response(status_code=204)
 
     async def search(self, limit=100):
         downloads = await self.manager.retrieve_all_downloads(limit)
@@ -36,7 +36,7 @@ class DownloadsView:
     # custom functions
 
     async def pause(self, download_id: str):
-        self.manager.pause_download(download_id)
+        await self.manager.pause_download(download_id)
         return JSONResponse(status_code=200, content={"message": "Download paused"})
 
     async def resume(self, download_id: str):

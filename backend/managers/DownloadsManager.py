@@ -34,6 +34,22 @@ class DownloadsManager:
     def _is_valid_path(self, path):
         return Path(path).resolve().is_relative_to(data_dir)
 
+    def _is_duplicate_download(self, source_url, target_filename, target_directory):
+        for existing_download in self.downloads.values():
+            if (existing_download["source_url"] == source_url and
+                existing_download["target_filename"] == target_filename and
+                existing_download["target_directory"] == target_directory):
+                return True
+        return False
+
+    def _is_file_in_use(self, target_filename, target_directory):
+        for existing_download in self.downloads.values():
+            if (existing_download["target_filename"] == target_filename and
+                existing_download["target_directory"] == target_directory and
+                existing_download["status"] in {DownloadStatus.DOWNLOADING, DownloadStatus.PAUSED}):
+                return True
+        return False
+
     async def _calculate_hash(self, file_path, hash_type):
         hash_func = getattr(hashlib, hash_type)()
         async with aiofiles.open(file_path, 'rb') as f:
@@ -152,7 +168,7 @@ class DownloadsManager:
 
             if target_directory:
                 target_directory_path.mkdir(parents=True, exist_ok=True)
-                target_file_path = Path(target_directory_path) / download["target_filename"]
+                target_file_path = download["target_file_path"]
                 if target_file_path.exists():
                     raise FileExistsError(f"Destination file already exists: {target_file_path}")
 
@@ -196,19 +212,23 @@ class DownloadsManager:
             else:
                 target_directory_path = self.downloads_dir
 
+            target_filename = download.get('target_filename')
+            target_file_path = target_directory_path / target_filename
+
             # Check for existing download with the same parameters
-            # TODO: Failures in one file should not affect all files.
-            for existing_download in self.downloads.values():
-                if (existing_download["source_url"] == download.get('source_url') and
-                    existing_download["target_filename"] == download.get('target_filename') and
-                    existing_download["target_directory"] == download.get('target_directory')):
-                    raise ValueError("Download with the same parameters already exists")
+            if self._is_duplicate_download(download.get('source_url'), target_filename, target_directory):
+                raise ValueError("Download with the same parameters already exists")
+
+            # Check if the target file is being used by an active or paused download
+            if self._is_file_in_use(target_filename, target_directory):
+                raise ValueError(f"File {target_file_path} is currently being downloaded or paused")
 
             self.downloads[download_id] = {
                 "source_url": download.get('source_url'),
-                "target_filename": download.get('target_filename'),
+                "target_filename": target_filename,
                 "target_directory": target_directory,
                 "target_directory_path": target_directory_path,
+                "target_file_path": target_file_path,  # Store target_file_path
                 "status": DownloadStatus.DOWNLOADING,
                 "start_byte": 0,
                 "total_size": 0,
@@ -226,30 +246,30 @@ class DownloadsManager:
         return download_ids
 
     async def pause_download(self, download_id):
-        if download_id in self.downloads and not self.downloads[download_id]["paused"]:
+        if download_id in self.downloads and not self.downloads[download_id]["status"] == DownloadStatus.PAUSED:
             self.downloads[download_id]["task"].cancel()
             self.downloads[download_id]["status"] = DownloadStatus.PAUSED
-            self.downloads[download_id]["start_byte"] = os.path.getsize(self.downloads[download_id]["target_file"])
+            self.downloads[download_id]["start_byte"] = os.path.getsize(self.downloads[download_id]["target_file_path"])
 
     async def resume_download(self, download_id):
         if download_id in self.downloads and self.downloads[download_id]["status"] == DownloadStatus.PAUSED:
             source_url = self.downloads[download_id]["source_url"]
-            target_file = self.downloads[download_id]["target_file"]
+            target_filename = self.downloads[download_id]["target_filename"]
             start_byte = self.downloads[download_id]["start_byte"]
-            download_task = asyncio.create_task(self.download_file(download_id, source_url, target_file, start_byte))
+            download_task = asyncio.create_task(self.download_file(download_id))
             self.downloads[download_id]["task"] = download_task
-            self.downloads[download_id]["paused"] = False
+            self.downloads[download_id]["status"] = DownloadStatus.DOWNLOADING
             self.downloads[download_id]["start_time"] = time.time()  # Reset start time for resumed download
             await download_task
 
     async def delete_download(self, download_id):
         if download_id in self.downloads:
             self.downloads[download_id]["task"].cancel()
-            target_file = Path(self.downloads[download_id]["target_file"])
-            if target_file.exists():
-                target_file.unlink()
+            target_file_path = self.downloads[download_id]["target_file_path"]
+            if target_file_path.exists():
+                target_file_path.unlink()
             del self.downloads[download_id]
-
+    
     async def shutdown(self):
         tasks = [download["task"] for download in self.downloads.values()]
         for task in tasks:
