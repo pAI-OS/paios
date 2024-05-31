@@ -95,7 +95,6 @@ class DownloadsManager:
                     total_size = int(response.headers.get('Content-Length', -1)) + start_byte
                     download["total_size"] = total_size
 
-                    # Determine filename
                     content_disposition = response.headers.get('Content-Disposition')
                     if content_disposition:
                         filename = content_disposition.split('filename=')[-1].strip('"')
@@ -107,19 +106,29 @@ class DownloadsManager:
                     download["temp_file"] = temp_file
 
                     mode = 'ab' if start_byte > 0 else 'wb'
-                    with open(temp_file, mode) as f:
-                        while True:
-                            chunk = await response.content.read(1024)
-                            if not chunk:
-                                break
-                            f.write(chunk)
-                            download["downloaded"] += len(chunk)
-                            if download["total_size"] > 0:
-                                download["progress"] = round(
-                                    (download["downloaded"] / download["total_size"]) * 100, 2
-                                )
-                            else:
-                                download["progress"] = -1
+                    try:
+                        with open(temp_file, mode) as f:
+                            while True:
+                                chunk_start_time = time.time()
+                                chunk = await response.content.read(1024)
+                                chunk_end_time = time.time()
+                                if not chunk:
+                                    break
+                                f.write(chunk)
+                                download["downloaded"] += len(chunk)
+                                chunk_time = chunk_end_time - chunk_start_time
+                                if chunk_time > 0:
+                                    download["download_rate"] = len(chunk) / chunk_time
+                                if download["total_size"] > 0:
+                                    download["progress"] = round(
+                                        (download["downloaded"] / download["total_size"]) * 100, 2
+                                    )
+                                else:
+                                    download["progress"] = -1
+                    except asyncio.CancelledError:
+                        # Handle the cancellation here
+                        download["status"] = DownloadStatus.PAUSED
+                        raise
                 else:
                     raise Exception(f"Failed to download {source_url}")
 
@@ -135,7 +144,6 @@ class DownloadsManager:
                 total_size = total_size['size']
                 download["total_size"] = total_size
 
-                # Determine filename
                 filename = Path(source_url).name or download_id
                 download["target_filename"] = filename
 
@@ -143,13 +151,26 @@ class DownloadsManager:
                 download["temp_file"] = temp_file
 
                 mode = 'ab' if start_byte > 0 else 'wb'
-                with open(temp_file, mode) as f:
-                    async for chunk in stream.iter_by_block(1024):
-                        f.write(chunk)
-                        download["downloaded"] += len(chunk)
-                        download["progress"] = round(
-                            (download["downloaded"] / download["total_size"]) * 100, 2
-                        )
+                try:
+                    with open(temp_file, mode) as f:
+                        while True:
+                            chunk_start_time = time.time()
+                            chunk = await stream.read(1024)
+                            chunk_end_time = time.time()
+                            if not chunk:
+                                break
+                            f.write(chunk)
+                            download["downloaded"] += len(chunk)
+                            chunk_time = chunk_end_time - chunk_start_time
+                            if chunk_time > 0:
+                                download["download_rate"] = len(chunk) / chunk_time
+                            download["progress"] = round(
+                                (download["downloaded"] / download["total_size"]) * 100, 2
+                            )
+                except asyncio.CancelledError:
+                    # Handle the cancellation here
+                    download["status"] = DownloadStatus.PAUSED
+                    raise
 
     async def download_file(self, download_id):
         download = self.downloads[download_id]
@@ -157,7 +178,6 @@ class DownloadsManager:
             source_url = download["source_url"]
             target_directory = download.get("target_directory")
             target_directory_path = download["target_directory_path"]
-            start_byte = download["start_byte"]
             hash_type = download.get("hash_type")
             expected_hash = download.get("expected_hash")
 
@@ -196,6 +216,10 @@ class DownloadsManager:
                 download["temp_file"].rename(target_file_path)
             
             download["status"] = DownloadStatus.COMPLETED
+
+        except asyncio.CancelledError:
+            # CancelledError is expected when the download is paused or about to be deleted
+            return  # Ensure the function exits on cancellation
 
         except Exception as e:
             download["status"] = DownloadStatus.FAILED
@@ -253,9 +277,6 @@ class DownloadsManager:
 
     async def resume_download(self, download_id):
         if download_id in self.downloads and self.downloads[download_id]["status"] == DownloadStatus.PAUSED:
-            source_url = self.downloads[download_id]["source_url"]
-            target_filename = self.downloads[download_id]["target_filename"]
-            start_byte = self.downloads[download_id]["start_byte"]
             download_task = asyncio.create_task(self.download_file(download_id))
             self.downloads[download_id]["task"] = download_task
             self.downloads[download_id]["status"] = DownloadStatus.DOWNLOADING
