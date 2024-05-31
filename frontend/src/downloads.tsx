@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { List, Datagrid, TextField, TextInput, useRecordContext, useNotify, useRefresh, Button } from 'react-admin';
 import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -72,6 +73,23 @@ const DownloadActions = () => {
 };
 
 export const DownloadsList = () => {
+    const refresh = useRefresh();
+    const intervalId = useRef<NodeJS.Timeout | null>(null);
+
+    useEffect(() => {
+        // Set an interval to refresh the list every few seconds
+        intervalId.current = setInterval(() => {
+            refresh();
+        }, 5000);
+
+        return () => {
+            // Clear the interval when the component is unmounted
+            if (intervalId.current) {
+                clearInterval(intervalId.current);
+            }
+        };
+    }, [refresh]);
+
     return (
         <List filters={downloadFilters}>
             <Datagrid rowClick="edit">
