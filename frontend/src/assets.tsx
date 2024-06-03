@@ -8,14 +8,14 @@ const AssetTitle = () => {
 
 const assetFilters = [
     <TextInput source="q" label="Search" alwaysOn />,
-    <ReferenceInput source="userId" label="User" reference="users" />,
+    <ReferenceInput source="user_id" label="User" reference="users" />,
 ];
 
 export const AssetList = () => (
     <List filters={assetFilters}>
         <Datagrid rowClick="edit">
             <TextField source="title" />
-            <ReferenceField source="userId" reference="users" link="show" />
+            <ReferenceField source="user_id" reference="users" link="show" />
             <EditButton />
         </Datagrid>
     </List>
@@ -24,7 +24,7 @@ export const AssetList = () => (
 export const AssetEdit = () => (
     <Edit title={<AssetTitle />}>
         <SimpleForm>
-            <ReferenceInput source="userId" reference="users" optionText="name" />
+            <ReferenceInput source="user_id" reference="users" optionText="name" />
             <TextInput source="title" />
             <TextInput source="description" multiline rows={5} />
         </SimpleForm>
@@ -34,7 +34,7 @@ export const AssetEdit = () => (
 export const AssetCreate = () => (
     <Create>
         <SimpleForm>
-            <ReferenceInput source="userId" reference="users" optionText="name" />
+            <ReferenceInput source="user_id" reference="users" optionText="name" />
             <TextInput source="title" />
             <TextInput source="description" multiline rows={5} />
         </SimpleForm>

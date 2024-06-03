@@ -1,6 +1,5 @@
 import { useNotify, useRefresh, useRecordContext, TabbedShowLayout, Tab, UrlField } from "react-admin";
 import { Button, List, Datagrid, TextField, WrapperField, Show, SimpleShowLayout, ShowButton } from "react-admin";
-import { Link } from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StopIcon from '@mui/icons-material/Stop';
 import { apiBase, httpClient } from "./apiBackend";
@@ -101,7 +100,7 @@ export const AbilityDependencies = () => {
     return (
         <TabbedShowLayout >
             {dependencies.debian && (<Tab label="Debian"><DebianDependency dependencies={dependencies.debian} /></Tab>)}
-            {dependencies.python && (<Tab label="Python"><PythonDependency dependencies={dependencies.python} abilityId={String(record.id)} /></Tab>)}
+            {dependencies.python && (<Tab label="Python"><PythonDependency dependencies={dependencies.python} ability_id={String(record.id)} /></Tab>)}
             {dependencies.resources && (<Tab label="Resource"><ResourceDependency dependencies={dependencies.resources} /></Tab>)}
         </TabbedShowLayout>
     );

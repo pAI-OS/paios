@@ -14,7 +14,7 @@ class AssetsView:
 
     async def post(self, body: dict):
         asset_data = {
-            'userId': body.get('userId'),
+            'user_id': body.get('user_id'),
             'title': body.get('title'),
             'creator': body.get('creator'),
             'subject': body.get('subject'),
@@ -26,7 +26,7 @@ class AssetsView:
     
     async def put(self, asset_id: str, body: dict):
         asset_data = {
-            'userId': body.get('userId'),
+            'user_id': body.get('user_id'),
             'title': body.get('title'),
             'creator': body.get('creator'),
             'subject': body.get('subject'),

@@ -6,7 +6,7 @@ import GetAppIcon from '@mui/icons-material/GetApp';
 import { useRecordContext, useNotify, useRefresh } from 'react-admin';
 import { apiBase, httpClient } from '../apiBackend';
 
-export const PythonDependency = (props: { dependencies: any, abilityId: string }) => {
+export const PythonDependency = (props: { dependencies: any, ability_id: string }) => {
     return (
         <Datagrid data={props.dependencies} sort={{ field: 'name', order: 'ASC' }}>
             <TextField source="id" />
@@ -14,13 +14,13 @@ export const PythonDependency = (props: { dependencies: any, abilityId: string }
             <TextField source="version-installed" label="Installed" />
             <TextField source="version" label="Required" />
             <CheckedField source="satisfied" />
-            <InstallButton abilityId={props.abilityId} />
+            <InstallButton ability_id={props.ability_id} />
         </Datagrid>
     );
 };
 
 
-const InstallButton = ({ abilityId }: { abilityId: string }) => {
+const InstallButton = ({ ability_id }: { ability_id: string }) => {
     const record = useRecordContext();
     const notify = useNotify();
     const refresh = useRefresh();
@@ -53,7 +53,7 @@ const InstallButton = ({ abilityId }: { abilityId: string }) => {
         event.stopPropagation();
         setIsInstalling(true);
 
-        httpClient(`${apiBase}/abilities/${abilityId}/dependencies/python/${record.id}/install`, { method: 'POST' })
+        httpClient(`${apiBase}/abilities/${ability_id}/dependencies/python/${record.id}/install`, { method: 'POST' })
             .then(() => {
                 notify('Python dependency installation requested');
                 refresh();

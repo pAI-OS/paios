@@ -6,7 +6,7 @@ import DownloadingIcon from '@mui/icons-material/Downloading';
 import DeleteIcon from '@mui/icons-material/Delete'
 import { apiBase, httpClient } from "../apiBackend";
 
-const DownloadButton = ({ abilityId }: { abilityId: string }) => {
+const DownloadButton = ({ ability_id }: { ability_id: string }) => {
     const record = useRecordContext();
     const notify = useNotify();
     const refresh = useRefresh();
@@ -15,7 +15,7 @@ const DownloadButton = ({ abilityId }: { abilityId: string }) => {
         // prevent the click event propagating to the row and calling show
         event.stopPropagation();
 
-        httpClient(`${apiBase}/abilities/${abilityId}/dependencies/resources/${record.id}/download/start`, { method: 'POST' })
+        httpClient(`${apiBase}/abilities/${ability_id}/dependencies/resources/${record.id}/download/start`, { method: 'POST' })
             .then(() => {
                 notify('Download started');
                 refresh();
@@ -30,7 +30,7 @@ const DownloadButton = ({ abilityId }: { abilityId: string }) => {
         // prevent the click event propagating to the row and calling show
         event.stopPropagation();
 
-        httpClient(`${apiBase}/abilities/${abilityId}/dependencies/resources/${record.id}/download/stop`, { method: 'POST' })
+        httpClient(`${apiBase}/abilities/${ability_id}/dependencies/resources/${record.id}/download/stop`, { method: 'POST' })
             .then(() => {
                 notify('Download stop requested');
                 refresh();
@@ -45,7 +45,7 @@ const DownloadButton = ({ abilityId }: { abilityId: string }) => {
         // prevent the click event propagating to the row and calling show
         event.stopPropagation();
 
-        httpClient(`${apiBase}/abilities/${abilityId}/dependencies/resources/${record.id}/download/delete`, { method: 'POST' })
+        httpClient(`${apiBase}/abilities/${ability_id}/dependencies/resources/${record.id}/download/delete`, { method: 'POST' })
             .then(() => {
                 notify('Download deletion requested');
                 refresh();
@@ -87,7 +87,7 @@ const DownloadButton = ({ abilityId }: { abilityId: string }) => {
 export const ResourceDependency = (props: { dependencies: any }) => {
     const record = useRecordContext();
     const refresh = useRefresh();
-    const abilityId = String(record.id);
+    const ability_id = String(record.id);
     const intervalId = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
@@ -117,7 +117,7 @@ export const ResourceDependency = (props: { dependencies: any }) => {
             <TextField source="name" />
             <TextField source="filename" />
             <TextField source="url" />
-            <DownloadButton abilityId={abilityId} />    
+            <DownloadButton ability_id={ability_id} />    
         </Datagrid>
     );
 };

@@ -68,25 +68,25 @@ for ability in os.listdir(abilities_dir):
                 pass
 
 # Helper functions for common responses
-def get_ability(abilityId):
+def get_ability(ability_id):
     for ability in abilities:
-        if ability["id"] == abilityId: return ability
+        if ability["id"] == ability_id: return ability
     return None
 
-def get_ability_dependency(abilityId, dependencyId, dependencyType):
-    # print(f"Getting dependency {dependencyId} of type {dependencyType} for ability {abilityId}")
-    ability = get_ability(abilityId)
+def get_ability_dependency(ability_id, dependency_id, dependency_type):
+    # print(f"Getting dependency {dependency_id} of type {dependency_type} for ability {ability_id}")
+    ability = get_ability(ability_id)
     # print(f"Ability: {ability}")
     if not ability: return None
-    if dependencyType not in ability["dependencies"]:
-        # print(f"Dependency type {dependencyType} not found for ability {abilityId}")
+    if dependency_type not in ability["dependencies"]:
+        # print(f"Dependency type {dependency_type} not found for ability {ability_id}")
         return None
-    for dependency in ability["dependencies"][dependencyType]:
+    for dependency in ability["dependencies"][dependency_type]:
         # print(f"Dependency: {dependency}")
-        if dependency["id"] == dependencyId: return dependency
+        if dependency["id"] == dependency_id: return dependency
     return None
 
-def ability_python_dependency_install(abilityId, dependencyId):
+def ability_python_dependency_install(ability_id, dependency_id):
     import importlib
     import subprocess
     import sys
@@ -150,7 +150,7 @@ def ability_python_dependency_install(abilityId, dependencyId):
         except (subprocess.CalledProcessError, pkg_resources.DistributionNotFound, ImportError) as e:
             return {"error": f"Failed to install {package_with_version}.", "details": e.stderr}, 500
 
-    dependency = get_ability_dependency(abilityId, dependencyId, "python")
+    dependency = get_ability_dependency(ability_id, dependency_id, "python")
     if not dependency:
         return {"error": "Dependency not found"}, 404
     package_id = dependency.get('id')
@@ -161,7 +161,7 @@ def ability_python_dependency_install(abilityId, dependencyId):
     return install_python_package(package_id, version_specifier)
 
 
-def ability_resource_dependency_download_start(abilityId, dependencyId): 
+def ability_resource_dependency_download_start(ability_id, dependency_id): 
     import threading
     import requests
     import time
@@ -169,17 +169,17 @@ def ability_resource_dependency_download_start(abilityId, dependencyId):
 
     # threads check if they should keep running on each loop
     timeout = 60*60*24 # one day in seconds
-    ability_data_dir = os.path.join(abilities_data_dir, abilityId)
+    ability_data_dir = os.path.join(abilities_data_dir, ability_id)
     local_file = ''
 
     #try:
-    dependency = get_ability_dependency(abilityId, dependencyId, "resources")
+    dependency = get_ability_dependency(ability_id, dependency_id, "resources")
     url = dependency["url"]
     local_file = os.path.join(ability_data_dir, dependency["filename"])
 
     dependency["keepDownloading"] = True
     #except KeyError:
-    #    print(f"An error occurred downloading ability {abilityId} dependency {dependencyId}")
+    #    print(f"An error occurred downloading ability {ability_id} dependency {dependency_id}")
     #    return
 
     def download_file():
@@ -207,7 +207,7 @@ def ability_resource_dependency_download_start(abilityId, dependencyId):
                         return # download complete so exit thread
                     keep_downloading()
             except KeyError as e:
-                print(f"An error occurred updating progress of ability {abilityId} dependency {dependencyId} download: {e}")
+                print(f"An error occurred updating progress of ability {ability_id} dependency {dependency_id} download: {e}")
                 return
 
 
@@ -215,7 +215,7 @@ def ability_resource_dependency_download_start(abilityId, dependencyId):
         # give up and exit thread after timeout
         if time.time() - start_time > timeout: return
         # exit thread if keepDownloading is False or removed
-        dependency = get_ability_dependency(abilityId, dependencyId, "resources")
+        dependency = get_ability_dependency(ability_id, dependency_id, "resources")
         if not dependency or not dependency.get('keepDownloading'): return
 
     start_time = time.time()
@@ -223,18 +223,18 @@ def ability_resource_dependency_download_start(abilityId, dependencyId):
     threading.Thread(target=update_progress).start()
 
 
-def ability_resource_dependency_download_stop(abilityId, dependencyId): 
+def ability_resource_dependency_download_stop(ability_id, dependency_id): 
     # sets keepDownloading to False to stop download thread
-    dependency = get_ability_dependency(abilityId, dependencyId, "resources")
+    dependency = get_ability_dependency(ability_id, dependency_id, "resources")
     if dependency:
         if "keepDownloading" in dependency:
             del dependency["keepDownloading"]
 
 
-def ability_resource_dependency_download_delete(abilityId, dependencyId): 
+def ability_resource_dependency_download_delete(ability_id, dependency_id): 
     # deletes local file
-    dependency = get_ability_dependency(abilityId, dependencyId, "resources")
-    ability_data_dir = os.path.join(abilities_data_dir, abilityId)
+    dependency = get_ability_dependency(ability_id, dependency_id, "resources")
+    ability_data_dir = os.path.join(abilities_data_dir, ability_id)
     local_file = os.path.join(ability_data_dir, dependency["filename"])
     if dependency:
         try:
@@ -253,19 +253,19 @@ def retrieve_all(payload, status_code=200): return jsonify(payload), status_code
 def retrieve_all_abilities(): return retrieve_all(abilities)
 
 # Retrieve by ID
-def retrieve_ability_by_id(abilityId):
-    ability = get_ability(abilityId)
+def retrieve_ability_by_id(ability_id):
+    ability = get_ability(ability_id)
     if ability:
         return ability, 200
     else:
         return {"error": "Ability not found"}, 404
 
 # Abilities Management
-def start_ability(abilityId):
+def start_ability(ability_id):
     import stat
 
-    print(f"Starting ability {abilityId}")
-    ability = get_ability(abilityId)
+    print(f"Starting ability {ability_id}")
+    ability = get_ability(ability_id)
     if ability is None: return {"error": "Ability not found"}, 404
 
     start_script = ability.get('scripts', {}).get('start', '')
@@ -279,7 +279,7 @@ def start_ability(abilityId):
         return {"error": "Unable to determine start script executable"}, 500
 
     # find the start script in the ability's directory or the ability's data directory
-    search_paths = [abilities_dir / abilityId, abilities_data_dir / abilityId, venv_bin_dir ]
+    search_paths = [abilities_dir / ability_id, abilities_data_dir / ability_id, venv_bin_dir ]
     script_found = False
     for path in search_paths:
         start_script_candidate = os.path.join(path, start_script_parts[0])
@@ -306,8 +306,8 @@ def start_ability(abilityId):
         start_script_parts.insert(0, python_executable)
 
     # Define file paths for stdout and stderr
-    stdout_file_path = Path(start_script_cwd) / f"{abilityId}_stdout.log"
-    stderr_file_path = Path(start_script_cwd) / f"{abilityId}_stderr.log"
+    stdout_file_path = Path(start_script_cwd) / f"{ability_id}_stdout.log"
+    stderr_file_path = Path(start_script_cwd) / f"{ability_id}_stderr.log"
 
     # Open file handles
     stdout_file = open(stdout_file_path, 'w')
@@ -318,8 +318,8 @@ def start_ability(abilityId):
     ability['pid'] = process.pid
     return ok()
 
-def stop_ability(abilityId):
-    ability = get_ability(abilityId)
+def stop_ability(ability_id):
+    ability = get_ability(ability_id)
     if not ability: return {"error": "Ability not found"}, 404
     if 'pid' in ability:
         # Terminate the subprocess
