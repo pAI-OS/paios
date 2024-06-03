@@ -162,14 +162,14 @@ paths:
                   type: string
                   x-stoplight:
                     id: fth78lwtn3nw3
-  '/assets/{assetId}':
+  '/assets/{asset_id}':
     get:
       tags:
         - Asset Management
       summary: Retrieve asset by id
       description: Retrieve the information of the asset with the matching asset ID.
       parameters:
-        - name: assetId
+        - name: asset_id
           in: path
           description: Id of an existing asset.
           required: true
@@ -185,6 +185,8 @@ paths:
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
+      x-stoplight:
+        id: 2zks0jok3godg
     put:
       summary: Update asset by id
       tags:
@@ -220,7 +222,7 @@ paths:
     parameters:
       - schema:
           type: string
-        name: assetId
+        name: asset_id
         description: id of an existing asset.
         in: path
         required: true
@@ -844,7 +846,7 @@ components:
           example: Artificial Intelligence
         description:
           type: string
-          example: We propose a new simple network architecture, the Transformer...
+          example: 'We propose a new simple network architecture, the Transformer...'
     Channel:
       type: object
       title: Channel
@@ -858,7 +860,7 @@ components:
           example: LLM API
         uri:
           type: string
-          example: https://localhost:8080/v1/api
+          example: 'https://localhost:8080/v1/api'
     Config:
       title: Config
       type: object
@@ -894,7 +896,7 @@ components:
           example: e2b55b15-4080-41b2-bbbf-cbac0a282880
         source_url:
           type: string
-          example: https://releases.ubuntu.com/24.04/ubuntu-24.04-desktop-amd64.iso
+          example: 'https://releases.ubuntu.com/24.04/ubuntu-24.04-desktop-amd64.iso'
         target_filename:
           type: string
           example: ubuntu-24.04-desktop-amd64.iso
