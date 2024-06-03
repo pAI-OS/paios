@@ -34,21 +34,13 @@ class DownloadsManager:
         resolved_path = Path(path).resolve()
         return resolved_path.is_relative_to(data_dir) and resolved_path.exists()
 
-    def _is_duplicate_download(self, source_url, file_name, target_directory):
-        for existing_download in self.downloads.values():
-            if (existing_download["source_url"] == source_url and
-                existing_download["file_name"] == file_name and
-                existing_download["target_directory"] == target_directory):
-                return True
-        return False
-
     def _is_file_already_downloading(self, current_download):
         for existing_download in self.downloads.values():
             if existing_download is current_download:
                 continue
             if (existing_download["file_name"] == current_download["file_name"] and
                 existing_download["target_directory"] == current_download["target_directory"] and
-                existing_download["status"] in {DownloadStatus.DOWNLOADING, DownloadStatus.PAUSED}):
+                existing_download["status"] == DownloadStatus.DOWNLOADING):
                 return True
         return False
 
@@ -82,11 +74,12 @@ class DownloadsManager:
         return paginated_downloads, total_count
 
     def _calculate_transfer_rate(self, download):
-        elapsed_time = time.time() - download["start_time"]
-        if elapsed_time > 0:
-            return download["downloaded"] / elapsed_time
+        if download["status"] == DownloadStatus.DOWNLOADING:
+            elapsed_time = time.time() - download["start_time"]
+            if elapsed_time > 0:
+                return download["downloaded"] / elapsed_time
         return 0
-
+    
     async def download_file_http(self, id):
         download = self.downloads[id]
         source_url = download["source_url"]
@@ -110,15 +103,14 @@ class DownloadsManager:
                         download["file_name"] = resolved_file_name
 
                     temp_file = downloads_dir / download.get("file_name")
-                    if temp_file.exists():
-                        raise FileExistsError(f"Temporary file already exists: {temp_file}")
-                    download["temp_file"] = temp_file
+                    #if temp_file.exists():
+                    #    print(download["status"].value)
+                    #    raise FileExistsError(f"Temporary file already exists: {temp_file}")
+                    download["file_path"] = temp_file
 
-                    print("temp_file: ", temp_file)
-
-                    # Check if the target file is being used by an active or paused download
+                    # Check if the target file is being used by an active download
                     if self._is_file_already_downloading(download):
-                        raise ValueError(f"File {download.get('file_name')} is currently being downloaded or paused")
+                        raise ValueError(f"File {download.get('file_name')} is currently being downloaded")
 
                     mode = 'ab' if start_byte > 0 else 'wb'
                     try:
@@ -135,6 +127,8 @@ class DownloadsManager:
                                 if chunk_time > 0:
                                     if download["status"] != DownloadStatus.PAUSED:
                                         download["transfer_rate"] = len(chunk) / chunk_time
+                                    else:
+                                        download["transfer_rate"] = 0
                                 if download["total_size"] > 0:
                                     download["progress"] = round(
                                         (download["downloaded"] / download["total_size"]) * 100, 2
@@ -165,11 +159,13 @@ class DownloadsManager:
                     download["file_name"] = resolved_file_name
 
                 temp_file = downloads_dir / download.get("file_name")
-                download["temp_file"] = temp_file
+                if temp_file.exists():
+                    raise FileExistsError(f"Temporary file already exists: {temp_file}")
+                download["file_path"] = temp_file
 
-                # Check if the target file is being used by an active or paused download
-                if self._is_file_already_downloading(download.get('file_name'), download.get('target_directory')):
-                    raise ValueError(f"File {download.get('file_name')} is currently being downloaded or paused")
+                # Check if the target file is being used by an active download
+                if self._is_file_already_downloading(download):
+                    raise ValueError(f"File {download.get('file_name')} is currently being downloaded")
 
                 mode = 'ab' if start_byte > 0 else 'wb'
                 try:
@@ -186,6 +182,8 @@ class DownloadsManager:
                             if chunk_time > 0:
                                 if download["status"] != DownloadStatus.PAUSED:
                                     download["transfer_rate"] = len(chunk) / chunk_time
+                                else:
+                                    download["transfer_rate"] = 0
                             download["progress"] = round(
                                 (download["downloaded"] / download["total_size"]) * 100, 2
                             )
@@ -214,10 +212,6 @@ class DownloadsManager:
             if not self._is_valid_path(target_directory_path):
                 raise ValueError(f"Invalid destination path: {target_directory_path}")
 
-            if download.get('file_name'):
-                if (target_directory_path / download.get("file_name")).exists():
-                    raise FileExistsError(f"Destination file already exists: {target_directory_path / download.get('file_name')}")
-
             parsed_url = urlparse(source_url)
             if parsed_url.scheme in ('http', 'https'):
                 await self.download_file_http(id)
@@ -226,6 +220,7 @@ class DownloadsManager:
             else:
                 raise ValueError(f"Unsupported URL scheme: {parsed_url.scheme}")
             
+            download["transfer_rate"] = 0
             download["finish_time"] = time.time()
             download["status"] = DownloadStatus.PROCESSING
 
@@ -237,11 +232,10 @@ class DownloadsManager:
 
             # If a target_directory has been specified, we need to move the file out of the general downloads directory
             if target_directory:
-                file_path = target_directory_path / download.get('file_name')
-                if file_path.exists():
-                    raise FileExistsError(f"Destination file already exists: {file_path}")
-                download["temp_file"].rename(file_path)
-            del(download["temp_file"])
+                target_file_path = target_directory_path / download.get('file_name')
+                if target_file_path.exists():
+                    raise FileExistsError(f"Destination file already exists: {target_file_path}")
+                download["file_path"].rename(target_file_path)
 
             download["status"] = DownloadStatus.COMPLETED
 
@@ -305,7 +299,7 @@ class DownloadsManager:
             self.downloads[id]["task"] = download_task
             self.downloads[id]["status"] = DownloadStatus.DOWNLOADING
             self.downloads[id]["start_time"] = time.time()  # Reset start time for resumed download
-            await download_task
+            download_task.add_done_callback(lambda t, d=self.downloads[id]: self._handle_task_exception(t, d))
 
     async def delete_download(self, id: str):
         download = self.downloads.get(id)
@@ -313,17 +307,30 @@ class DownloadsManager:
             raise ValueError(f"Download with ID {id} does not exist")
 
         # Cancel the download task if it's active or paused
-        if download["status"] in ["downloading", "paused"]:
+        if download["status"] in [DownloadStatus.DOWNLOADING, DownloadStatus.PAUSED]:
             download["task"].cancel()
             try:
                 await download["task"]
             except asyncio.CancelledError:
                 pass
 
-        # Unlink the downloaded file if it exists
-        file_path = Path(download.get("file_path", ""))
-        if file_path.exists():
-            file_path.unlink()
+        # Recalculate the file paths
+        file_name = download.get("file_name")
+        if file_name:
+            temp_file_path = downloads_dir / file_name
+            target_directory = download.get("target_directory")
+            if target_directory:
+                target_file_path = data_dir / Path(target_directory) / file_name
+            else:
+                target_file_path = None
+
+            # Unlink the temporary file if it exists
+            if temp_file_path.exists():
+                temp_file_path.unlink()
+
+            # Unlink the target file if it exists
+            if target_file_path and target_file_path.exists():
+                target_file_path.unlink()
 
         del self.downloads[id]
 
