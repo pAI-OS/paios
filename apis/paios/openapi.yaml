@@ -30,15 +30,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Ability'
-              examples:
-                Example 1:
-                  value:
-                    - ability_id: optical-character-recognition
-                      name: Optical Character Recognition
-                      description: Conversion of images to text
-                    - ability_id: vector-database
-                      name: Vector Database
-                      description: Stores vectors (fixed-length lists of numbers) along with other data items
           headers:
             X-Total-Count:
               schema:
@@ -65,12 +56,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Ability'
-              examples:
-                Example 1:
-                  value:
-                    id: optical-character-recognition
-                    name: Optical Character Recognition
-                    description: Conversion of images to text
       x-stoplight:
         id: dyrvaak9tni3i
   '/abilities/{ability_id}/start':
@@ -124,21 +109,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Asset'
-              examples:
-                Example 1:
-                  value:
-                    - id: 43c03b22-dbc5-449d-9618-39ce35af9926
-                      user_id: 5bae4a90-ce69-4483-86ef-d723258f21e5
-                      title: Attention Is All You Need
-                      creator: Ashish Vaswani et al
-                      subject: Artificial Intelligence
-                      description: 'We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.'
-                    - id: 9df36f59-a1d0-454c-8cbb-da8c64b94ebc
-                      user_id: 1cbb0bc5-bae2-4b9d-9555-f2282f767047
-                      title: Generative Adversarial Networks
-                      creator: Goodfellow et al
-                      subject: Artificial Intelligence
-                      description: 'We propose a new framework for estimating generative models via an adversarial process, in which we simultaneously train two models: a generative model G that captures the data distribution, and a discriminative model D that estimates the probability that a sample came from the training data rather than G.'
           headers:
             X-Total-Count:
               schema:
@@ -212,14 +182,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Asset'
-              examples:
-                Example 1:
-                  value:
-                    id: 43c03b22-dbc5-449d-9618-39ce35af9926
-                    title: Attention Is All You Need
-                    creator: Vaswani et al
-                    subject: Artificial Intelligence
-                    description: 'We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.'
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
@@ -277,12 +239,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Channel'
-              examples:
-                Example 1:
-                  value:
-                    - id: llm-api
-                      name: Large Language Model API
-                      uri: 'https://localhost:8080/v1'
           headers:
             X-Total-Count:
               schema:
@@ -329,12 +285,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Channel'
-              examples:
-                Example 1:
-                  value:
-                    id: llm-api
-                    name: Large Language Model API
-                    uri: 'https://localhost:8080/v1'
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
@@ -403,14 +353,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Config'
-              examples:
-                Example 1:
-                  value: 123
-                Example 2:
-                  value: secret
-                Example 3:
-                  value:
-                    x: 'y'
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
@@ -482,21 +424,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Download'
-              examples:
-                Example 1:
-                  value:
-                    - url: 'http://example.com/file1.zip'
-                      dest: downloads/file1.zip
-                      total_size: 1024
-                      downloaded: 512
-                      progress: 50
-                      status: downloading
-                    - url: 'http://example.com/file2.zip'
-                      dest: downloads/file2.zip
-                      total_size: 2048
-                      downloaded: 2048
-                      progress: 100
-                      status: completed
           headers:
             X-Total-Count:
               schema:
@@ -614,15 +541,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/User'
-              examples:
-                Example 1:
-                  value:
-                    - id: 5bae4a90-ce69-4483-86ef-d723258f21e5
-                      name: Alice Smith
-                      email: alice.smith@gmail.com
-                    - id: 1cbb0bc5-bae2-4b9d-9555-f2282f767047
-                      name: Bob Jones
-                      email: bob.jones@gmail.com
           headers:
             X-Total-Count:
               schema:
@@ -651,11 +569,6 @@ paths:
                   type: string
                 email:
                   type: string
-            examples:
-              Create User Bob Fellow:
-                value:
-                  name: Bob Fellow
-                  email: bob.fellow@gmail.com
       responses:
         '201':
           description: User Created
@@ -663,12 +576,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-              examples:
-                New User Bob Fellow:
-                  value:
-                    id: 1cbb0bc5-bae2-4b9d-9555-f2282f767047
-                    name: Bob Fellow
-                    email: bob.fellow@gmail.com
         '400':
           description: Missing Required Information
         '409':
@@ -697,12 +604,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-              examples:
-                Get User Alice Smith:
-                  value:
-                    id: 5bae4a90-ce69-4483-86ef-d723258f21e5
-                    name: Alice Smith
-                    email: alice.smith@gmail.com
         '404':
           description: User Not Found
       servers:
@@ -763,7 +664,7 @@ paths:
                   name: Rebecca Baker
               Update Email:
                 value:
-                  email: rebecca@gmail.com
+                  email: rebecca.baker@example.com
       responses:
         '200':
           description: User Updated
@@ -771,12 +672,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-              examples:
-                Updated User Rebecca Baker:
-                  value:
-                    id: 08c73f41-a733-4cef-945e-2b0aa978452e
-                    name: Rebecca Baker
-                    email: rebecca@gmail.com
         '404':
           description: User Not Found
         '409':
