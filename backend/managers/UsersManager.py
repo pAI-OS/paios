@@ -11,13 +11,6 @@ class UsersManager:
         await db.execute_query(query, (id, name, email))
         return id
 
-    async def retrieve_user(self, id):
-        query = 'SELECT name, email FROM user WHERE id = ?'
-        result = await db.execute_query(query, (id,))
-        if result:
-            return {'id': id, 'name': result[0][0], 'email': result[0][1]}
-        return None
-
     async def update_user(self, id, name, email):
         query = 'INSERT OR REPLACE INTO user (id, name, email) VALUES (?, ?, ?)'
         return await db.execute_query(query, (id, name, email))
@@ -26,7 +19,14 @@ class UsersManager:
         query = 'DELETE FROM user WHERE id = ?'
         return await db.execute_query(query, (id,))
 
-    async def retrieve_all_users(self, offset=0, limit=100, sort_by=None, sort_order='asc', filters=None):
+    async def retrieve_user(self, id):
+        query = 'SELECT name, email FROM user WHERE id = ?'
+        result = await db.execute_query(query, (id,))
+        if result:
+            return {'id': id, 'name': result[0][0], 'email': result[0][1]}
+        return None
+
+    async def retrieve_users(self, offset=0, limit=100, sort_by=None, sort_order='asc', filters=None):
         base_query = 'SELECT id, name, email FROM user'
         query_params = []
 

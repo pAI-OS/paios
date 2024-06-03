@@ -11,7 +11,22 @@ class AssetsManager:
         await db.execute_query(query, (id, user_id, title, creator, subject, description))
         return id
 
-    async def retrieve_all_assets(self, offset=0, limit=100, sort_by=None, sort_order='asc', filters=None):
+    async def update_asset(self, id, user_id, title, creator, subject, description):
+        query = 'INSERT OR REPLACE INTO asset (id, user_id, title, creator, subject, description) VALUES (?, ?, ?, ?, ?, ?)'
+        return await db.execute_query(query, (id, user_id, title, creator, subject, description))
+
+    async def delete_asset(self, id):
+        query = 'DELETE FROM asset WHERE id = ?'
+        return await db.execute_query(query, (id,))
+
+    async def retrieve_asset(self, id):
+        query = 'SELECT user_id, title, creator, subject, description FROM asset WHERE id = ?'
+        result = await db.execute_query(query, (id,))
+        if result:
+            return {'id': id, 'user_id': result[0][0], 'title': result[0][1], 'creator': result[0][2], 'subject': result[0][3], 'description': result[0][4]}
+        return None
+
+    async def retrieve_assets(self, offset=0, limit=100, sort_by=None, sort_order='asc', filters=None):
         base_query = 'SELECT id, user_id, title, creator, subject, description FROM asset'
         query_params = []
 
@@ -52,18 +67,3 @@ class AssetsManager:
         total_count = total_count_result[0][0] if total_count_result else 0
 
         return assets, total_count
-
-    async def retrieve_asset(self, id):
-        query = 'SELECT user_id, title, creator, subject, description FROM asset WHERE id = ?'
-        result = await db.execute_query(query, (id,))
-        if result:
-            return {'id': id, 'user_id': result[0][0], 'title': result[0][1], 'creator': result[0][2], 'subject': result[0][3], 'description': result[0][4]}
-        return None
-
-    async def update_asset(self, id, user_id, title, creator, subject, description):
-        query = 'INSERT OR REPLACE INTO asset (id, user_id, title, creator, subject, description) VALUES (?, ?, ?, ?, ?, ?)'
-        return await db.execute_query(query, (id, user_id, title, creator, subject, description))
-
-    async def delete_asset(self, id):
-        query = 'DELETE FROM asset WHERE id = ?'
-        return await db.execute_query(query, (id,))
