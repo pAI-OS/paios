@@ -14,7 +14,7 @@ def init_db():
     command.upgrade(alembic_cfg, "head")
 
 async def execute_query(query, params=None):
-    #print(f"Executing query: {query} with params: {params}")
+    print(f"Executing query: {query} with params: {params}")
     async with aiosqlite.connect(db_path) as conn:
         async with conn.cursor() as cursor:
             try:

@@ -21,6 +21,10 @@ paths:
         - Abilities Management
       summary: Retrieve all abilities
       description: Retrieve the information of all abilities.
+      parameters:
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/Range'
+        - $ref: '#/components/parameters/Filter'
       responses:
         '200':
           description: OK
@@ -100,6 +104,10 @@ paths:
         - Asset Management
       summary: Retrieve all assets
       description: Retrieve the information of all assets.
+      parameters:
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/Range'
+        - $ref: '#/components/parameters/Filter'
       responses:
         '200':
           description: OK
@@ -162,14 +170,14 @@ paths:
                   type: string
                   x-stoplight:
                     id: fth78lwtn3nw3
-  '/assets/{asset_id}':
+  '/assets/{id}':
     get:
       tags:
         - Asset Management
       summary: Retrieve asset by id
       description: Retrieve the information of the asset with the matching asset ID.
       parameters:
-        - name: asset_id
+        - name: id
           in: path
           description: Id of an existing asset.
           required: true
@@ -222,7 +230,7 @@ paths:
     parameters:
       - schema:
           type: string
-        name: asset_id
+        name: id
         description: id of an existing asset.
         in: path
         required: true
@@ -232,6 +240,10 @@ paths:
         - Channel Management
       summary: Retrieve all channels
       description: Retrieve the information of all channels.
+      parameters:
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/Range'
+        - $ref: '#/components/parameters/Filter'
       responses:
         '200':
           description: OK
@@ -421,6 +433,9 @@ paths:
           schema:
             type: integer
             default: 100
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/Range'
+        - $ref: '#/components/parameters/Filter'
       responses:
         '200':
           description: OK
@@ -538,6 +553,10 @@ paths:
         - User Management
       summary: Retrieve all users
       description: Get all users.
+      parameters:
+        - $ref: '#/components/parameters/Sort'
+        - $ref: '#/components/parameters/Range'
+        - $ref: '#/components/parameters/Filter'
       responses:
         '200':
           description: OK
@@ -559,6 +578,8 @@ paths:
     post:
       tags:
         - User Management
+      x-stoplight:
+        id: 529fe234619a5
       summary: Create new user
       description: Create a new user.
       requestBody:
@@ -581,7 +602,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
         '400':
           description: Missing Required Information
         '409':
@@ -589,14 +614,14 @@ paths:
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
-  '/users/{user_id}':
+  '/users/{id}':
     get:
       tags:
         - User Management
       summary: Retrieve user by id
       description: Retrieve the information of the user with the matching user ID.
       parameters:
-        - name: user_id
+        - name: id
           in: path
           description: UUID of user
           required: true
@@ -623,7 +648,7 @@ paths:
       summary: Delete user by id
       description: Delete the user with the specified ID
       parameters:
-        - name: user_id
+        - name: id
           in: path
           description: UUID of user
           required: true
@@ -646,9 +671,9 @@ paths:
       summary: Update user
       description: Update the information of an existing user.
       parameters:
-        - name: user_id
+        - name: id
           in: path
-          description: UUID of user
+          description: id of user
           required: true
           schema:
             type: string
@@ -809,6 +834,31 @@ tags:
   - name: User Management
     description: Management of user accounts
 components:
+  parameters:
+    Sort:
+      name: sort
+      in: query
+      description: 'Specifies the sorting order and field (e.g., ["title", "ASC"]).'
+      required: false
+      schema:
+        type: string
+        example: '["title","ASC"]'
+    Range:
+      name: range
+      in: query
+      description: 'Specifies the range of results to return (e.g., [0, 24]).'
+      required: false
+      schema:
+        type: string
+        example: '[0, 24]'
+    Filter:
+      name: filter
+      in: query
+      description: 'JSON string specifying the filter conditions (e.g., {"title":"bar"}).'
+      required: false
+      schema:
+        type: string
+        example: '{"title":"bar"}'
   schemas:
     Ability:
       type: object
@@ -839,18 +889,22 @@ components:
           type: string
           format: uuid
           example: a9cab4c3-65d3-4871-83b9-165b2e9d5947
+          nullable: true
         title:
           type: string
           example: Attention Is All You Need
         creator:
           type: string
           example: Ashish Vaswani et al
+          nullable: true
         subject:
           type: string
           example: Artificial Intelligence
+          nullable: true
         description:
           type: string
           example: 'We propose a new simple network architecture, the Transformer...'
+          nullable: true
     Channel:
       type: object
       title: Channel

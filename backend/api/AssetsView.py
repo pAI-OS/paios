@@ -6,8 +6,8 @@ class AssetsView:
     def __init__(self):
         self.am = AssetsManager()
 
-    async def get(self, asset_id: str):
-        asset = await self.am.retrieve_asset(asset_id)
+    async def get(self, id: str):
+        asset = await self.am.retrieve_asset(id)
         if asset is None:
             return JSONResponse({"error": "Asset not found"},status_code=404)
         return JSONResponse(asset, status_code=200)
@@ -20,11 +20,11 @@ class AssetsView:
             'subject': body.get('subject'),
             'description': body.get('description')
         }
-        asset_id = await self.am.create_asset(**asset_data)
-        asset = await self.am.retrieve_asset(asset_id)
-        return JSONResponse(asset, status_code=201, headers={'Location': f'{api_base_url}/assets/{asset_id}'})
+        id = await self.am.create_asset(**asset_data)
+        asset = await self.am.retrieve_asset(id)
+        return JSONResponse(asset, status_code=201, headers={'Location': f'{api_base_url}/assets/{id}'})
     
-    async def put(self, asset_id: str, body: dict):
+    async def put(self, id: str, body: dict):
         asset_data = {
             'user_id': body.get('user_id'),
             'title': body.get('title'),
@@ -32,12 +32,12 @@ class AssetsView:
             'subject': body.get('subject'),
             'description': body.get('description')
         }
-        await self.am.update_asset(asset_id, **asset_data)
-        asset = await self.am.retrieve_asset(asset_id)
+        await self.am.update_asset(id, **asset_data)
+        asset = await self.am.retrieve_asset(id)
         return JSONResponse(asset, status_code=200)
 
-    async def delete(self, asset_id: str):
-        await self.am.delete_asset(asset_id)
+    async def delete(self, id: str):
+        await self.am.delete_asset(id)
         return Response(status_code=204)
     
     async def search(self, limit=100):

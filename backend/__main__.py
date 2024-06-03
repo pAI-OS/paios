@@ -26,15 +26,21 @@ def create_backend_app():
     connexion_app.add_middleware(
        CORSMiddleware,
        position=MiddlewarePosition.BEFORE_EXCEPTION,
-       allow_origins=[allow_origins],  # TODO: Configure CORS
+       allow_origins=[allow_origins],
        allow_credentials=True,
        allow_methods=["*"],
        allow_headers=["*"],
-       expose_headers=["X-Total-Count"],
+       expose_headers=["Content-Range", "X-Total-Count"],
     )
 
-    connexion_app.add_api('openapi.yaml', resolver=MethodResolver('backend.api'), resolver_error=501)
-
+    # Add API with validation
+    connexion_app.add_api(
+        'openapi.yaml',
+        resolver=MethodResolver('backend.api'),
+        resolver_error=501,
+        validate_responses=True,  # Validate responses against the OpenAPI spec
+        strict_validation=True    # Validate requests strictly against the OpenAPI spec
+    )
     return connexion_app
 
 if __name__ == '__main__':
