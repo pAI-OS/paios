@@ -267,14 +267,14 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/Channel'
-  '/channels/{channelId}':
+  '/channels/{channel_id}':
     get:
       tags:
         - Channel Management
       summary: Retrieve channel by id
       description: Retrieve the information of the channel with the matching channel ID.
       parameters:
-        - name: channelId
+        - name: channel_id
           in: path
           description: ID of an existing channel
           required: true
@@ -290,6 +290,8 @@ paths:
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
+      x-stoplight:
+        id: n2y8xwoqwy42p
     put:
       tags:
         - Channel Management
@@ -298,7 +300,7 @@ paths:
       summary: Update channel by key
       description: Updates the channel with the specified id.
       parameters:
-        - name: channelId
+        - name: channel_id
           in: path
           description: ID of channel
           required: true
@@ -321,7 +323,7 @@ paths:
       summary: Delete channel by key
       description: Delete a channel with the specified ID.
       parameters:
-        - name: channelId
+        - name: channel_id
           in: path
           description: ID of channel
           required: true
@@ -335,6 +337,8 @@ paths:
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
+      x-stoplight:
+        id: 1tecqsp0tdwoy
   '/config/{key}':
     get:
       tags:
