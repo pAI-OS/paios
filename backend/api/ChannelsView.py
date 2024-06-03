@@ -1,6 +1,7 @@
 from starlette.responses import JSONResponse, Response
 from backend.managers.ChannelsManager import ChannelsManager
 from backend.paths import api_base_url
+from backend.pagination import parse_pagination_params
 
 class ChannelsView:
     def __init__(self):
@@ -24,7 +25,16 @@ class ChannelsView:
         await self.cm.delete_channel(channel_id)
         return Response(status_code=204)
 
-    async def search(self, limit=100):
-        channels = await self.cm.retrieve_all_channels(limit)
-        return JSONResponse(channels, status_code=200, headers={'X-Total-Count': str(len(channels))})
-    
+    async def search(self, filter: str = None, range: str = None, sort: str = None):
+        result = parse_pagination_params(filter, range, sort)
+        if isinstance(result, JSONResponse):
+            return result
+
+        offset, limit, sort_by, sort_order, filters = result
+
+        channels, total_count = await self.cm.retrieve_channels(limit=limit, offset=offset, sort_by=sort_by, sort_order=sort_order, filters=filters)
+        headers = {
+            'X-Total-Count': str(total_count),
+            'Content-Range': f'channels {offset}-{offset + len(channels) - 1}/{total_count}'
+        }
+        return JSONResponse(channels, status_code=200, headers=headers)
