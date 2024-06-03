@@ -32,7 +32,7 @@ export const AssetEdit = () => (
 );
 
 export const AssetCreate = () => (
-    <Create>
+    <Create redirect="show">
         <SimpleForm>
             <ReferenceInput source="user_id" reference="users" optionText="name" />
             <TextInput source="title" />
