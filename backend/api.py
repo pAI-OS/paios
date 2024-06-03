@@ -250,7 +250,7 @@ def not_implemented(): return {"message": "This operation is not implemented yet
 def retrieve_all(payload, status_code=200): return jsonify(payload), status_code, {'X-Total-Count': len(payload)}
 
 # Retrieve all
-def retrieve_all_abilities(): return retrieve_all(abilities)
+def retrieve_abilities(): return retrieve_all(abilities)
 
 # Retrieve by ID
 def retrieve_ability_by_id(ability_id):
