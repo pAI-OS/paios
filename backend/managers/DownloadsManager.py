@@ -68,8 +68,8 @@ class DownloadsManager:
             if "finish_time" in download and (current_time - download["finish_time"] > retention_period):
                 del self.downloads[download_id]
             else:
-                keys_to_include = ["download_id", "source_url", "target_filename", "target_directory", "total_size", "downloaded", "progress", "start_time", "finish_time", "download_rate"]
-                download["download_rate"] = self._calculate_download_rate(download)
+                keys_to_include = ["download_id", "source_url", "target_filename", "target_directory", "total_size", "downloaded", "progress", "start_time", "finish_time", "transfer_rate"]
+                download["transfer_rate"] = self._calculate_transfer_rate(download)
                 filtered_dict = {k: download[k] for k in keys_to_include if k in download}
                 filtered_dict["download_id"] = download_id
                 filtered_dict["status"] = download["status"].value
@@ -77,7 +77,7 @@ class DownloadsManager:
 
         return all_downloads if limit is None else all_downloads[:limit]
 
-    def _calculate_download_rate(self, download):
+    def _calculate_transfer_rate(self, download):
         elapsed_time = time.time() - download["start_time"]
         if elapsed_time > 0:
             return download["downloaded"] / elapsed_time
@@ -118,7 +118,8 @@ class DownloadsManager:
                                 download["downloaded"] += len(chunk)
                                 chunk_time = chunk_end_time - chunk_start_time
                                 if chunk_time > 0:
-                                    download["download_rate"] = len(chunk) / chunk_time
+                                    if download["status"] != DownloadStatus.PAUSED:
+                                        download["transfer_rate"] = len(chunk) / chunk_time
                                 if download["total_size"] > 0:
                                     download["progress"] = round(
                                         (download["downloaded"] / download["total_size"]) * 100, 2
@@ -163,7 +164,8 @@ class DownloadsManager:
                             download["downloaded"] += len(chunk)
                             chunk_time = chunk_end_time - chunk_start_time
                             if chunk_time > 0:
-                                download["download_rate"] = len(chunk) / chunk_time
+                                if download["status"] != DownloadStatus.PAUSED:
+                                    download["transfer_rate"] = len(chunk) / chunk_time
                             download["progress"] = round(
                                 (download["downloaded"] / download["total_size"]) * 100, 2
                             )
@@ -273,6 +275,8 @@ class DownloadsManager:
         if download_id in self.downloads and not self.downloads[download_id]["status"] == DownloadStatus.PAUSED:
             self.downloads[download_id]["task"].cancel()
             self.downloads[download_id]["status"] = DownloadStatus.PAUSED
+            if "transfer_rate" in self.downloads[download_id]:
+                del self.downloads[download_id]["transfer_rate"]
             self.downloads[download_id]["start_byte"] = os.path.getsize(self.downloads[download_id]["target_file_path"])
 
     async def resume_download(self, download_id):
@@ -285,7 +289,14 @@ class DownloadsManager:
 
     async def delete_download(self, download_id):
         if download_id in self.downloads:
+            # Cancel the download task
             self.downloads[download_id]["task"].cancel()
+            try:
+                # Wait for the task to be cancelled
+                await self.downloads[download_id]["task"]
+            except asyncio.CancelledError:
+                pass  # Expected exception when the task is cancelled
+
             target_file_path = self.downloads[download_id]["target_file_path"]
             if target_file_path.exists():
                 target_file_path.unlink()

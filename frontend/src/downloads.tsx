@@ -5,6 +5,7 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { apiBase, httpClient } from "./apiBackend";
 import FormattedSizeField from './components/FormattedSizeField';
+import FormattedTransferRateField from './components/FormattedTransferRateField';
 import ProgressField from './components/ProgressField';
 
 interface Download {
@@ -107,8 +108,9 @@ export const DownloadsList = () => {
                 <TextField source="source_url" />
                 <TextField source="target_filename" />
                 <TextField source="target_directory" />
-                <FormattedSizeField source="total_size" />
                 <FormattedSizeField source="downloaded" />
+                <FormattedSizeField source="total_size" />
+                <FormattedTransferRateField source="transfer_rate" />
                 <ProgressField source="progress" />
                 <TextField source="status" />
                 <DownloadActions refresh={refresh} />
