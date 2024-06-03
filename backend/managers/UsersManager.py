@@ -34,8 +34,13 @@ class UsersManager:
         if filters:
             filter_clauses = []
             for key, value in filters.items():
-                filter_clauses.append(f"{key} = ?")
-                query_params.append(value)
+                if isinstance(value, list):
+                    placeholders = ', '.join(['?'] * len(value))
+                    filter_clauses.append(f"{key} IN ({placeholders})")
+                    query_params.extend(value)
+                else:
+                    filter_clauses.append(f"{key} = ?")
+                    query_params.append(value)
             base_query += ' WHERE ' + ' AND '.join(filter_clauses)
 
         # Validate and apply sorting
@@ -58,7 +63,7 @@ class UsersManager:
         total_count_query = 'SELECT COUNT(*) FROM user'
         if filters:
             total_count_query += ' WHERE ' + ' AND '.join(filter_clauses)
-        total_count_result = await db.execute_query(total_count_query, tuple(query_params[:len(filters)] if filters else ()))
+        total_count_result = await db.execute_query(total_count_query, tuple(query_params[:len(query_params) - 2] if filters else ()))
         total_count = total_count_result[0][0] if total_count_result else 0
 
         return users, total_count
