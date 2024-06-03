@@ -34,10 +34,10 @@ class AbilitiesManager:
                 return ability
         return None
 
-    def get_all_abilities(self, limit=None):
-        if limit:
-            return self.abilities[:limit]
-        return self.abilities
+    def retrieve_abilities(self, offset=0, limit=100):
+        total_count = len(self.abilities)
+        paginated_abilities = self.abilities[offset:offset + limit]
+        return paginated_abilities, total_count
 
     def refresh_abilities(self):
         self._load_abilities()
