@@ -1,8 +1,8 @@
-from starlette.requests import Request
 from starlette.responses import JSONResponse, Response
 from backend.managers.UsersManager import UsersManager
 from backend.paths import api_base_url
 from backend.pagination import parse_pagination_params
+from aiosqlite import IntegrityError
 
 class UsersView:
     def __init__(self):
@@ -15,8 +15,11 @@ class UsersView:
         return JSONResponse(user, status_code=200)
 
     async def post(self, body: dict):
-        id = await self.um.create_user(body['name'], body['email'])
-        return JSONResponse({"id": id}, status_code=201, headers={'Location': f'{api_base_url}/users/{id}'})
+        try:
+            id = await self.um.create_user(body['name'], body['email'])
+            return JSONResponse({"id": id}, status_code=201, headers={'Location': f'{api_base_url}/users/{id}'})
+        except IntegrityError:
+            return JSONResponse({"message": "A user with the provided details already exists."}, status_code=400)
     
     async def put(self, id: str, body: dict):
         await self.um.update_user(id, body['name'], body['email'])
