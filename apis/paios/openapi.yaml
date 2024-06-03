@@ -469,12 +469,12 @@ paths:
                   source_url:
                     type: string
                     description: The URL of the file to download.
-                  target_dir:
-                    type: string
-                    description: The optional target directory for the downloaded file (default is 'downloads').
                   file_name:
                     type: string
                     description: The optional filename for the downloaded file.
+                  target_directory:
+                    type: string
+                    description: The optional target directory for the downloaded file (default is 'downloads').
                   hash_type:
                     type: string
                     description: 'The type of hash to validate (e.g., md5, sha256).'
@@ -957,18 +957,23 @@ components:
           example: 'https://releases.ubuntu.com/24.04/ubuntu-24.04-desktop-amd64.iso'
         file_name:
           type: string
+          nullable: true
           example: ubuntu-24.04-desktop-amd64.iso
         target_directory:
           type: string
+          nullable: true
           example: abilities/virtual-machine/isos
         total_size:
           type: integer
+          nullable: true
           example: 6114656256
         downloaded:
           type: integer
+          nullable: true
           example: 614252544
         progress:
           type: number
+          nullable: true
           example: 10.05
         status:
           type: string
@@ -980,10 +985,15 @@ components:
           example: downloading
         start_time:
           type: number
+          nullable: true
           example: 1717398019.4677122
         transfer_rate:
           type: number
+          nullable: true
           example: 49028995.95526451
+      required:
+        - download_id
+        - source_url
     User:
       type: object
       title: User
