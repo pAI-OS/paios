@@ -32,11 +32,11 @@ for ability in os.listdir(abilities_dir):
                     if 'dependencies' in metadata:
                         if 'resources' in metadata['dependencies']:
                             for resource in metadata['dependencies']['resources']:
-                                resource_path = os.path.join(abilities_data_dir, ability, resource['filename'])
+                                resource_path = os.path.join(abilities_data_dir, ability, resource['file_name'])
                                 if os.path.exists(resource_path):
                                     resource['localSize'] = os.path.getsize(resource_path)
-                                if 'remoteSize' in resource and 'localSize' in resource:
-                                    resource['percentComplete'] = round((resource['localSize'] / resource['remoteSize']) * 100, 2)
+                                if 'file_size' in resource and 'localSize' in resource:
+                                    resource['percentComplete'] = round((resource['localSize'] / resource['file_size']) * 100, 2)
 
                         from packaging.specifiers import SpecifierSet
                         if 'python' in metadata['dependencies']:
@@ -174,7 +174,7 @@ def ability_resource_dependency_download_start(ability_id, dependency_id):
 
     #try:
     dependency = get_ability_dependency(ability_id, dependency_id, "resources")
-    url = dependency["url"]
+    source_url = dependency["source_url"]
     local_file = os.path.join(ability_data_dir, dependency["filename"])
 
     dependency["keepDownloading"] = True
@@ -183,9 +183,9 @@ def ability_resource_dependency_download_start(ability_id, dependency_id):
     #    return
 
     def download_file():
-        #print("Downloading " + url + " to " + dependency["localFile"])
+        #print("Downloading " + source_url + " to " + dependency["localFile"])
         os.makedirs(ability_data_dir, exist_ok=True)
-        with requests.get(url, stream=True) as r:
+        with requests.get(source_url, stream=True) as r:
             r.raise_for_status()
             with open(local_file, 'wb') as f:
                 for chunk in r.iter_content(chunk_size=8192): 
@@ -201,8 +201,8 @@ def ability_resource_dependency_download_start(ability_id, dependency_id):
                     # sleep first so thread doesn't exit immediately on first loop (e.g. re-downloading)
                     time.sleep(1)
                     dependency["localSize"] = os.path.getsize(local_file)
-                    dependency["percentComplete"] = round((dependency["localSize"] / dependency["remoteSize"]) * 100, 2)
-                    if (dependency["localSize"] == dependency["remoteSize"]):
+                    dependency["percentComplete"] = round((dependency["localSize"] / dependency["file_size"]) * 100, 2)
+                    if (dependency["localSize"] == dependency["file_size"]):
                         #print("Already downloaded " + local_file)
                         return # download complete so exit thread
                     keep_downloading()
@@ -235,7 +235,7 @@ def ability_resource_dependency_download_delete(ability_id, dependency_id):
     # deletes local file
     dependency = get_ability_dependency(ability_id, dependency_id, "resources")
     ability_data_dir = os.path.join(abilities_data_dir, ability_id)
-    local_file = os.path.join(ability_data_dir, dependency["filename"])
+    local_file = os.path.join(ability_data_dir, dependency["file_name"])
     if dependency:
         try:
             os.remove(local_file)

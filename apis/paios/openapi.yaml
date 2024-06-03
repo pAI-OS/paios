@@ -981,7 +981,7 @@ components:
             - downloading
             - paused
             - completed
-            - error
+            - failed
           example: downloading
         start_time:
           type: number

@@ -57,7 +57,7 @@ const DownloadButton = ({ ability_id }: { ability_id: string }) => {
 
 
     // file is downloaded, show delete button
-    if ((record.localSize || 0) === (record.remoteSize || 0)) {
+    if ((record.localSize || 0) === (record.file_size || 0)) {
         return (
         <Button label="Delete" onClick={handleDeleteDownloadClick}>
             <DeleteIcon />
@@ -115,8 +115,8 @@ export const ResourceDependency = (props: { dependencies: any }) => {
     return (
         <Datagrid data={props.dependencies} sort={{ field: 'name', order: 'ASC' }}>
             <TextField source="name" />
-            <TextField source="filename" />
-            <TextField source="url" />
+            <TextField source="file_name" />
+            <TextField source="source_url" />
             <DownloadButton ability_id={ability_id} />    
         </Datagrid>
     );
