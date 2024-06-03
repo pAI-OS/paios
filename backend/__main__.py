@@ -38,6 +38,7 @@ def create_backend_app():
         'openapi.yaml',
         resolver=MethodResolver('backend.api'),
         resolver_error=501,
+        # TODO: Validation has a performance impact and may want to be disabled in production
         validate_responses=True,  # Validate responses against the OpenAPI spec
         strict_validation=True    # Validate requests strictly against the OpenAPI spec
     )
