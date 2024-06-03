@@ -26,20 +26,17 @@ def setup_backend():
     subprocess.run([str(venv_python), "-m", "pip", "install", "-r", str(backend_dir / "requirements.txt")], check=True)
 
 def build_frontend():
-    if not os.path.exists(frontend_dir / 'dist' / 'index.html'):
-        print("Setting up the frontend environment...")
-        npm_path = shutil.which("npm")
-        if npm_path:
-            current_dir = os.getcwd()
-            os.chdir(frontend_dir)
-            subprocess.run([npm_path, "install"], check=True)
-            subprocess.run([npm_path, "run", "build"], check=True)
-            os.chdir(current_dir)
-        else:
-            print("Skipped as npm command not found.")
-            print("Download Node.js to build the frontend or use a prebuilt version (e.g. canary branch): https://nodejs.org/en/download")
+    print("Setting up the frontend environment...")
+    npm_path = shutil.which("npm")
+    if npm_path:
+        current_dir = os.getcwd()
+        os.chdir(frontend_dir)
+        subprocess.run([npm_path, "install"], check=True)
+        subprocess.run([npm_path, "run", "build"], check=True)
+        os.chdir(current_dir)
     else:
-        print("Skipping frontend setup as build already exists.")
+        print("Skipped as npm command not found.")
+        print("Download Node.js to build the frontend or use a prebuilt version (e.g. canary branch): https://nodejs.org/en/download")
 
 def main():
     setup_backend()

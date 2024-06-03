@@ -10,6 +10,12 @@ if base_dir not in sys.path:
 
 ignore_errors = True
 
+# Check if the current environment is the one we're about to delete
+venv_path = base_dir / '.venv'
+if sys.prefix == str(venv_path):
+    print("You are currently in the virtual environment that you're trying to delete. Please deactivate it first.")
+    sys.exit(1)
+
 # Remove the virtual environment directory and node_modules
-shutil.rmtree(base_dir / '.venv', ignore_errors=ignore_errors)
+shutil.rmtree(venv_path, ignore_errors=ignore_errors)
 shutil.rmtree(base_dir / 'frontend' / 'node_modules', ignore_errors=ignore_errors)
