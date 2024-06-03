@@ -22,6 +22,19 @@ Content-Type: application/json
     }
 ]
 
+### Test download with target directory specified
+
+POST http://localhost:3080/api/v1/downloads
+Content-Type: application/json
+
+[
+    {
+        "source_url": "https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.5.0-amd64-netinst.iso",
+        "file_name": "debian-12.5.0-amd64-netinst.iso",
+        "target_directory": "downloads_test_target"
+    }
+]
+
 ### Test download without filename specified
 
 POST http://localhost:3080/api/v1/downloads
@@ -51,7 +64,7 @@ Content-Type: application/json
 [
     {
         "source_url": "https://releases.ubuntu.com/24.04/ubuntu-24.04-desktop-amd64.iso",
-        "file_name": "ubuntu-24.04-desktop-amd64.iso",
+        "file_name": "ubuntu-24.04-desktop-amd64.iso"
     }
 ]
 
