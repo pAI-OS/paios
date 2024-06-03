@@ -1,10 +1,16 @@
 import { useMediaQuery, Theme } from "@mui/material";
-import { Create, Edit, List, SimpleList, Show, SimpleForm, SimpleShowLayout, Datagrid, TextField, TextInput, ReferenceInput, EmailField, useRecordContext } from "react-admin";
+import { Create, Edit, List, SimpleList, Show, SimpleForm, SimpleShowLayout, Datagrid, TextField, TextInput, EmailField, useRecordContext } from "react-admin";
 
 const UserTitle = () => {
     const record = useRecordContext();
     return <span>Users {record ? `- ${record.name}` : ""}</span>;
 };
+
+interface UserRecord {
+    id: string;
+    name: string;
+    email: string;
+}
 
 export const UserList = () => {
     const isSmall = useMediaQuery<Theme>((theme) => theme.breakpoints.down("sm"));
@@ -12,8 +18,8 @@ export const UserList = () => {
         <List>
             {isSmall ? (
                 <SimpleList
-                    primaryText={(record) => record.name}
-                    secondaryText={(record) => record.email}
+                    primaryText={(record: UserRecord) => record.name}
+                    secondaryText={(record: UserRecord) => record.email}
                 />
             ) : (
                 <Datagrid rowClick="edit">
@@ -45,7 +51,7 @@ export const UserEdit = () => (
 );
 
 export const UserCreate = () => (
-    <Create>
+    <Create redirect="show">
         <SimpleForm>
             <TextInput source="name" />
             <TextInput source="email" />
