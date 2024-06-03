@@ -31,7 +31,7 @@ def check_env():
             print(f"\nOnce you have activated the virtual environment, run this again.")
             sys.exit(1)
 
-    required_modules = ['connexion', 'flask_cors', 'uvicorn']
+    required_modules = ['connexion', 'uvicorn']
     for module in required_modules:
         try:
             __import__(module)
