@@ -34,17 +34,17 @@ class DownloadsManager:
     def _is_valid_path(self, path):
         return Path(path).resolve().is_relative_to(data_dir)
 
-    def _is_duplicate_download(self, source_url, target_filename, target_directory):
+    def _is_duplicate_download(self, source_url, file_name, target_directory):
         for existing_download in self.downloads.values():
             if (existing_download["source_url"] == source_url and
-                existing_download["target_filename"] == target_filename and
+                existing_download["file_name"] == file_name and
                 existing_download["target_directory"] == target_directory):
                 return True
         return False
 
-    def _is_file_in_use(self, target_filename, target_directory):
+    def _is_file_in_use(self, file_name, target_directory):
         for existing_download in self.downloads.values():
-            if (existing_download["target_filename"] == target_filename and
+            if (existing_download["file_name"] == file_name and
                 existing_download["target_directory"] == target_directory and
                 existing_download["status"] in {DownloadStatus.DOWNLOADING, DownloadStatus.PAUSED}):
                 return True
@@ -68,7 +68,7 @@ class DownloadsManager:
             if "finish_time" in download and (current_time - download["finish_time"] > 600):
                 del self.downloads[download_id]
             else:
-                keys_to_include = ["download_id", "source_url", "target_filename", "target_directory", "total_size", "downloaded", "progress", "start_time", "finish_time", "transfer_rate"]
+                keys_to_include = ["download_id", "source_url", "file_name", "target_directory", "total_size", "downloaded", "progress", "start_time", "finish_time", "transfer_rate"]
                 download["transfer_rate"] = self._calculate_transfer_rate(download)
                 filtered_dict = {k: download[k] for k in keys_to_include if k in download}
                 filtered_dict["download_id"] = download_id
@@ -102,7 +102,7 @@ class DownloadsManager:
                         filename = content_disposition.split('filename=')[-1].strip('"')
                     else:
                         filename = Path(source_url).name or download_id
-                    download["target_filename"] = filename
+                    download["file_name"] = filename
 
                     temp_file = self.downloads_dir / filename
                     download["temp_file"] = temp_file
@@ -148,7 +148,7 @@ class DownloadsManager:
                 download["total_size"] = total_size
 
                 filename = Path(source_url).name or download_id
-                download["target_filename"] = filename
+                download["file_name"] = filename
 
                 temp_file = self.downloads_dir / filename
                 download["temp_file"] = temp_file
@@ -192,9 +192,9 @@ class DownloadsManager:
 
             if target_directory:
                 target_directory_path.mkdir(parents=True, exist_ok=True)
-                target_file_path = download["target_file_path"]
-                if target_file_path.exists():
-                    raise FileExistsError(f"Destination file already exists: {target_file_path}")
+                file_path = download["file_path"]
+                if file_path.exists():
+                    raise FileExistsError(f"Destination file already exists: {file_path}")
 
             parsed_url = urlparse(source_url)
             if parsed_url.scheme in ('http', 'https'):
@@ -215,9 +215,9 @@ class DownloadsManager:
 
             if target_directory:
                 # Check again before renaming to minimize race condition
-                if target_file_path.exists():
-                    raise FileExistsError(f"Destination file already exists: {target_file_path}")
-                download["temp_file"].rename(target_file_path)
+                if file_path.exists():
+                    raise FileExistsError(f"Destination file already exists: {file_path}")
+                download["temp_file"].rename(file_path)
             
             download["status"] = DownloadStatus.COMPLETED
 
@@ -240,23 +240,23 @@ class DownloadsManager:
             else:
                 target_directory_path = self.downloads_dir
 
-            target_filename = download.get('target_filename')
-            target_file_path = target_directory_path / target_filename
+            file_name = download.get('file_name')
+            file_path = target_directory_path / file_name
 
             # Check for existing download with the same parameters
-            if self._is_duplicate_download(download.get('source_url'), target_filename, target_directory):
+            if self._is_duplicate_download(download.get('source_url'), file_name, target_directory):
                 raise ValueError("Download with the same parameters already exists")
 
             # Check if the target file is being used by an active or paused download
-            if self._is_file_in_use(target_filename, target_directory):
-                raise ValueError(f"File {target_file_path} is currently being downloaded or paused")
+            if self._is_file_in_use(file_name, target_directory):
+                raise ValueError(f"File {file_path} is currently being downloaded or paused")
 
             self.downloads[download_id] = {
                 "source_url": download.get('source_url'),
-                "target_filename": target_filename,
+                "file_name": file_name,
                 "target_directory": target_directory,
                 "target_directory_path": target_directory_path,
-                "target_file_path": target_file_path,  # Store target_file_path
+                "file_path": file_path,
                 "status": DownloadStatus.DOWNLOADING,
                 "start_byte": 0,
                 "total_size": 0,
@@ -279,7 +279,7 @@ class DownloadsManager:
             self.downloads[download_id]["status"] = DownloadStatus.PAUSED
             if "transfer_rate" in self.downloads[download_id]:
                 del self.downloads[download_id]["transfer_rate"]
-            self.downloads[download_id]["start_byte"] = os.path.getsize(self.downloads[download_id]["target_file_path"])
+            self.downloads[download_id]["start_byte"] = os.path.getsize(self.downloads[download_id]["file_path"])
 
     async def resume_download(self, download_id):
         if download_id in self.downloads and self.downloads[download_id]["status"] == DownloadStatus.PAUSED:
@@ -299,9 +299,9 @@ class DownloadsManager:
             except asyncio.CancelledError:
                 pass  # Expected exception when the task is cancelled
 
-            target_file_path = self.downloads[download_id]["target_file_path"]
-            if target_file_path.exists():
-                target_file_path.unlink()
+            file_path = self.downloads[download_id]["file_path"]
+            if file_path.exists():
+                file_path.unlink()
             del self.downloads[download_id]
     
     async def shutdown(self):

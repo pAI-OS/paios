@@ -6,7 +6,7 @@ Content-Type: application/json
 [
     {
         "source_url": "https://releases.ubuntu.com/24.04/ubuntu-24.04-desktop-amd64.iso",
-        "target_filename": "ubuntu-24.04-desktop-amd64.iso"
+        "file_name": "ubuntu-24.04-desktop-amd64.iso"
     }
 ]
 
@@ -18,7 +18,7 @@ Content-Type: application/json
 [
     {
         "source_url": "https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.5.0-amd64-netinst.iso",
-        "target_filename": "debian-12.5.0-amd64-netinst.iso"
+        "file_name": "debian-12.5.0-amd64-netinst.iso"
     }
 ]
 
@@ -39,8 +39,8 @@ POST http://localhost:3080/api/v1/downloads
 Content-Type: application/json
 
 [
-    { "source_url": "https://releases.ubuntu.com/24.04/ubuntu-24.04-desktop-amd64.iso", "target_filename": "ubuntu-24.04-desktop-amd64.iso" },
-    { "source_url": "https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.5.0-amd64-netinst.iso", "target_filename": "debian-12.5.0-amd64-netinst.iso" }
+    { "source_url": "https://releases.ubuntu.com/24.04/ubuntu-24.04-desktop-amd64.iso", "file_name": "ubuntu-24.04-desktop-amd64.iso" },
+    { "source_url": "https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.5.0-amd64-netinst.iso", "file_name": "debian-12.5.0-amd64-netinst.iso" }
 ]
 
 ###
@@ -51,7 +51,7 @@ Content-Type: application/json
 [
     {
         "source_url": "https://releases.ubuntu.com/24.04/ubuntu-24.04-desktop-amd64.iso",
-        "target_filename": "ubuntu-24.04-desktop-amd64.iso",
+        "file_name": "ubuntu-24.04-desktop-amd64.iso",
     }
 ]
 
@@ -63,7 +63,7 @@ Content-Type: application/json
 [
     {
         "source_url": "https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/debian-12.5.0-amd64-netinst.iso",
-        "target_filename": "ubuntu-24.04-desktop-amd64.iso",
+        "file_name": "ubuntu-24.04-desktop-amd64.iso",
         "hash_type": "sha512",
         "expected_hash": "33c08e56c83d13007e4a5511b9bf2c4926c4aa12fd5dd56d493c0653aecbab380988c5bf1671dbaea75c582827797d98c4a611f7fb2b131fbde2c677d5258ec9"
     }

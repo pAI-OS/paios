@@ -11,7 +11,7 @@ import ProgressField from './components/ProgressField';
 interface Download {
     download_id: string;
     source_url: string;
-    target_filename: string;
+    file_name: string;
     target_directory: string;
     total_size: number;
     downloaded: number;
@@ -106,7 +106,7 @@ export const DownloadsList = () => {
         <List filters={downloadFilters}>
             <Datagrid rowClick="edit">
                 <TextField source="source_url" />
-                <TextField source="target_filename" />
+                <TextField source="file_name" />
                 <TextField source="target_directory" />
                 <FormattedSizeField source="downloaded" />
                 <FormattedSizeField source="total_size" />

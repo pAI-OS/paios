@@ -469,12 +469,12 @@ paths:
                   source_url:
                     type: string
                     description: The URL of the file to download.
-                  target_file:
-                    type: string
-                    description: The optional filename for the downloaded file.
                   target_dir:
                     type: string
                     description: The optional target directory for the downloaded file (default is 'downloads').
+                  file_name:
+                    type: string
+                    description: The optional filename for the downloaded file.
                   hash_type:
                     type: string
                     description: 'The type of hash to validate (e.g., md5, sha256).'
@@ -955,7 +955,7 @@ components:
         source_url:
           type: string
           example: 'https://releases.ubuntu.com/24.04/ubuntu-24.04-desktop-amd64.iso'
-        target_filename:
+        file_name:
           type: string
           example: ubuntu-24.04-desktop-amd64.iso
         target_directory:
