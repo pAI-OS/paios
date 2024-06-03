@@ -33,10 +33,10 @@ paths:
               examples:
                 Example 1:
                   value:
-                    - id: optical-character-recognition
+                    - ability_id: optical-character-recognition
                       name: Optical Character Recognition
                       description: Conversion of images to text
-                    - id: vector-database
+                    - ability_id: vector-database
                       name: Vector Database
                       description: Stores vectors (fixed-length lists of numbers) along with other data items
           headers:
@@ -45,14 +45,14 @@ paths:
                 type: string
                 example: '2'
               description: Count of results required by jsonServer Data Provider for pagination
-  '/abilities/{abilityId}':
+  '/abilities/{ability_id}':
     get:
       tags:
         - Abilities Management
       summary: Retrieve ability by id
       description: Retrieve the information of the ability with the matching ability ID.
       parameters:
-        - name: abilityId
+        - name: ability_id
           in: path
           description: ID of an existing ability
           required: true
@@ -71,14 +71,16 @@ paths:
                     id: optical-character-recognition
                     name: Optical Character Recognition
                     description: Conversion of images to text
-  '/abilities/{abilityId}/start':
+      x-stoplight:
+        id: dyrvaak9tni3i
+  '/abilities/{ability_id}/start':
     post:
       tags:
         - Abilities Management
       summary: Start ability
       description: Starts the ability with the matching ability ID.
       parameters:
-        - name: abilityId
+        - name: ability_id
           in: path
           description: ID of an existing ability
           required: true
@@ -87,14 +89,16 @@ paths:
       responses:
         '200':
           description: OK
-  '/abilities/{abilityId}/stop':
+      x-stoplight:
+        id: oymowererbmk1
+  '/abilities/{ability_id}/stop':
     post:
       tags:
         - Abilities Management
       summary: Stop ability
       description: Stops the ability with the matching ability ID.
       parameters:
-        - name: abilityId
+        - name: ability_id
           in: path
           description: ID of an existing ability
           required: true
@@ -103,6 +107,8 @@ paths:
       responses:
         '200':
           description: OK
+      x-stoplight:
+        id: rl7akdqs5zokh
   /assets:
     get:
       tags:
@@ -122,13 +128,13 @@ paths:
                 Example 1:
                   value:
                     - id: 43c03b22-dbc5-449d-9618-39ce35af9926
-                      userId: 5bae4a90-ce69-4483-86ef-d723258f21e5
+                      user_id: 5bae4a90-ce69-4483-86ef-d723258f21e5
                       title: Attention Is All You Need
                       creator: Ashish Vaswani et al
                       subject: Artificial Intelligence
                       description: 'We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely.'
                     - id: 9df36f59-a1d0-454c-8cbb-da8c64b94ebc
-                      userId: 1cbb0bc5-bae2-4b9d-9555-f2282f767047
+                      user_id: 1cbb0bc5-bae2-4b9d-9555-f2282f767047
                       title: Generative Adversarial Networks
                       creator: Goodfellow et al
                       subject: Artificial Intelligence
@@ -166,7 +172,7 @@ paths:
               required:
                 - title
               properties:
-                userId:
+                user_id:
                   type: string
                   x-stoplight:
                     id: tcrecsxwclhod
@@ -479,13 +485,13 @@ paths:
               examples:
                 Example 1:
                   value:
-                    - url: http://example.com/file1.zip
+                    - url: 'http://example.com/file1.zip'
                       dest: downloads/file1.zip
                       total_size: 1024
                       downloaded: 512
                       progress: 50
                       status: downloading
-                    - url: http://example.com/file2.zip
+                    - url: 'http://example.com/file2.zip'
                       dest: downloads/file2.zip
                       total_size: 2048
                       downloaded: 2048
@@ -523,7 +529,7 @@ paths:
                     description: The optional target directory for the downloaded file (default is 'downloads').
                   hash_type:
                     type: string
-                    description: The type of hash to validate (e.g., md5, sha256).
+                    description: 'The type of hash to validate (e.g., md5, sha256).'
                   expected_hash:
                     type: string
                     description: The expected hash value for validation.
@@ -670,14 +676,14 @@ paths:
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
-  '/users/{userId}':
+  '/users/{user_id}':
     get:
       tags:
         - User Management
       summary: Retrieve user by id
       description: Retrieve the information of the user with the matching user ID.
       parameters:
-        - name: userId
+        - name: user_id
           in: path
           description: UUID of user
           required: true
@@ -702,13 +708,15 @@ paths:
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
+      x-stoplight:
+        id: 1ghm6r4v82ch1
     delete:
       tags:
         - User Management
       summary: Delete user by id
       description: Delete the user with the specified ID
       parameters:
-        - name: userId
+        - name: user_id
           in: path
           description: UUID of user
           required: true
@@ -723,13 +731,15 @@ paths:
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
+      x-stoplight:
+        id: g3lg9dif14k5r
     put:
       tags:
         - User Management
       summary: Update user
       description: Update the information of an existing user.
       parameters:
-        - name: userId
+        - name: user_id
           in: path
           description: UUID of user
           required: true
@@ -774,20 +784,22 @@ paths:
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
-  '/abilities/{abilityId}/dependencies/resources/{dependencyId}/download/start':
+      x-stoplight:
+        id: 2fpaptklpmtue
+  '/abilities/{ability_id}/dependencies/resources/{dependency_id}/download/start':
     post:
       tags:
         - Abilities Management
       summary: Start download
       description: Downloads an ability's dependency.
       parameters:
-        - name: abilityId
+        - name: ability_id
           in: path
           description: 'ID of an existing ability (e.g., optical-character-recognition)'
           required: true
           schema:
             type: string
-        - name: dependencyId
+        - name: dependency_id
           in: path
           description: 'ID of an ability''s dependency (e.g., pandas)'
           required: true
@@ -799,20 +811,22 @@ paths:
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
-  '/abilities/{abilityId}/dependencies/resources/{dependencyId}/download/stop':
+      x-stoplight:
+        id: xngy10ictavd9
+  '/abilities/{ability_id}/dependencies/resources/{dependency_id}/download/stop':
     post:
       tags:
         - Abilities Management
       summary: Stop download
       description: Stops download of an ability's dependency.
       parameters:
-        - name: abilityId
+        - name: ability_id
           in: path
           description: 'ID of an existing ability (e.g., optical-character-recognition)'
           required: true
           schema:
             type: string
-        - name: dependencyId
+        - name: dependency_id
           in: path
           description: 'ID of an ability''s dependency (e.g., pandas)'
           required: true
@@ -824,20 +838,22 @@ paths:
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
-  '/abilities/{abilityId}/dependencies/resources/{dependencyId}/download/delete':
+      x-stoplight:
+        id: 2u3cy4t9q5x53
+  '/abilities/{ability_id}/dependencies/resources/{dependency_id}/download/delete':
     post:
       tags:
         - Abilities Management
       summary: Delete download
       description: Deletes download of an ability's dependency.
       parameters:
-        - name: abilityId
+        - name: ability_id
           in: path
           description: 'ID of an existing ability (e.g., optical-character-recognition)'
           required: true
           schema:
             type: string
-        - name: dependencyId
+        - name: dependency_id
           in: path
           description: 'ID of an ability''s dependency (e.g., pandas)'
           required: true
@@ -849,20 +865,22 @@ paths:
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
-  '/abilities/{abilityId}/dependencies/python/{dependencyId}/install':
+      x-stoplight:
+        id: 9wjpktkrew5kt
+  '/abilities/{ability_id}/dependencies/python/{dependency_id}/install':
     post:
       tags:
         - Abilities Management
       summary: Start install
       description: Installs an ability's dependency.
       parameters:
-        - name: abilityId
+        - name: ability_id
           in: path
           description: 'ID of an existing ability (e.g., optical-character-recognition)'
           required: true
           schema:
             type: string
-        - name: dependencyId
+        - name: dependency_id
           in: path
           description: 'ID of an ability''s dependency (e.g., pandas)'
           required: true
@@ -874,6 +892,8 @@ paths:
       servers:
         - url: 'http://localhost:3080/api/v1'
           description: ''
+      x-stoplight:
+        id: s0cmunju1qpd7
 tags:
   - name: Abilities Management
     description: Installation and configuration of abilities
@@ -899,12 +919,13 @@ components:
           pattern: '^[a-z0-9-]+'
           minLength: 2
           maxLength: 100
+          example: optical-character-recognition
         name:
           type: string
-          example: optical-character-recognition
+          example: Optical Character Recognition
         description:
           type: string
-          example: Optical Character Recognition
+          example: Conversion of images to text
     Asset:
       type: object
       title: Asset
@@ -912,17 +933,23 @@ components:
         id:
           type: string
           format: uuid
-        userId:
+          example: abf83ff3-3b8c-4e52-b378-4a6ad4aca448
+        user_id:
           type: string
           format: uuid
+          example: a9cab4c3-65d3-4871-83b9-165b2e9d5947
         title:
           type: string
+          example: Attention Is All You Need
         creator:
           type: string
+          example: Ashish Vaswani et al
         subject:
           type: string
+          example: Artificial Intelligence
         description:
           type: string
+          example: We propose a new simple network architecture, the Transformer...
     Channel:
       type: object
       title: Channel
@@ -930,25 +957,38 @@ components:
       properties:
         id:
           type: string
+          example: llm-api
         name:
           type: string
+          example: LLM API
         uri:
           type: string
+          example: https://localhost:8080/v1/api
     Config:
       title: Config
-      anyOf:
-        - type: boolean
-        - type: integer
-        - type: number
-        - type: string
-        - type: object
-        - type: array
-          items:
-            oneOf:
-              - type: string
-              - type: number
-              - type: boolean
-              - type: object
+      type: object
+      properties:
+        key:
+          type: string
+          description: The key for the config item.
+          example: example_key
+        value:
+          anyOf:
+            - type: boolean
+            - type: integer
+            - type: number
+            - type: string
+            - type: object
+            - type: array
+              items:
+                oneOf:
+                  - type: string
+                  - type: number
+                  - type: boolean
+                  - type: object
+      required:
+        - key
+        - value
     Download:
       type: object
       properties:
@@ -956,16 +996,25 @@ components:
           type: string
           description: Unique identifier for the given download.
           format: uuid
-        url:
+          example: e2b55b15-4080-41b2-bbbf-cbac0a282880
+        source_url:
           type: string
-        dest:
+          example: https://releases.ubuntu.com/24.04/ubuntu-24.04-desktop-amd64.iso
+        target_filename:
           type: string
+          example: ubuntu-24.04-desktop-amd64.iso
+        target_directory:
+          type: string
+          example: abilities/virtual-machine/isos
         total_size:
           type: integer
+          example: 6114656256
         downloaded:
           type: integer
+          example: 614252544
         progress:
           type: number
+          example: 10.05
         status:
           type: string
           enum:
@@ -973,6 +1022,13 @@ components:
             - paused
             - completed
             - error
+          example: downloading
+        start_time:
+          type: number
+          example: 1717398019.4677122
+        transfer_rate:
+          type: number
+          example: 49028995.95526451
     User:
       type: object
       title: User
@@ -982,11 +1038,14 @@ components:
           type: string
           description: Unique identifier for the given user.
           format: uuid
+          example: 7ea85f9e-0c5f-450c-9b6d-3cb7a42f5242
         name:
           type: string
+          example: Sally Smith
         email:
           type: string
           format: email
+          example: sally.smith@example.com
       required:
         - id
         - name
