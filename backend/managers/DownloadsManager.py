@@ -60,12 +60,12 @@ class DownloadsManager:
                 hash_func.update(chunk)
         return hash_func.hexdigest()
 
-    async def retrieve_all_downloads(self, limit=None, retention_period=600):
+    async def retrieve_downloads(self, limit=100, offset=0):
         current_time = time.time()
         all_downloads = []
 
         for download_id, download in list(self.downloads.items()):
-            if "finish_time" in download and (current_time - download["finish_time"] > retention_period):
+            if "finish_time" in download and (current_time - download["finish_time"] > 600):
                 del self.downloads[download_id]
             else:
                 keys_to_include = ["download_id", "source_url", "target_filename", "target_directory", "total_size", "downloaded", "progress", "start_time", "finish_time", "transfer_rate"]
@@ -75,7 +75,9 @@ class DownloadsManager:
                 filtered_dict["status"] = download["status"].value
                 all_downloads.append(filtered_dict)
 
-        return all_downloads if limit is None else all_downloads[:limit]
+        total_count = len(all_downloads)
+        paginated_downloads = all_downloads[offset:offset + limit]
+        return paginated_downloads, total_count
 
     def _calculate_transfer_rate(self, download):
         elapsed_time = time.time() - download["start_time"]

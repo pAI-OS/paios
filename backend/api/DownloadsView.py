@@ -2,13 +2,14 @@ from starlette.requests import Request
 from starlette.responses import Response, JSONResponse
 from backend.managers.DownloadsManager import DownloadsManager
 from backend.paths import api_base_url
+from backend.pagination import parse_pagination_params
 
 class DownloadsView:
     def __init__(self):
         self.manager = DownloadsManager()
 
     async def get(self):
-        downloads = await self.manager.retrieve_all_downloads()
+        downloads = await self.manager.retrieve_downloads()
         return JSONResponse(status_code=200, content=downloads)
 
     async def post(self, body: list):
@@ -29,9 +30,19 @@ class DownloadsView:
         await self.manager.delete_download(download_id)
         return Response(status_code=204)
 
-    async def search(self, limit=100):
-        downloads = await self.manager.retrieve_all_downloads(limit)
-        return JSONResponse(status_code=200, content=downloads, headers={'X-Total-Count': str(len(downloads))})
+    async def search(self, filter: str = None, range: str = None, sort: str = None):
+        result = parse_pagination_params(filter, range, sort)
+        if isinstance(result, JSONResponse):
+            return result
+
+        offset, limit, sort_by, sort_order, filters = result
+
+        downloads, total_count = await self.manager.retrieve_downloads(limit=limit, offset=offset)
+        headers = {
+            'X-Total-Count': str(total_count),
+            'Content-Range': f'downloads {offset}-{offset + len(downloads) - 1}/{total_count}'
+        }
+        return JSONResponse(downloads, status_code=200, headers=headers)
 
     # custom functions
 
