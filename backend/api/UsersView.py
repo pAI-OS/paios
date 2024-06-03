@@ -36,7 +36,7 @@ class UsersView:
 
         offset, limit, sort_by, sort_order, filters = result
 
-        users, total_count = await self.um.retrieve_all_users(limit=limit, offset=offset, sort_by=sort_by, sort_order=sort_order, filters=filters)
+        users, total_count = await self.um.retrieve_users(limit=limit, offset=offset, sort_by=sort_by, sort_order=sort_order, filters=filters)
         headers = {
             'X-Total-Count': str(total_count),
             'Content-Range': f'users {offset}-{offset + len(users) - 1}/{total_count}'
