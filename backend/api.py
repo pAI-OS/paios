@@ -1,3 +1,8 @@
+#
+#
+# THIS IS A DEPRECATED FILE ACTIVELY BEING MIGRATED TO THE MANAGER INFRASTRUCTURE
+#
+#
 from flask import jsonify
 import os
 import sys
