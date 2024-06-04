@@ -1,5 +1,5 @@
 import { useNotify, useRefresh, useRecordContext, TabbedShowLayout, Tab } from "react-admin";
-import { Button, List, Datagrid, TextField, WrapperField, Show, SimpleShowLayout, ShowButton } from "react-admin";
+import { Button, List, Datagrid, TextField, WrapperField, Show, SimpleShowLayout, ShowButton, TextInput } from "react-admin";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StopIcon from '@mui/icons-material/Stop';
 import { apiBase, httpClient } from "./apiBackend";
@@ -59,8 +59,12 @@ const AbilityTitle = () => {
     return <span>Abilities {record ? `- ${record.title} (${record.id})` : ""}</span>;
 };
 
+const abilityFilters = [
+    <TextInput source="q" label="Search" alwaysOn />,
+];
+
 export const AbilityList = () => (
-    <List>
+    <List filters={abilityFilters}>
         <Datagrid rowClick="show">
             <TextField source="id" label="Name" />
             <TextField source="title" />

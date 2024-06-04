@@ -1,5 +1,5 @@
 import { useRecordContext } from "react-admin";
-import { Edit, Create, List, Datagrid, TextField, TextInput, ReferenceField, ReferenceInput, SimpleForm, EditButton } from "react-admin";
+import { Edit, Create, List, Show, SimpleShowLayout, Datagrid, TextField, TextInput, ReferenceField, ReferenceInput, SimpleForm, EditButton } from "react-admin";
 
 const AssetTitle = () => {
     const record = useRecordContext();
@@ -13,12 +13,22 @@ const assetFilters = [
 
 export const AssetList = () => (
     <List filters={assetFilters}>
-        <Datagrid rowClick="edit">
+        <Datagrid rowClick="show">
             <TextField source="title" />
             <ReferenceField source="user_id" reference="users" link="show" />
             <EditButton />
         </Datagrid>
     </List>
+);
+
+export const AssetShow = () => (
+    <Show title={<AssetTitle />}>
+        <SimpleShowLayout>
+            <TextField source="title" />
+            <ReferenceField source="user_id" reference="users" />
+            <TextField source="description" />
+        </SimpleShowLayout>
+    </Show>
 );
 
 export const AssetEdit = () => (

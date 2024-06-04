@@ -26,13 +26,13 @@ class AssetsManager:
             return {'id': id, 'user_id': result[0][0], 'title': result[0][1], 'creator': result[0][2], 'subject': result[0][3], 'description': result[0][4]}
         return None
 
-    async def retrieve_assets(self, offset=0, limit=100, sort_by=None, sort_order='asc', filters=None):
+    async def retrieve_assets(self, offset=0, limit=100, sort_by=None, sort_order='asc', filters=None, query=None):
         base_query = 'SELECT id, user_id, title, creator, subject, description FROM asset'
         query_params = []
 
         # Apply filters
+        filter_clauses = []
         if filters:
-            filter_clauses = []
             for key, value in filters.items():
                 if isinstance(value, list):
                     placeholders = ', '.join(['?'] * len(value))
@@ -41,6 +41,14 @@ class AssetsManager:
                 else:
                     filter_clauses.append(f"{key} = ?")
                     query_params.append(value)
+
+        # Apply free text search
+        if query:
+            query_clause = "(title LIKE ? OR description LIKE ? OR creator LIKE ? OR subject LIKE ?)"
+            query_params.extend([f"%{query}%"] * 4)
+            filter_clauses.append(query_clause)
+
+        if filter_clauses:
             base_query += ' WHERE ' + ' AND '.join(filter_clauses)
 
         # Validate and apply sorting
@@ -53,17 +61,17 @@ class AssetsManager:
         base_query += ' LIMIT ? OFFSET ?'
         query_params.extend([limit, offset])
 
+        # Execute the main query
         results = await db.execute_query(base_query, tuple(query_params))
         
-        assets = []
-        for result in results:
-            assets.append({'id': result[0], 'user_id': result[1], 'title': result[2], 'creator': result[3], 'subject': result[4], 'description': result[5]})
-        
-        # Assuming you have a way to get the total count of assets
+        assets = [{'id': result[0], 'user_id': result[1], 'title': result[2], 'creator': result[3], 'subject': result[4], 'description': result[5]} for result in results]
+
+        # Get the total count of assets
         total_count_query = 'SELECT COUNT(*) FROM asset'
-        if filters:
+        total_count_params = query_params[:-2]  # Exclude limit and offset for the count query
+        if filter_clauses:
             total_count_query += ' WHERE ' + ' AND '.join(filter_clauses)
-        total_count_result = await db.execute_query(total_count_query, tuple(query_params[:len(filters)] if filters else ()))
+        total_count_result = await db.execute_query(total_count_query, tuple(total_count_params))
         total_count = total_count_result[0][0] if total_count_result else 0
 
         return assets, total_count

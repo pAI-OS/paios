@@ -48,7 +48,17 @@ class AssetsView:
 
         offset, limit, sort_by, sort_order, filters = result
 
-        assets, total_count = await self.am.retrieve_assets(limit=limit, offset=offset, sort_by=sort_by, sort_order=sort_order, filters=filters)
+        # Extract the free text search query
+        query = filters.pop('q', None)
+
+        assets, total_count = await self.am.retrieve_assets(
+            limit=limit, 
+            offset=offset, 
+            sort_by=sort_by, 
+            sort_order=sort_order, 
+            filters=filters, 
+            query=query
+        )
         headers = {
             'X-Total-Count': str(total_count),
             'Content-Range': f'assets {offset}-{offset + len(assets) - 1}/{total_count}'

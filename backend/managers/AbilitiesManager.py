@@ -1,13 +1,9 @@
 import json
-from pathlib import Path
 from backend.paths import abilities_dir
 
 class AbilitiesManager:
     _instance = None
 
-    # This implementation ensures that AbilitiesManager is instantiated only once,
-    # and the abilities are loaded into memory at that time.
-    # You can refresh the abilities by calling AbilitiesManager().refresh_abilities()
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
             cls._instance = super(AbilitiesManager, cls).__new__(cls, *args, **kwargs)
@@ -33,11 +29,34 @@ class AbilitiesManager:
             if ability.get('id') == ability_id:
                 return ability
         return None
-
-    def retrieve_abilities(self, offset=0, limit=100):
-        total_count = len(self.abilities)
-        paginated_abilities = self.abilities[offset:offset + limit]
+    
+    def retrieve_abilities(self, offset=0, limit=100, sort_by=None, sort_order='asc', filters=None, query=None):
+        filtered_abilities = self._apply_filters(self.abilities, filters)
+        if query:
+            filtered_abilities = self._apply_query(filtered_abilities, query)
+        sorted_abilities = self._apply_sorting(filtered_abilities, sort_by, sort_order)
+        total_count = len(sorted_abilities)
+        paginated_abilities = sorted_abilities[offset:offset + limit]
         return paginated_abilities, total_count
+
+    def _apply_filters(self, abilities, filters):
+        if not filters:
+            return abilities
+        filtered_abilities = []
+        for ability in abilities:
+            match = all(ability.get(key) == value for key, value in filters.items())
+            if match:
+                filtered_abilities.append(ability)
+        return filtered_abilities
+
+    def _apply_query(self, abilities, query):
+        query = query.lower()
+        return [ability for ability in abilities if query in ability.get('title', '').lower() or query in ability.get('description', '').lower()]
+
+    def _apply_sorting(self, abilities, sort_by, sort_order):
+        if not sort_by:
+            return abilities
+        return sorted(abilities, key=lambda x: x.get(sort_by), reverse=(sort_order == 'desc'))
 
     def refresh_abilities(self):
         self._load_abilities()

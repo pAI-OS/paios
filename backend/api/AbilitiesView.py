@@ -24,8 +24,16 @@ class AbilitiesView:
             return result
 
         offset, limit, sort_by, sort_order, filters = result
+        query = filters.pop('q', None)
 
-        abilities, total_count = AbilitiesManager().retrieve_abilities(limit=limit, offset=offset)
+        abilities, total_count = AbilitiesManager().retrieve_abilities(
+            limit=limit, 
+            offset=offset, 
+            sort_by=sort_by, 
+            sort_order=sort_order, 
+            filters=filters,
+            query=query
+        )
         headers = {
             'X-Total-Count': str(total_count),
             'Content-Range': f'abilities {offset}-{offset + len(abilities) - 1}/{total_count}'
