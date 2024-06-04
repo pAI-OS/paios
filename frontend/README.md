@@ -22,6 +22,10 @@ Start the application in development mode by running:
 npm run dev
 ```
 
+Access the development server at https://localhost:5173
+
+Note: This has the benefit of automatically reloading the page when files are modified without having to `npm run build`.
+
 ## Production
 
 Build the application in production mode by running:

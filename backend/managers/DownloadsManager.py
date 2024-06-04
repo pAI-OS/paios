@@ -242,7 +242,7 @@ class DownloadsManager:
         except asyncio.CancelledError:
             # CancelledError is expected when the download is paused or about to be deleted
             return  # Ensure the function exits on cancellation
-
+        # TODO: Network issues appear to throw TimeoutError
         # TODO: This may catch download errors and send them to the client instead of the logs
         #except Exception as e:
         #    download["status"] = DownloadStatus.FAILED

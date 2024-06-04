@@ -8,7 +8,7 @@ export const formatSize = (bytes: number): string => {
         unitIndex++;
     }
 
-    return `${size.toFixed(3)} ${units[unitIndex]}`;
+    return `${size.toFixed(2)} ${units[unitIndex]}`;
 };
 
 export const formatTransferRate = (bytesPerSecond: number): string => {
