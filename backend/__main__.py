@@ -20,13 +20,14 @@ def create_backend_app():
     allow_origins = [
         'http://localhost',
         'http://localhost:3080',
+        'http://localhost:5173'
     ]
 
    # Add CORS middleware
     connexion_app.add_middleware(
        CORSMiddleware,
        position=MiddlewarePosition.BEFORE_EXCEPTION,
-       allow_origins=[allow_origins],
+       allow_origins=allow_origins,
        allow_credentials=True,
        allow_methods=["*"],
        allow_headers=["*"],
