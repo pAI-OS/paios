@@ -40,16 +40,16 @@ class AbilitiesManager:
         # For now, we'll assume no versions are installed
         return {}
 
-    def get_ability(self, ability_id, version=None):
+    def get_ability(self, id, version=None):
         for ability_name, data in self.abilities.items():
             versions = data['versions']
             if version:
-                if version in versions and versions[version].get('id') == ability_id:
+                if version in versions and versions[version].get('id') == id:
                     return versions[version]
             else:
                 # Return the installed version if available, otherwise the latest version
                 version_to_return = self.installed_versions.get(ability_name, data['latest_version'])
-                if versions[version_to_return].get('id') == ability_id:
+                if versions[version_to_return].get('id') == id:
                     return versions[version_to_return]
         return None
 

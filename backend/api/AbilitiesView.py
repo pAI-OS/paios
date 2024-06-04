@@ -12,11 +12,11 @@ class AbilitiesView:
     async def put(self, body: dict):
         return self.error_immutable()
     
-    async def delete(self, ability_id: str):
+    async def delete(self, id: str):
         return self.error_immutable()
 
-    def get(self, ability_id=None):
-        return JSONResponse(status_code=200, content=AbilitiesManager().get_ability(ability_id))
+    def get(self, id=None):
+        return JSONResponse(status_code=200, content=AbilitiesManager().get_ability(id))
 
     async def search(self, filter: str = None, range: str = None, sort: str = None):
         result = parse_pagination_params(filter, range, sort)

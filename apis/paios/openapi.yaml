@@ -13,7 +13,7 @@ info:
     name: MIT
 servers:
   - url: /api/v1
-    description: ''
+    description: 'Local instance'
 paths:
   /abilities:
     get:
@@ -40,19 +40,12 @@ paths:
                 type: string
                 example: '2'
               description: Count of results required by jsonServer Data Provider for pagination
-  '/abilities/{ability_id}':
+  '/abilities/{id}':
     get:
       tags:
         - Abilities Management
       summary: Retrieve ability by id
       description: Retrieve the information of the ability with the matching ability ID.
-      parameters:
-        - name: ability_id
-          in: path
-          description: ID of an existing ability
-          required: true
-          schema:
-            type: string
       responses:
         '200':
           description: OK
@@ -62,42 +55,93 @@ paths:
                 $ref: '#/components/schemas/Ability'
       x-stoplight:
         id: dyrvaak9tni3i
-  '/abilities/{ability_id}/start':
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+  '/abilities/{id}/start':
     post:
       tags:
         - Abilities Management
       summary: Start ability
       description: Starts the ability with the matching ability ID.
-      parameters:
-        - name: ability_id
-          in: path
-          description: ID of an existing ability
-          required: true
-          schema:
-            type: string
       responses:
         '200':
           description: OK
       x-stoplight:
         id: oymowererbmk1
-  '/abilities/{ability_id}/stop':
+    parameters:
+      - schema:
+          type: string
+        name: id
+        description: id of an existing ability
+        in: path
+        required: true
+  '/abilities/{id}/stop':
     post:
       tags:
         - Abilities Management
       summary: Stop ability
       description: Stops the ability with the matching ability ID.
-      parameters:
-        - name: ability_id
-          in: path
-          description: ID of an existing ability
-          required: true
-          schema:
-            type: string
       responses:
         '200':
           description: OK
       x-stoplight:
         id: rl7akdqs5zokh
+    parameters:
+      - schema:
+          type: string
+        name: id
+        description: id of an existing ability
+        in: path
+        required: true
+  '/abilities/{id}/dependencies/{dependency_id}/download':
+    post:
+      tags:
+        - Abilities Management
+      summary: Start download
+      description: Downloads an ability's dependency.
+      responses:
+        '200':
+          description: Download started
+      x-stoplight:
+        id: xngy10ictavd9
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: dependency_id
+        description: id of a dependency
+        in: path
+        required: true
+  '/abilities/{id}/dependencies/{dependency_id}/install':
+    post:
+      tags:
+        - Abilities Management
+      summary: Start install
+      description: Installs an ability's dependency.
+      responses:
+        '200':
+          description: Install started
+      x-stoplight:
+        id: s0cmunju1qpd7
+    parameters:
+      - schema:
+          type: string
+        name: id
+        in: path
+        required: true
+      - schema:
+          type: string
+        name: dependency_id
+        in: path
+        required: true
   /assets:
     get:
       tags:
@@ -123,9 +167,6 @@ paths:
                 type: string
                 example: '2'
               description: Count of results required by jsonServer Data Provider for pagination
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
     post:
       summary: Create new asset
       tags:
@@ -190,9 +231,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Asset'
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
       x-stoplight:
         id: 2zks0jok3godg
     put:
@@ -259,9 +297,6 @@ paths:
                 type: string
                 example: '2'
               description: Count of results required by jsonServer Data Provider for pagination
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
     post:
       summary: Create new channel
       tags:
@@ -299,9 +334,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Channel'
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
       x-stoplight:
         id: n2y8xwoqwy42p
     put:
@@ -326,9 +358,6 @@ paths:
       responses:
         '200':
           description: OK
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
     delete:
       tags:
         - Channel Management
@@ -346,9 +375,6 @@ paths:
           description: No Content
         '404':
           description: Not Found
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
       x-stoplight:
         id: 1tecqsp0tdwoy
   '/config/{key}':
@@ -371,9 +397,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Config'
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
     put:
       tags:
         - Configuration Management
@@ -396,9 +419,6 @@ paths:
       responses:
         '200':
           description: OK
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
     delete:
       tags:
         - Configuration Management
@@ -416,9 +436,6 @@ paths:
           description: No Content
         '404':
           description: Not Found
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
   /downloads:
     get:
       tags:
@@ -578,9 +595,6 @@ paths:
                 type: integer
                 example: 2
               description: Count of results required by jsonServer Data Provider for pagination
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
     post:
       tags:
         - User Management
@@ -617,9 +631,6 @@ paths:
           description: Missing Required Information
         '409':
           description: Email Already Taken
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
   '/users/{id}':
     get:
       tags:
@@ -643,9 +654,6 @@ paths:
                 $ref: '#/components/schemas/User'
         '404':
           description: User Not Found
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
       x-stoplight:
         id: 1ghm6r4v82ch1
     delete:
@@ -666,9 +674,6 @@ paths:
           description: No Content
         '404':
           description: Not Found
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
       x-stoplight:
         id: g3lg9dif14k5r
     put:
@@ -713,119 +718,8 @@ paths:
           description: User Not Found
         '409':
           description: Email Already Taken
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
       x-stoplight:
         id: 2fpaptklpmtue
-  '/abilities/{ability_id}/dependencies/resources/{dependency_id}/download/start':
-    post:
-      tags:
-        - Abilities Management
-      summary: Start download
-      description: Downloads an ability's dependency.
-      parameters:
-        - name: ability_id
-          in: path
-          description: 'ID of an existing ability (e.g., optical-character-recognition)'
-          required: true
-          schema:
-            type: string
-        - name: dependency_id
-          in: path
-          description: 'ID of an ability''s dependency (e.g., pandas)'
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Download started
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
-      x-stoplight:
-        id: xngy10ictavd9
-  '/abilities/{ability_id}/dependencies/resources/{dependency_id}/download/stop':
-    post:
-      tags:
-        - Abilities Management
-      summary: Stop download
-      description: Stops download of an ability's dependency.
-      parameters:
-        - name: ability_id
-          in: path
-          description: 'ID of an existing ability (e.g., optical-character-recognition)'
-          required: true
-          schema:
-            type: string
-        - name: dependency_id
-          in: path
-          description: 'ID of an ability''s dependency (e.g., pandas)'
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Download stopped
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
-      x-stoplight:
-        id: 2u3cy4t9q5x53
-  '/abilities/{ability_id}/dependencies/resources/{dependency_id}/download/delete':
-    post:
-      tags:
-        - Abilities Management
-      summary: Delete download
-      description: Deletes download of an ability's dependency.
-      parameters:
-        - name: ability_id
-          in: path
-          description: 'ID of an existing ability (e.g., optical-character-recognition)'
-          required: true
-          schema:
-            type: string
-        - name: dependency_id
-          in: path
-          description: 'ID of an ability''s dependency (e.g., pandas)'
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Download deleted
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
-      x-stoplight:
-        id: 9wjpktkrew5kt
-  '/abilities/{ability_id}/dependencies/python/{dependency_id}/install':
-    post:
-      tags:
-        - Abilities Management
-      summary: Start install
-      description: Installs an ability's dependency.
-      parameters:
-        - name: ability_id
-          in: path
-          description: 'ID of an existing ability (e.g., optical-character-recognition)'
-          required: true
-          schema:
-            type: string
-        - name: dependency_id
-          in: path
-          description: 'ID of an ability''s dependency (e.g., pandas)'
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Install started
-      servers:
-        - url: 'http://localhost:3080/api/v1'
-          description: ''
-      x-stoplight:
-        id: s0cmunju1qpd7
 tags:
   - name: Abilities Management
     description: Installation and configuration of abilities
