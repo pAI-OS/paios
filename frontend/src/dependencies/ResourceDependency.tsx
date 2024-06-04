@@ -1,3 +1,4 @@
+import React, { useState } from 'react';
 import { Button, Datagrid, TextField, useRecordContext, useNotify, useRefresh } from 'react-admin';
 import DownloadIcon from '@mui/icons-material/Download';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -7,10 +8,12 @@ const DownloadButton = ({ ability_id }: { ability_id: string }) => {
     const record = useRecordContext();
     const notify = useNotify();
     const refresh = useRefresh();
+    const [isDownloading, setIsDownloading] = useState(false);
 
     const handleDownloadClick = (event: React.MouseEvent) => {
         // prevent the click event propagating to the row and calling show
         event.stopPropagation();
+        setIsDownloading(true);
 
         const downloadData = [
             {
@@ -29,7 +32,8 @@ const DownloadButton = ({ ability_id }: { ability_id: string }) => {
                 refresh();
             })
             .catch((e) => {
-                notify('Error: download not started', { type: 'warning' });
+                notify(e.body.message, { type: 'warning' });
+                setIsDownloading(false);
             });
     };
 
@@ -43,7 +47,7 @@ const DownloadButton = ({ ability_id }: { ability_id: string }) => {
                 refresh();
             })
             .catch((e) => {
-                notify('Error: deletion not requested', { type: 'warning' });
+                notify(e.body.message, { type: 'warning' });
             });
     };
 
@@ -58,7 +62,7 @@ const DownloadButton = ({ ability_id }: { ability_id: string }) => {
 
     // file is not downloaded, show download button
     return (
-        <Button label="Download" onClick={handleDownloadClick}>
+        <Button label="Download" onClick={handleDownloadClick} disabled={isDownloading}>
             <DownloadIcon />
         </Button>
     );

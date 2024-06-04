@@ -258,10 +258,18 @@ class DownloadsManager:
             #print(f"Error in download {download['source_url']}: {e}")
             raise
 
+    # TODO: If a queued download is already in-situ then we should check its size/hash and go straight to complete
     async def queue_downloads(self, downloads: list):
         download_ids = []
         for download in downloads:
             id = str(uuid4())
+
+            # Check if the download already exists
+            for existing_download in self.downloads.values():
+                if (existing_download["source_url"] == download.get('source_url') and
+                    existing_download["file_name"] == download.get('file_name') and
+                    existing_download["target_directory"] == download.get('target_directory')):
+                    raise ValueError(f"Download already exists")
 
             self.downloads[id] = {
                 "source_url": download.get('source_url'),
@@ -302,6 +310,8 @@ class DownloadsManager:
             self.downloads[id]["start_time"] = time.time()  # Reset start time for resumed download
             download_task.add_done_callback(lambda t, d=self.downloads[id]: self._handle_task_exception(t, d))
 
+    # TODO: Deleting one failed download will delete the file even if it was ultimately downloaded by another one
+    # TODO: Unless it is still downloading in which case the delete will fail (at least on Windows)
     async def delete_download(self, id: str):
         download = self.downloads.get(id)
         if not download:
