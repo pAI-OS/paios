@@ -24,12 +24,6 @@ const downloadFilters = [
     <TextInput source="q" label="Search" alwaysOn />,
 ];
 
-const FileLinkField = ({ source }: { source: { source_url: string, file_name: string } }) => (
-    <Link to={source.source_url} target="_blank" rel="noopener noreferrer">
-        {source.file_name}
-    </Link>
-);
-
 const DownloadActions = ({ refresh }: { refresh: () => void }) => {
     const record = useRecordContext<Download>();
     const notify = useNotify();
@@ -83,7 +77,6 @@ const DownloadActions = ({ refresh }: { refresh: () => void }) => {
 };
 
 export const DownloadsList = () => {
-    const record = useRecordContext<Download>();
     const refresh = useRefresh();
     const notify = useNotify();
     const intervalId = useRef<NodeJS.Timeout | null>(null);
@@ -115,7 +108,7 @@ export const DownloadsList = () => {
     return (
         <List filters={downloadFilters}>
             <Datagrid rowClick="edit">
-                <FileLinkField source={{ source_url: 'source_url', file_name: 'file_name' }} />
+                <TextField source="file_name" />
                 <TextField source="target_directory" />
                 <FormattedSizeField source="downloaded" />
                 <FormattedSizeField source="total_size" />
