@@ -58,14 +58,14 @@ class DownloadsManager:
         current_time = time.time()
         all_downloads = []
 
-        for download_id, download in list(self.downloads.items()):
+        for id, download in list(self.downloads.items()):
             if "finish_time" in download and (current_time - download["finish_time"] > 600):
-                del self.downloads[download_id]
+                del self.downloads[id]
             else:
-                keys_to_include = ["download_id", "source_url", "file_name", "target_directory", "total_size", "downloaded", "progress", "start_time", "finish_time", "transfer_rate"]
+                keys_to_include = ["id", "source_url", "file_name", "target_directory", "total_size", "downloaded", "progress", "start_time", "finish_time", "transfer_rate"]
                 download["transfer_rate"] = self._calculate_transfer_rate(download)
                 filtered_dict = {k: download[k] for k in keys_to_include if k in download}
-                filtered_dict["download_id"] = download_id
+                filtered_dict["id"] = id
                 filtered_dict["status"] = download["status"].value
                 all_downloads.append(filtered_dict)
 
@@ -260,9 +260,9 @@ class DownloadsManager:
     async def queue_downloads(self, downloads: list):
         download_ids = []
         for download in downloads:
-            download_id = str(uuid4())
+            id = str(uuid4())
 
-            self.downloads[download_id] = {
+            self.downloads[id] = {
                 "source_url": download.get('source_url'),
                 "file_name": download.get('file_name'),
                 "target_directory": download.get('target_directory'),
@@ -276,12 +276,12 @@ class DownloadsManager:
                 "expected_hash": download.get('expected_hash')
             }        
 
-            download_task = asyncio.create_task(self.download_file(download_id))
-            self.downloads[download_id]["task"] = download_task
-            download_ids.append(download_id)
+            download_task = asyncio.create_task(self.download_file(id))
+            self.downloads[id]["task"] = download_task
+            download_ids.append(id)
         
             # Add done callback but pass in the download along with the task object so we know what it was later
-            download_task.add_done_callback(lambda t, d=self.downloads[download_id]: self._handle_task_exception(t, d))
+            download_task.add_done_callback(lambda t, d=self.downloads[id]: self._handle_task_exception(t, d))
 
         return download_ids
 

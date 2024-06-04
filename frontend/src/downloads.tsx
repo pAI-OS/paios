@@ -9,7 +9,7 @@ import FormattedTransferRateField from './components/FormattedTransferRateField'
 import ProgressField from './components/ProgressField';
 
 interface Download {
-    download_id: string;
+    id: string;
     source_url: string;
     file_name: string;
     target_directory: string;
@@ -26,6 +26,8 @@ const downloadFilters = [
 const DownloadActions = ({ refresh }: { refresh: () => void }) => {
     const record = useRecordContext<Download>();
     const notify = useNotify();
+
+    //console.log(record)
 
     const handlePauseClick = (id: string) => {
         httpClient(`${apiBase}/downloads/${encodeURIComponent(id)}/pause`, { method: 'POST' })
@@ -57,16 +59,16 @@ const DownloadActions = ({ refresh }: { refresh: () => void }) => {
     return (
         <div>
             {record.status === 'downloading' && (
-                <Button label="Pause" onClick={() => handlePauseClick(record.download_id)}>
+                <Button label="Pause" onClick={() => handlePauseClick(record.id)}>
                     <PauseIcon />
                 </Button>
             )}
             {record.status === 'paused' && (
-                <Button label="Resume" onClick={() => handleResumeClick(record.download_id)}>
+                <Button label="Resume" onClick={() => handleResumeClick(record.id)}>
                     <PlayArrowIcon />
                 </Button>
             )}
-            <Button label="Delete" onClick={() => handleDeleteClick(record.download_id)}>
+            <Button label="Delete" onClick={() => handleDeleteClick(record.id)}>
                 <DeleteIcon />
             </Button>
         </div>

@@ -18,7 +18,7 @@ class DownloadsView:
 
         #try:
         download_ids = await self.manager.queue_downloads(body)
-        return JSONResponse(status_code=200, content=[{"download_id": download_id} for download_id in download_ids])
+        return JSONResponse(status_code=200, content=[{"id": id} for id in download_ids])
         # TODO: This was catching download errors and sending them to the client instead of the logs
         #except Exception as e:
         #    return JSONResponse(status_code=400, content={"message": str(e)})
@@ -26,8 +26,8 @@ class DownloadsView:
     async def put(self):
         return JSONResponse(status_code=501, content={"message": "Not Implemented"})
 
-    async def delete(self, download_id: str):
-        await self.manager.delete_download(download_id)
+    async def delete(self, id: str):
+        await self.manager.delete_download(id)
         return Response(status_code=204)
 
     async def search(self, filter: str = None, range: str = None, sort: str = None):
@@ -46,10 +46,10 @@ class DownloadsView:
 
     # custom functions
 
-    async def pause(self, download_id: str):
-        await self.manager.pause_download(download_id)
+    async def pause(self, id: str):
+        await self.manager.pause_download(id)
         return JSONResponse(status_code=200, content={"message": "Download paused"})
 
-    async def resume(self, download_id: str):
-        await self.manager.resume_download(download_id)
+    async def resume(self, id: str):
+        await self.manager.resume_download(id)
         return JSONResponse(status_code=200, content={"message": "Download resumed"})

@@ -491,18 +491,18 @@ paths:
                 items:
                   type: object
                   properties:
-                    download_id:
+                    id:
                       type: string
         '400':
           description: Invalid request
-  '/downloads/{download_id}':
+  '/downloads/{id}':
     delete:
       tags:
         - Downloads Management
       summary: Delete download
       description: Deletes the download with the specified ID and removes the file.
       parameters:
-        - name: download_id
+        - name: id
           in: path
           description: ID of the download
           required: true
@@ -513,7 +513,9 @@ paths:
           description: No Content
         '404':
           description: Download Not Found
-  '/downloads/{download_id}/pause':
+      x-stoplight:
+        id: dduck5g3v903s
+  '/downloads/{id}/pause':
     post:
       tags:
         - Downloads Management
@@ -521,7 +523,7 @@ paths:
       description: Pauses the download with the specified ID.
       operationId: backend.api.DownloadsView.pause
       parameters:
-        - name: download_id
+        - name: id
           in: path
           description: ID of the download
           required: true
@@ -530,7 +532,9 @@ paths:
       responses:
         '200':
           description: Download paused
-  '/downloads/{download_id}/resume':
+      x-stoplight:
+        id: jfzldt7n6zi4y
+  '/downloads/{id}/resume':
     post:
       tags:
         - Downloads Management
@@ -538,7 +542,7 @@ paths:
       description: Resumes the download with the specified ID.
       operationId: backend.api.DownloadsView.resume
       parameters:
-        - name: download_id
+        - name: id
           in: path
           description: ID of the download
           required: true
@@ -547,6 +551,8 @@ paths:
       responses:
         '200':
           description: Download resumed
+      x-stoplight:
+        id: rwumyu04mqxrw
   /users:
     get:
       tags:
@@ -947,7 +953,7 @@ components:
     Download:
       type: object
       properties:
-        download_id:
+        id:
           type: string
           description: Unique identifier for the given download.
           format: uuid
@@ -992,7 +998,7 @@ components:
           nullable: true
           example: 49028995.95526451
       required:
-        - download_id
+        - id
         - source_url
     User:
       type: object
