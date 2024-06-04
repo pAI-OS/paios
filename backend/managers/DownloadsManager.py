@@ -225,7 +225,7 @@ class DownloadsManager:
             download["status"] = DownloadStatus.PROCESSING
 
             if hash_type and expected_hash:
-                actual_hash = await self._calculate_hash(download["temp_file"], hash_type)
+                actual_hash = await self._calculate_hash(download["file_path"], hash_type)
                 if actual_hash != expected_hash:
                     download["status"] = DownloadStatus.INVALID
                     raise ValueError(f"Hash mismatch: expected {expected_hash}, got {actual_hash}")
@@ -244,10 +244,10 @@ class DownloadsManager:
             return  # Ensure the function exits on cancellation
 
         # TODO: This may catch download errors and send them to the client instead of the logs
-        except Exception as e:
-            download["status"] = DownloadStatus.FAILED
-            download["error"] = str(e)
-            raise
+        #except Exception as e:
+        #    download["status"] = DownloadStatus.FAILED
+        #    download["error"] = str(e)
+        #    raise
 
     def _handle_task_exception(self, task, download):
         try:
@@ -255,7 +255,8 @@ class DownloadsManager:
         except Exception as e:
             download["status"] = DownloadStatus.FAILED
             download["error"] = str(e)
-            print(f"Error in download {download['source_url']}: {e}")
+            #print(f"Error in download {download['source_url']}: {e}")
+            raise
 
     async def queue_downloads(self, downloads: list):
         download_ids = []

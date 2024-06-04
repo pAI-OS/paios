@@ -986,6 +986,7 @@ components:
           enum:
             - downloading
             - paused
+            - processing
             - completed
             - failed
           example: downloading
