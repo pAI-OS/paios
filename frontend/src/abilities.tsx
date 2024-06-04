@@ -93,7 +93,7 @@ export const AbilityShow = () => (
 );
 
 interface Dependency {
-    type: 'abilities' | 'container' | 'linux' | 'python' | 'resource';
+    type: 'abilities' | 'container' | 'linux' | 'python' | 'resources';
     // common properties
     name?: string;
     description?: string;
@@ -122,7 +122,7 @@ export const AbilityDependencies = () => {
 
     const debianDeps = dependencies.filter((dep: Dependency) => dep.type === 'linux');
     const pythonDeps = dependencies.filter((dep: Dependency) => dep.type === 'python');
-    const resourceDeps = dependencies.filter((dep: Dependency) => dep.type === 'resource');
+    const resourceDeps = dependencies.filter((dep: Dependency) => dep.type === 'resources');
 
     return (
         <TabbedShowLayout>
