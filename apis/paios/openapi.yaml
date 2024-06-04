@@ -883,6 +883,50 @@ components:
         description:
           type: string
           example: Conversion of images to text
+        author:
+          type: object
+          properties:
+            name:
+              type: string
+            url:
+              type: string
+        maintainer:
+          type: object
+          properties:
+            name:
+              type: string
+            email:
+              type: string
+            url:
+              type: string
+        language:
+          type: string
+        scripts:
+          type: object
+          properties:
+            start:
+              type: string
+        license:
+          type: string
+        dependencies:
+          type: object
+          properties:
+            python:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  version:
+                    type: string
+        latest_version:
+          type: string
+        installed_version:
+          type: string
+          nullable: true
     Asset:
       type: object
       title: Asset
