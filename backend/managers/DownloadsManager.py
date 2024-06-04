@@ -16,6 +16,7 @@ class DownloadStatus(Enum):
     PAUSED = "paused"
     PROCESSING = "processing"
     COMPLETED = "completed"
+    VERIFIED = "verified"
     FAILED = "failed"
     INVALID = "invalid"
 
@@ -44,15 +45,19 @@ class DownloadsManager:
                 return True
         return False
 
-    async def _calculate_hash(self, file_path, hash_type):
+    async def _check_hash(self, file_path, file_hash, block_size=65536):
+        #print(f"Checking hash of file {file_path} against {file_hash}")
+        hash_type, expected_hash = file_hash.split(':')
         hash_func = getattr(hashlib, hash_type)()
         async with aiofiles.open(file_path, 'rb') as f:
             while True:
-                chunk = await f.read(4096)
+                chunk = await f.read(block_size)
                 if not chunk:
                     break
                 hash_func.update(chunk)
-        return hash_func.hexdigest()
+        hexdigest = hash_func.hexdigest()
+        #print(f"Hash of file {file_path} is {hexdigest} (vs {expected_hash})")
+        return hexdigest == expected_hash
 
     async def retrieve_downloads(self, limit=100, offset=0):
         current_time = time.time()
@@ -62,9 +67,9 @@ class DownloadsManager:
             if "finish_time" in download and (current_time - download["finish_time"] > 600):
                 del self.downloads[id]
             else:
-                keys_to_include = ["id", "source_url", "file_name", "target_directory", "total_size", "downloaded", "progress", "start_time", "finish_time", "transfer_rate"]
+                keys_to_include = ["id", "source_url", "file_name", "file_hash", "file_size", "target_directory", "downloaded", "progress", "start_time", "finish_time", "transfer_rate"]
                 download["transfer_rate"] = self._calculate_transfer_rate(download)
-                filtered_dict = {k: download[k] for k in keys_to_include if k in download}
+                filtered_dict = {k: download[k] for k in keys_to_include if k in download and download[k] is not None}
                 filtered_dict["id"] = id
                 filtered_dict["status"] = download["status"].value
                 all_downloads.append(filtered_dict)
@@ -90,8 +95,9 @@ class DownloadsManager:
         async with aiohttp.ClientSession() as session:
             async with session.get(source_url, headers=headers) as response:
                 if response.status in [200, 206]:
-                    total_size = int(response.headers.get('Content-Length', -1)) + start_byte
-                    download["total_size"] = total_size
+                    if "file_size" not in download or download["file_size"] is None:
+                        file_size = int(response.headers.get('Content-Length', -1)) + start_byte
+                        download["file_size"] = file_size
 
                     # If file_name not specified, get it from Content-Disposition headers, URL, or default to id
                     if not download.get("file_name"):
@@ -129,9 +135,9 @@ class DownloadsManager:
                                         download["transfer_rate"] = len(chunk) / chunk_time
                                     else:
                                         download["transfer_rate"] = 0
-                                if download["total_size"] > 0:
+                                if download["file_size"] > 0:
                                     download["progress"] = round(
-                                        (download["downloaded"] / download["total_size"]) * 100, 2
+                                        (download["downloaded"] / download["file_size"]) * 100, 2
                                     )
                                 else:
                                     download["progress"] = -1
@@ -140,7 +146,7 @@ class DownloadsManager:
                         download["status"] = DownloadStatus.PAUSED
                         raise
                 else:
-                    raise Exception(f"Failed to download {source_url}")
+                    raise Exception(f"Failed to download {source_url}: HTTP status code {response.status}")
 
     async def download_file_ftp(self, id):
         download = self.downloads[id]
@@ -150,9 +156,10 @@ class DownloadsManager:
         parsed_url = urlparse(source_url)
         async with aioftp.Client.context(parsed_url.hostname, parsed_url.port or 21, parsed_url.username, parsed_url.password) as client:
             async with client.download_stream(parsed_url.path, offset=start_byte) as stream:
-                total_size = await client.stat(parsed_url.path)
-                total_size = total_size['size']
-                download["total_size"] = total_size
+                if "file_size" not in download or download["file_size"] is None:
+                    file_stat = await client.stat(parsed_url.path)
+                    file_size = file_stat['size']
+                    download["file_size"] = file_size
 
                 if not download.get("file_name"):
                     resolved_file_name = Path(source_url).name or id
@@ -185,7 +192,7 @@ class DownloadsManager:
                                 else:
                                     download["transfer_rate"] = 0
                             download["progress"] = round(
-                                (download["downloaded"] / download["total_size"]) * 100, 2
+                                (download["downloaded"] / download["file_size"]) * 100, 2
                             )
                 except asyncio.CancelledError:
                     # Handle the cancellation here
@@ -197,8 +204,7 @@ class DownloadsManager:
         try:
             source_url = download["source_url"]
             target_directory = download.get("target_directory")
-            hash_type = download.get("hash_type")
-            expected_hash = download.get("expected_hash")
+            file_hash = download.get("file_hash")
 
             if not self._is_valid_url(source_url):
                 raise ValueError(f"Invalid URL: {source_url}")
@@ -224,11 +230,13 @@ class DownloadsManager:
             download["finish_time"] = time.time()
             download["status"] = DownloadStatus.PROCESSING
 
-            if hash_type and expected_hash:
-                actual_hash = await self._calculate_hash(download["file_path"], hash_type)
-                if actual_hash != expected_hash:
+            final_status = DownloadStatus.COMPLETED
+            if file_hash is not None:
+                if not await self._check_hash(download["file_path"], file_hash):
                     download["status"] = DownloadStatus.INVALID
-                    raise ValueError(f"Hash mismatch: expected {expected_hash}, got {actual_hash}")
+                    raise ValueError(f"Hash mismatch for file: {download['file_path']} (expected: {file_hash})")
+                else:
+                    final_status = DownloadStatus.VERIFIED
 
             # If a target_directory has been specified, we need to move the file out of the general downloads directory
             if target_directory:
@@ -237,7 +245,7 @@ class DownloadsManager:
                     raise FileExistsError(f"Destination file already exists: {target_file_path}")
                 download["file_path"].rename(target_file_path)
 
-            download["status"] = DownloadStatus.COMPLETED
+            download["status"] = final_status
 
         except asyncio.CancelledError:
             # CancelledError is expected when the download is paused or about to be deleted
@@ -275,14 +283,13 @@ class DownloadsManager:
                 "source_url": download.get('source_url'),
                 "file_name": download.get('file_name'),
                 "target_directory": download.get('target_directory'),
+                "file_hash": download.get('file_hash'),
+                "file_size": download.get('file_size'),
                 "status": DownloadStatus.DOWNLOADING,
                 "start_byte": 0,
-                "total_size": 0,
                 "downloaded": 0,
                 "progress": 0.0,
-                "start_time": time.time(),
-                "hash_type": download.get('hash_type'),
-                "expected_hash": download.get('expected_hash')
+                "start_time": time.time()
             }        
 
             download_task = asyncio.create_task(self.download_file(id))

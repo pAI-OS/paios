@@ -14,7 +14,8 @@ interface Download {
     source_url: string;
     file_name: string;
     target_directory: string;
-    total_size: number;
+    file_size: number;
+    file_hash: string;
     downloaded: number;
     progress: number;
     status: string;
@@ -111,7 +112,7 @@ export const DownloadsList = () => {
                 <TextField source="file_name" />
                 <TextField source="target_directory" />
                 <FormattedSizeField source="downloaded" />
-                <FormattedSizeField source="total_size" />
+                <FormattedSizeField source="file_size" />
                 <FormattedTransferRateField source="transfer_rate" />
                 <ProgressField source="progress" />
                 <TextField source="status" />

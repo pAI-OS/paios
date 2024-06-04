@@ -59,6 +59,7 @@ paths:
       - schema:
           type: string
         name: id
+        description: id of the ability
         in: path
         required: true
   '/abilities/{id}/start':
@@ -112,6 +113,7 @@ paths:
       - schema:
           type: string
         name: id
+        description: id of the ability
         in: path
         required: true
       - schema:
@@ -135,11 +137,13 @@ paths:
       - schema:
           type: string
         name: id
+        description: id of the ability
         in: path
         required: true
       - schema:
           type: string
         name: dependency_id
+        description: id of the dependency
         in: path
         required: true
   /assets:
@@ -492,12 +496,11 @@ paths:
                   target_directory:
                     type: string
                     description: The optional target directory for the downloaded file (default is 'downloads').
-                  hash_type:
+                  file_hash:
                     type: string
-                    description: 'The type of hash to validate (e.g., md5, sha256).'
-                  expected_hash:
-                    type: string
-                    description: The expected hash value for validation.
+                    description: The hash type and hash of the file separated by colon (e.g., md5, sha256).
+                    example: sha256:db32e79624c8f2627b051e46de7007a556a43c3e8ddf573214eab5d4fdabdadf
+                    nullable: true
       responses:
         '200':
           description: Downloads started
@@ -910,7 +913,11 @@ components:
           type: string
           nullable: true
           example: abilities/virtual-machine/isos
-        total_size:
+        file_hash:
+          type: string
+          description: The hash type and hash of the file separated by colon
+          example: sha256:db32e79624c8f2627b051e46de7007a556a43c3e8ddf573214eab5d4fdabdadf
+        file_size:
           type: integer
           nullable: true
           example: 6114656256
@@ -929,6 +936,7 @@ components:
             - paused
             - processing
             - completed
+            - verified
             - failed
           example: downloading
         start_time:
