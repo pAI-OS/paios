@@ -13,13 +13,12 @@
     },
     "language": "python",
     "license": "GPL-3.0-or-later",
-    "dependencies": {
-        "python": [
-            {
-                "id": "ansible",
-                "name": "Ansible",
-                "version": ">=9.0.0"
-            }
-        ]
-    }
+    "dependencies": [
+        {
+            "type": "python",
+            "id": "ansible",
+            "name": "Ansible",
+            "version": ">=9.0.0"
+        }
+    ]
 }

@@ -16,18 +16,18 @@
         "start": "main.py"
     },
     "license": "Apache-2.0",
-    "dependencies": {
-        "python": [
-            {
-                "id": "airllm",
-                "name": "AirLLM",
-                "version": ">=2.8"
-            },
-            {
-                "id": "mlx",
-                "name": "MLX",
-                "version": ">=0.12"
-            }
-        ]
-    }
+    "dependencies": [
+        {
+            "type": "python",
+            "id": "airllm",
+            "name": "AirLLM",
+            "version": ">=2.8"
+        },
+        {
+            "type": "python",
+            "id": "mlx",
+            "name": "MLX",
+            "version": ">=0.12"
+        }
+    ]
 }

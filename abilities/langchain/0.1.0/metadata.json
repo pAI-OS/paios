@@ -17,79 +17,88 @@
     },
     "language": "python",
     "license": "Apache-2.0",
-    "dependencies": {
-        "python": [
-            {
-                "id": "langchain",
-                "name": "LangChain",
-                "description": "This will install the bare minimum requirements of LangChain. A lot of the value of LangChain comes when integrating it with various model providers, datastores, etc.",
-                "version": ">=0.1.0"
-            },
-            {
-                "id": "langchain-core",
-                "name": "LangChain Core",
-                "description": "Base abstractions that the rest of the LangChain ecosystem uses, along with the LangChain Expression Language. It is automatically installed by langchain, but can also be used separately.",
-                "version": ">=0.1.6"
-            },
-            {
-                "id": "langchain-cli",
-                "name": "LangChain CLI",
-                "description": "CLI for working with LangChain templates and other LangServe projects.",
-                "version": ">=0.0.20"
-            },
-            {
-                "id": "langchain-community",
-                "name": "LangChain Community",
-                "description": "Third-party integrations. It is automatically installed by langchain, but can also be used separately.",
-                "version": ">=0.0.10"
-            },
-            {
-                "id": "langchain-experimental",
-                "name": "LangChain Experimental",
-                "description": "experimental LangChain code, intended for research and experimental uses.",
-                "version": ">=0.0.10"
-            },
-            {
-                "id": "langchainhub",
-                "name": "LangChain Hub",
-                "description": "LangChain Hub API client.",
-                "version": ">=0.1.14"
-            },
-            {
-                "id": "langchain-openai",
-                "name": "LangChain OpenAI",
-                "description": "LangChain integrations for OpenAI through their openai SDK.",
-                "version": ">=0.0.2"
-            },
-            {
-                "id": "langchain-chroma",
-                "name": "LangChain Chroma",
-                "description": "LangChain integration with Chroma.",
-                "version": ">=0.1.0"
-            },
-            {
-                "id": "langgraph",
-                "name": "LangGraph",
-                "description": "Building language agents as graphs. Library for building stateful, multi-actor applications with LLMs, built on top of (and intended to be used with) LangChain.",
-                "version": ">=0.0.40"
-            },
-            {
-                "id": "langserve",
-                "name": "LangServe",
-                "description": "Building language agents as graphs. Library for building stateful, multi-actor applications with LLMs, built on top of (and intended to be used with) LangChain.",
-                "version": ">=0.0.40",
-                "extras": [
-                    "all",
-                    "client",
-                    "server"
-                ]
-            },            
-            {
-                "id": "langchain-text-splitters",
-                "name": "LangChain Text Splitters",
-                "description": "LangChain text splitting utilities",
-                "version": ">=0.0.1"
-            }
-        ]
-    }
+    "dependencies": [
+        {
+            "type": "python",
+            "id": "langchain",
+            "name": "LangChain",
+            "description": "This will install the bare minimum requirements of LangChain. A lot of the value of LangChain comes when integrating it with various model providers, datastores, etc.",
+            "version": ">=0.1.0"
+        },
+        {
+            "type": "python",
+            "id": "langchain-core",
+            "name": "LangChain Core",
+            "description": "Base abstractions that the rest of the LangChain ecosystem uses, along with the LangChain Expression Language. It is automatically installed by langchain, but can also be used separately.",
+            "version": ">=0.1.6"
+        },
+        {
+            "type": "python",
+            "id": "langchain-cli",
+            "name": "LangChain CLI",
+            "description": "CLI for working with LangChain templates and other LangServe projects.",
+            "version": ">=0.0.20"
+        },
+        {
+            "type": "python",
+            "id": "langchain-community",
+            "name": "LangChain Community",
+            "description": "Third-party integrations. It is automatically installed by langchain, but can also be used separately.",
+            "version": ">=0.0.10"
+        },
+        {
+            "type": "python",
+            "id": "langchain-experimental",
+            "name": "LangChain Experimental",
+            "description": "experimental LangChain code, intended for research and experimental uses.",
+            "version": ">=0.0.10"
+        },
+        {
+            "type": "python",
+            "id": "langchainhub",
+            "name": "LangChain Hub",
+            "description": "LangChain Hub API client.",
+            "version": ">=0.1.14"
+        },
+        {
+            "type": "python",
+            "id": "langchain-openai",
+            "name": "LangChain OpenAI",
+            "description": "LangChain integrations for OpenAI through their openai SDK.",
+            "version": ">=0.0.2"
+        },
+        {
+            "type": "python",
+            "id": "langchain-chroma",
+            "name": "LangChain Chroma",
+            "description": "LangChain integration with Chroma.",
+            "version": ">=0.1.0"
+        },
+        {
+            "type": "python",
+            "id": "langgraph",
+            "name": "LangGraph",
+            "description": "Building language agents as graphs. Library for building stateful, multi-actor applications with LLMs, built on top of (and intended to be used with) LangChain.",
+            "version": ">=0.0.40"
+        },
+        {
+            "type": "python",
+            "id": "langserve",
+            "name": "LangServe",
+            "description": "Building language agents as graphs. Library for building stateful, multi-actor applications with LLMs, built on top of (and intended to be used with) LangChain.",
+            "version": ">=0.0.40",
+            "extras": [
+                "all",
+                "client",
+                "server"
+            ]
+        },            
+        {
+            "type": "python",
+            "id": "langchain-text-splitters",
+            "name": "LangChain Text Splitters",
+            "description": "LangChain text splitting utilities",
+            "version": ">=0.0.1"
+        }
+    ]
 }

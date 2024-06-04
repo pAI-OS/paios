@@ -17,13 +17,12 @@
     },
     "language": "python",
     "license": "MIT",
-    "dependencies": {
-        "python": [
-            {
-                "id": "beautifulsoup4",
-                "name": "Beautiful Soup",
-                "version": ">=4"
-            }
-        ]
-    }
+    "dependencies": [
+        {
+            "type": "python",
+            "id": "beautifulsoup4",
+            "name": "Beautiful Soup",
+            "version": ">=4"
+        }
+    ]
 }

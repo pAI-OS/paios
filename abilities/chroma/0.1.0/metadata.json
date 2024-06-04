@@ -20,13 +20,12 @@
     "scripts": {
         "start": "chroma run"
     },
-    "dependencies": {
-        "python": [
-            {
-                "id": "chromadb",
-                "name": "ChromaDB",
-                "version": ">=0.5.0"
-            }
-        ]
-    }
+    "dependencies": [
+        {
+            "id": "chromadb",
+            "type": "python",
+            "name": "ChromaDB",
+            "version": ">=0.5.0"
+        }
+    ]
 }

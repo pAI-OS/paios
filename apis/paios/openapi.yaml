@@ -909,19 +909,22 @@ components:
         license:
           type: string
         dependencies:
-          type: object
-          properties:
-            python:
-              type: array
-              items:
-                type: object
-                properties:
-                  id:
-                    type: string
-                  name:
-                    type: string
-                  version:
-                    type: string
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                type: string
+                example: python
+              id:
+                type: string
+                example: airllm
+              name:
+                type: string
+                example: AirLLM
+              version:
+                type: string
+                example: '>=2.8'
         latest_version:
           type: string
         installed_version:

@@ -92,20 +92,43 @@ export const AbilityShow = () => (
     </Show>
 );
 
+interface Dependency {
+    type: 'abilities' | 'container' | 'linux' | 'python' | 'resource';
+    // common properties
+    name?: string;
+    description?: string;
+    version?: string;
+    priority?: string;
+    // python dependencies
+    extras?: string[];
+    // resource dependencies
+    source_url?: string;
+    file_name?: string;
+    file_size?: number;
+    file_hash?: string;
+    hash_type?: string;
+    // linux dependencies
+    packages?: object[];
+
+}
+
 export const AbilityDependencies = () => {
     const record = useRecordContext();
 
     if (!record) { return null; }
     if (!record.dependencies) { return null; }
-    // or any other fallback UI
 
-    const dependencies = record.dependencies;
+    const dependencies: Dependency[] = Array.isArray(record.dependencies) ? record.dependencies : [];
+
+    const debianDeps = dependencies.filter((dep: Dependency) => dep.type === 'linux');
+    const pythonDeps = dependencies.filter((dep: Dependency) => dep.type === 'python');
+    const resourceDeps = dependencies.filter((dep: Dependency) => dep.type === 'resource');
 
     return (
-        <TabbedShowLayout >
-            {dependencies.debian && (<Tab label="Debian"><DebianDependency dependencies={dependencies.debian} /></Tab>)}
-            {dependencies.python && (<Tab label="Python"><PythonDependency dependencies={dependencies.python} ability_id={String(record.id)} /></Tab>)}
-            {dependencies.resources && (<Tab label="Resource"><ResourceDependency dependencies={dependencies.resources} /></Tab>)}
+        <TabbedShowLayout>
+            {debianDeps.length > 0 && (<Tab label="Debian"><DebianDependency dependencies={debianDeps} /></Tab>)}
+            {pythonDeps.length > 0 && (<Tab label="Python"><PythonDependency dependencies={pythonDeps} ability_id={String(record.id)} /></Tab>)}
+            {resourceDeps.length > 0 && (<Tab label="Resource"><ResourceDependency dependencies={resourceDeps} /></Tab>)}
         </TabbedShowLayout>
     );
 };
