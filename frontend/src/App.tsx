@@ -21,7 +21,7 @@ export const App = () => (
     dashboard={Dashboard}
     layout={CustomLayout}
   >
-    <Resource name="assets" list={AssetList} create={AssetCreate} edit={AssetEdit} show={AssetShow} recordRepresentation='title' icon={DocIcon} />
+    <Resource name="assets" list={AssetList} create={AssetCreate} edit={AssetEdit} show={AssetShow} recordRepresentation='name' icon={DocIcon} />
     <Resource name="users" list={UserList} create={UserCreate} edit={UserEdit} show={UserShow} recordRepresentation='name' icon={UserIcon} />
     <Resource name="abilities" list={AbilityList} show={AbilityShow} recordRepresentation='id' icon={ExtensionIcon} />
     <Resource name="channels" list={ChannelList} show={ChannelShow} recordRepresentation='id' icon={SyncAltIcon} />

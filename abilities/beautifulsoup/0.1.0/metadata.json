@@ -1,6 +1,10 @@
 {
     "id": "beautifulsoup",
-    "title": "Beautiful Soup",
+    "name": "Beautiful Soup",
+    "versions": {
+        "package": "0.1.0",
+        "product": "4"
+    },
     "description": "Screen-scraping library",
     "author": {
         "name": "Leonard Richardson",

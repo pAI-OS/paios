@@ -1,6 +1,10 @@
 {
     "id": "llamafile",
-    "title": "llamafile",
+    "name": "llamafile",
+    "versions": {
+        "package": "0.1.0",
+        "product": "0.8"
+    },
     "description": "large language model tool",
     "author": {
         "name": "Mozilla Foundation",

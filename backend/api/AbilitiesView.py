@@ -16,7 +16,10 @@ class AbilitiesView:
         return self.error_immutable()
 
     def get(self, id=None):
-        return JSONResponse(status_code=200, content=AbilitiesManager().get_ability(id))
+        ability = AbilitiesManager().get_ability(id)
+        if ability:
+            return JSONResponse(status_code=200, content=ability)
+        return JSONResponse(status_code=404, content={"message": "Ability not found"})
 
     async def search(self, filter: str = None, range: str = None, sort: str = None):
         result = parse_pagination_params(filter, range, sort)

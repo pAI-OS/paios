@@ -5,7 +5,7 @@
         "id": {
             "type": "string"
         },
-        "title": {
+        "name": {
             "type": "string"
         },
         "description": {
@@ -186,7 +186,7 @@
     },
     "required": [
         "id",
-        "title",
+        "name",
         "description",
         "repository",
         "author",

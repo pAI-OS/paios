@@ -13,7 +13,7 @@ info:
     name: MIT
 servers:
   - url: /api/v1
-    description: 'Local instance'
+    description: Local instance
 paths:
   /abilities:
     get:
@@ -498,8 +498,8 @@ paths:
                     description: The optional target directory for the downloaded file (default is 'downloads').
                   file_hash:
                     type: string
-                    description: The hash type and hash of the file separated by colon (e.g., md5, sha256).
-                    example: sha256:db32e79624c8f2627b051e46de7007a556a43c3e8ddf573214eab5d4fdabdadf
+                    description: 'The hash type and hash of the file separated by colon (e.g., md5, sha256).'
+                    example: 'sha256:db32e79624c8f2627b051e46de7007a556a43c3e8ddf573214eab5d4fdabdadf'
                     nullable: true
       responses:
         '200':
@@ -780,6 +780,27 @@ components:
         description:
           type: string
           example: Conversion of images to text
+        versions:
+          type: object
+          properties:
+            package:
+              type: string
+              example: '0.1.0'
+            product:
+              type: string
+              example: '0.2'
+            latest:
+              type: string
+              example: '0.1.1'
+            installed:
+              type: string
+              example: '0.1.0'
+              nullable: true
+            available:
+              type: array
+              items:
+                type: string
+              example: ['0.1.0', '0.2.0']
         author:
           type: object
           properties:
@@ -822,8 +843,8 @@ components:
               version:
                 type: string
                 example: '>=2.8'
-        latest_version:
-          type: string
+          x-stoplight:
+            id: 97skm0furiybt
         installed_version:
           type: string
           nullable: true
@@ -916,7 +937,7 @@ components:
         file_hash:
           type: string
           description: The hash type and hash of the file separated by colon
-          example: sha256:db32e79624c8f2627b051e46de7007a556a43c3e8ddf573214eab5d4fdabdadf
+          example: 'sha256:db32e79624c8f2627b051e46de7007a556a43c3e8ddf573214eab5d4fdabdadf'
         file_size:
           type: integer
           nullable: true

@@ -14,9 +14,7 @@ const StartStopButton = () => {
     const isStarted = Boolean(record.pid);
 
     const handleStartClick = (event: React.MouseEvent) => {
-        // prevent the click event propagating to the row and calling show
         event.stopPropagation();
-
         httpClient(`${apiBase}/abilities/${record.id}/start`, { method: 'POST' })
             .then(() => {
                 notify('Ability started');
@@ -28,9 +26,7 @@ const StartStopButton = () => {
     };
 
     const handleStopClick = (event: React.MouseEvent) => {
-        // prevent the click event propagating to the row and calling show
         event.stopPropagation();
-
         httpClient(`${apiBase}/abilities/${record.id}/stop`, { method: 'POST' })
             .then(() => {
                 notify('Ability stopped');
@@ -56,7 +52,7 @@ const StartStopButton = () => {
 
 const AbilityTitle = () => {
     const record = useRecordContext();
-    return <span>Abilities {record ? `- ${record.title} (${record.id})` : ""}</span>;
+    return <span>Abilities {record ? `- ${record.name} (${record.id})` : ""}</span>;
 };
 
 const abilityFilters = [
@@ -67,8 +63,10 @@ export const AbilityList = () => (
     <List filters={abilityFilters}>
         <Datagrid rowClick="show">
             <TextField source="id" label="Name" />
-            <TextField source="title" />
+            <TextField source="name" />
             <TextField source="description" />
+            <TextField source="versions.package" label="Package Version" />
+            <TextField source="versions.product" label="Product Version" />
             <StartStopButton />
             <ShowButton />
         </Datagrid>
@@ -79,12 +77,14 @@ export const AbilityShow = () => (
     <Show title={<AbilityTitle />}>
         <SimpleShowLayout>
             <WrapperField label="Ability">
-                <TextField source="title" /> (<TextField source="id" />)
+                <TextField source="name" /> (<TextField source="id" />)
             </WrapperField>
             <WrapperField label="Author">
                 <TextField source="author.name" />
             </WrapperField>
             <TextField source="description" />
+            <TextField source="versions.package" label="Package Version" />
+            <TextField source="versions.product" label="Product Version" />
             <WrapperField label="Dependencies">
                 <AbilityDependencies />
             </WrapperField>
@@ -94,22 +94,17 @@ export const AbilityShow = () => (
 
 interface Dependency {
     type: 'abilities' | 'container' | 'linux' | 'python' | 'resources';
-    // common properties
     name?: string;
     description?: string;
     version?: string;
     priority?: string;
-    // python dependencies
     extras?: string[];
-    // resource dependencies
     source_url?: string;
     file_name?: string;
     file_size?: number;
     file_hash?: string;
     hash_type?: string;
-    // linux dependencies
     packages?: object[];
-
 }
 
 export const AbilityDependencies = () => {

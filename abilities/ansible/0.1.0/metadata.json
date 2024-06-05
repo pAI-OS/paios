@@ -1,6 +1,10 @@
 {
     "id": "ansible",
-    "title": "Ansible",
+    "name": "Ansible",
+    "versions": {
+        "package": "0.1.0",
+        "product": "9"
+    },
     "description": "IT automation engine that automates provisioning, configuration management, application deployment, orchestration, and many other IT processes.",
     "author": {
         "name": "Ansible Project",

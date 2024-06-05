@@ -22,7 +22,7 @@ class AbilitiesManager:
         for ability_path in abilities_dir.iterdir():
             if ability_path.is_dir():
                 ability_name = ability_path.name
-                abilities[ability_name] = {'versions': {}, 'latest_version': None, 'installed_version': None}
+                abilities[ability_name] = {'versions': {}, 'latest': None, 'installed': None}
                 for version_dir in ability_path.iterdir():
                     if version_dir.is_dir() and semver_pattern.match(version_dir.name):
                         metadata_file = version_dir / 'metadata.json'
@@ -32,7 +32,10 @@ class AbilitiesManager:
                                 abilities[ability_name]['versions'][version_dir.name] = metadata
                 # Determine the latest version
                 if abilities[ability_name]['versions']:
-                    abilities[ability_name]['latest_version'] = max(abilities[ability_name]['versions'].keys(), key=lambda v: list(map(int, v.split('.'))))
+                    abilities[ability_name]['latest_version'] = max(
+                        abilities[ability_name]['versions'].keys(), 
+                        key=lambda v: list(map(int, v.split('.')))
+                    )
         return abilities
 
     def _load_installed_versions(self):
@@ -87,7 +90,7 @@ class AbilitiesManager:
         filtered_abilities = {}
         for ability_name, data in abilities.items():
             for version, metadata in data['versions'].items():
-                if query in metadata.get('title', '').lower() or query in metadata.get('description', '').lower():
+                if query in metadata.get('name', '').lower() or query in metadata.get('description', '').lower():
                     filtered_abilities[ability_name] = data
                     break
         return filtered_abilities

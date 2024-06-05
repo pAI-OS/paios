@@ -1,6 +1,10 @@
 {
     "id": "chroma",
-    "title": "Chroma embedding database",
+    "name": "Chroma embedding database",
+    "versions": {
+        "package": "0.1.0",
+        "product": "0.5"
+    },
     "description": "The open-source embedding database. The fastest way to build Python or JavaScript LLM apps with memory!",
     "author": {
         "name": "Chroma",

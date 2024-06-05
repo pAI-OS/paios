@@ -1,6 +1,10 @@
 {
     "id": "airllm",
-    "title": "AirLLM",
+    "name": "AirLLM",
+    "versions": {
+        "package": "0.1.0",
+        "product": "2.8"
+    },
     "description": "AirLLM optimizes inference memory usage, allowing 70B large language models to run inference on a single 4GB GPU card.",
     "author": {
         "name": "Gavin Li",
