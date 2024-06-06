@@ -78,6 +78,74 @@ const InstallButton = () => {
     ) : null;
 };
 
+const UninstallButton = () => {
+    const record = useRecordContext();
+    const notify = useNotify();
+    const refresh = useRefresh();
+
+    const handleUninstallClick = (event: React.MouseEvent) => {
+        event.stopPropagation();
+        httpClient(`${apiBase}/abilities/${record.id}/uninstall`, { method: 'POST' })
+            .then(() => {
+                notify('Ability uninstallation requested');
+                refresh();
+            })
+            .catch((e) => {
+                notify('Error: ability not uninstalled', { type: 'warning' });
+            });
+    };
+
+    const isInstalled = Boolean(record.versions.installed);
+
+    return isInstalled ? (
+        <Button label="Uninstall" onClick={handleUninstallClick}>
+            <StopIcon />
+        </Button>
+    ) : null;
+};
+
+const UpgradeButton = () => {
+    const record = useRecordContext();
+    const notify = useNotify();
+    const refresh = useRefresh();
+
+    const handleUpgradeClick = (event: React.MouseEvent) => {
+        event.stopPropagation();
+        const version = record.versions.latest; // or any logic to determine the version
+        httpClient(`${apiBase}/abilities/${record.id}/upgrade`, { method: 'POST', params: { version } })
+            .then(() => {
+                notify('Ability upgrade requested');
+                refresh();
+            })
+            .catch((e) => {
+                notify('Error: ability not upgraded', { type: 'warning' });
+            });
+    };
+
+    return (
+        <Button label="Upgrade" onClick={handleUpgradeClick}>
+            <InstallIcon />
+        </Button>
+    );
+};
+
+const InstallUninstallUpgradeButtons = () => {
+    const record = useRecordContext();
+    const isInstalled = Boolean(record.versions.installed);
+    const isUpgradable = isInstalled && record.versions.latest !== record.versions.installed;
+
+    if (isUpgradable) {
+        return (
+            <>
+                <UpgradeButton />
+                <UninstallButton />
+            </>
+        );
+    }
+
+    return isInstalled ? <UninstallButton /> : <InstallButton />;
+};
+
 const AbilityTitle = () => {
     const record = useRecordContext();
     return <span>Abilities {record ? `- ${record.name} (${record.id})` : ""}</span>;
@@ -96,7 +164,7 @@ export const AbilityList = () => (
             <TextField source="versions.package" label="Package Version" />
             <TextField source="versions.product" label="Product Version" />
             <ShowButton />
-            <InstallButton />
+            <InstallUninstallUpgradeButtons />
             <StartStopButton />
         </Datagrid>
     </List>
@@ -132,7 +200,6 @@ interface Dependency {
     file_name?: string;
     file_size?: number;
     file_hash?: string;
-    hash_type?: string;
     packages?: object[];
 }
 

@@ -67,7 +67,7 @@ paths:
       tags:
         - Abilities Management
       summary: Install ability
-      description: Installs the ability with the matching ability ID and an optional version.
+      description: Installs the ability with the matching ability id to the specified or latest version.
       operationId: backend.api.AbilitiesView.install
       parameters:
         - name: id
@@ -85,6 +85,54 @@ paths:
       responses:
         '200':
           description: Ability installed
+        '400':
+          description: Invalid request
+        '404':
+          description: Ability not found
+  '/abilities/{id}/upgrade':
+    post:
+      tags:
+        - Abilities Management
+      summary: Upgrade ability
+      description: Upgrades the ability with the matching ability id to the specified or latest version.
+      operationId: backend.api.AbilitiesView.upgrade
+      parameters:
+        - name: id
+          in: path
+          description: id of the ability
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          description: Version of the ability to upgrade to (optional)
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ability upgraded
+        '400':
+          description: Invalid request
+        '404':
+          description: Ability not found
+  '/abilities/{id}/uninstall':
+    post:
+      tags:
+        - Abilities Management
+      summary: Uninstall ability
+      description: Uninstalls the ability with the matching ability id.
+      operationId: backend.api.AbilitiesView.uninstall
+      parameters:
+        - name: id
+          in: path
+          description: id of the ability
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ability uninstalled
         '400':
           description: Invalid request
         '404':
@@ -811,22 +859,24 @@ components:
           properties:
             package:
               type: string
-              example: '0.1.0'
+              example: 0.1.0
             product:
               type: string
               example: '0.2'
             latest:
               type: string
-              example: '0.1.1'
+              example: 0.1.1
             installed:
               type: string
-              example: '0.1.0'
+              example: 0.1.0
               nullable: true
             available:
               type: array
               items:
                 type: string
-              example: ['0.1.0', '0.2.0']
+              example:
+                - 0.1.0
+                - 0.2.0
         author:
           type: object
           properties:

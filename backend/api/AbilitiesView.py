@@ -52,3 +52,13 @@ class AbilitiesView:
                 return JSONResponse(status_code=400, content={"message": "Installation failed"})
         except ValueError as e:
             return JSONResponse(status_code=400, content={"message": str(e)})
+
+    async def uninstall(self, id: str):
+        manager = AbilitiesManager()
+        try:
+            if manager.uninstall_ability(id):
+                return JSONResponse(status_code=200, content={"message": "Ability uninstalled"})
+            else:
+                return JSONResponse(status_code=400, content={"message": "Uninstallation failed"})
+        except ValueError as e:
+            return JSONResponse(status_code=400, content={"message": str(e)})

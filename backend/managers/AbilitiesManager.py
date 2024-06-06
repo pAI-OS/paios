@@ -1,6 +1,13 @@
 import json
 import re
 from backend.paths import abilities_dir
+from enum import Enum
+
+class AbilityState(Enum):
+    AVAILABLE = "available"
+    INSTALLING = "installing"
+    INSTALLED = "installed"
+    UNINSTALLING = "uninstalling"
 
 class AbilitiesManager:
     _instance = None
@@ -106,28 +113,72 @@ class AbilitiesManager:
         self._load_abilities()
 
     def install_ability(self, id, version=None):
-        # Create a lockfile to prevent multiple installations
-        installing_file = abilities_dir / id / "installing"
-        installed_file = abilities_dir / id / "installed"
-
-        if installing_file.exists():
-            raise ValueError("Installation failed: Another installation is already in progress")
-
+        print(f"Installing ability {id} version {version}")
         for ability in self.abilities:
             if ability['id'] == id:
                 if version is None:
                     version = ability['versions']['latest']
                 ability['versions']['installed'] = version
-                with open(installing_file, 'w') as file:
-                    file.write(version)
+                self._set_ability_state(id, AbilityState.INSTALLING, version)
                 try:
                     # TODO: Perform the installation process here
 
-                    # If successful, move the lockfile to "installed"
-                    installing_file.replace(installed_file)
+                    # If successful, set state to installed
+                    self._set_ability_state(id, AbilityState.INSTALLED)
                     return True
                 except Exception as e:
-                    # Clean up the installing file if installation fails
-                    installing_file.unlink(missing_ok=True)
+                    # Rollback state to available
+                    self._set_ability_state(id, AbilityState.INSTALLING, rollback=True)
                     raise ValueError(f"Installation failed: {e}")
         raise ValueError("Installation failed: Ability not found")
+
+    def uninstall_ability(self, id):
+        print(f"Uninstalling ability {id}")
+        for ability in self.abilities:
+            if ability['id'] == id:
+                self._set_ability_state(id, AbilityState.UNINSTALLING)
+                try:
+                    # TODO: Perform the uninstallation process here
+
+                    # If successful, set state to available
+                    self._set_ability_state(id, AbilityState.AVAILABLE)
+                    ability['versions']['installed'] = None
+                    return True
+                except Exception as e:
+                    # Rollback state to installed
+                    self._set_ability_state(id, AbilityState.UNINSTALLING, rollback=True)
+                    raise ValueError(f"Uninstallation failed: {e}")
+        raise ValueError("Uninstallation failed: Ability not found")
+
+    # Simple state machine using lock files to keep track of state for durability    
+    def _set_ability_state(self, id, state, version=None, rollback=False):
+        state_file = abilities_dir / id / state.value
+        if state in [AbilityState.INSTALLING, AbilityState.UNINSTALLING]:
+            if state_file.exists() and not rollback:
+                raise ValueError(f"Operation failed: Another {state.value} is already in progress")
+            with open(state_file, 'w') as file:
+                file.write(version or state.value)
+        elif state == AbilityState.INSTALLED:
+            installing_file = abilities_dir / id / AbilityState.INSTALLING.value
+            if installing_file.exists():
+                installing_file.replace(state_file)
+            else:
+                raise ValueError("Operation failed: No installing file found")
+        elif state == AbilityState.AVAILABLE:
+            uninstalling_file = abilities_dir / id / AbilityState.UNINSTALLING.value
+            if uninstalling_file.exists():
+                uninstalling_file.unlink()
+            else:
+                raise ValueError("Operation failed: No uninstalling file found")
+            
+            # Remove the installed file when setting state to available
+            installed_file = abilities_dir / id / AbilityState.INSTALLED.value
+            if installed_file.exists():
+                installed_file.unlink()
+        elif rollback:
+            if state == AbilityState.INSTALLING:
+                (abilities_dir / id / AbilityState.INSTALLING.value).unlink(missing_ok=True)
+            elif state == AbilityState.UNINSTALLING:
+                (abilities_dir / id / AbilityState.UNINSTALLING.value).replace(
+                    abilities_dir / id / AbilityState.INSTALLED.value
+                )
