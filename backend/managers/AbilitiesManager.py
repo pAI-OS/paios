@@ -24,7 +24,10 @@ class AbilitiesManager:
                 if version_to_load:
                     ability_data = self._fetch_ability_from_directory(ability_path, version_to_load)
                     if ability_data:
-                        ability_data['versions'] = versions_info
+                        if 'versions' in ability_data:
+                            ability_data['versions'].update(versions_info)
+                        else:
+                            ability_data['versions'] = versions_info
                         abilities.append(ability_data)
         return abilities
 
