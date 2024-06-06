@@ -42,3 +42,10 @@ class AbilitiesView:
             'Content-Range': f'abilities {offset}-{offset + len(abilities) - 1}/{total_count}'
         }
         return JSONResponse(abilities, status_code=200, headers=headers)
+
+    async def install(self, id: str, version: str = None):
+        manager = AbilitiesManager()
+        success = manager.install_ability(id, version)
+        if success:
+            return JSONResponse(status_code=200, content={"message": "Ability installed"})
+        return JSONResponse(status_code=404, content={"message": "Ability not found or installation failed"})

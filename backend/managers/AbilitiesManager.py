@@ -105,14 +105,15 @@ class AbilitiesManager:
     def refresh_abilities(self):
         self._load_abilities()
 
-    def install_ability(self, ability_id, version):
+    def install_ability(self, id, version=None):
         # Logic to install the ability
-        # Update the installed version in the abilities data structure
         for ability in self.abilities:
-            if ability['id'] == ability_id and ability['version'] == version:
+            if ability['id'] == id:
+                if version is None:
+                    version = ability['versions']['latest']
                 ability['versions']['installed'] = version
-                # Persist this information as needed
-
-                # Create an "installed" file in the ability's directory containing the version number of the installed package
-                with open(f'abilities/{ability_id}/installed', 'w') as file:
+                installed_file = abilities_dir / id / "installed"
+                with open(installed_file, 'w') as file:
                     file.write(version)
+                return True
+        return False

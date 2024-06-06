@@ -2,6 +2,7 @@ import { useNotify, useRefresh, useRecordContext, TabbedShowLayout, Tab } from "
 import { Button, List, Datagrid, TextField, WrapperField, Show, SimpleShowLayout, ShowButton, TextInput } from "react-admin";
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StopIcon from '@mui/icons-material/Stop';
+import InstallIcon from '@mui/icons-material/GetApp';
 import { apiBase, httpClient } from "./apiBackend";
 import { DebianDependency } from './dependencies/DebianDependency';
 import { PythonDependency } from './dependencies/PythonDependency';
@@ -50,6 +51,33 @@ const StartStopButton = () => {
     ));
 };
 
+const InstallButton = () => {
+    const record = useRecordContext();
+    const notify = useNotify();
+    const refresh = useRefresh();
+
+    const handleInstallClick = (event: React.MouseEvent) => {
+        event.stopPropagation();
+        const version = record.versions.latest; // or any logic to determine the version
+        httpClient(`${apiBase}/abilities/${record.id}/install`, { method: 'POST', params: { version } })
+            .then(() => {
+                notify('Ability installed');
+                refresh();
+            })
+            .catch((e) => {
+                notify('Error: ability not installed', { type: 'warning' });
+            });
+    };
+
+    const isInstalled = Boolean(record.versions.installed);
+
+    return !isInstalled ? (
+        <Button label="Install" onClick={handleInstallClick}>
+            <InstallIcon />
+        </Button>
+    ) : null;
+};
+
 const AbilityTitle = () => {
     const record = useRecordContext();
     return <span>Abilities {record ? `- ${record.name} (${record.id})` : ""}</span>;
@@ -68,6 +96,7 @@ export const AbilityList = () => (
             <TextField source="versions.package" label="Package Version" />
             <TextField source="versions.product" label="Product Version" />
             <ShowButton />
+            <InstallButton />
             <StartStopButton />
         </Datagrid>
     </List>
@@ -121,9 +150,27 @@ export const AbilityDependencies = () => {
 
     return (
         <TabbedShowLayout>
-            {debianDeps.length > 0 && (<Tab label="Debian"><DebianDependency dependencies={debianDeps} /></Tab>)}
-            {pythonDeps.length > 0 && (<Tab label="Python"><PythonDependency dependencies={pythonDeps} ability_id={String(record.id)} /></Tab>)}
-            {resourceDeps.length > 0 && (<Tab label="Resource"><ResourceDependency dependencies={resourceDeps} /></Tab>)}
-        </TabbedShowLayout>
+        {debianDeps.length > 0 && (
+            <Tab label="Debian Dependencies">
+                {debianDeps.map((dep, index) => (
+                    <DebianDependency key={index} dependency={dep} />
+                ))}
+            </Tab>
+        )}
+        {pythonDeps.length > 0 && (
+            <Tab label="Python Dependencies">
+                {pythonDeps.map((dep, index) => (
+                    <PythonDependency key={index} dependency={dep} />
+                ))}
+            </Tab>
+        )}
+        {resourceDeps.length > 0 && (
+            <Tab label="Resource Dependencies">
+                {resourceDeps.map((dep, index) => (
+                    <ResourceDependency key={index} dependency={dep} />
+                ))}
+            </Tab>
+        )}
+    </TabbedShowLayout>
     );
 };

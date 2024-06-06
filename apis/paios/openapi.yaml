@@ -62,6 +62,33 @@ paths:
         description: id of the ability
         in: path
         required: true
+  '/abilities/{id}/install':
+    post:
+      tags:
+        - Abilities Management
+      summary: Install ability
+      description: Installs the ability with the matching ability ID and an optional version.
+      operationId: backend.api.AbilitiesView.install
+      parameters:
+        - name: id
+          in: path
+          description: ID of the ability
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          description: Version of the ability to install (optional)
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ability installed
+        '400':
+          description: Invalid request
+        '404':
+          description: Ability not found
   '/abilities/{id}/start':
     post:
       tags:
@@ -126,7 +153,7 @@ paths:
     post:
       tags:
         - Abilities Management
-      summary: Start install
+      summary: Start dependency install
       description: Installs an ability's dependency.
       responses:
         '200':
@@ -248,7 +275,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Asset'
-      operationId: ''
       x-stoplight:
         id: y45hktoao8x1p
       description: Updates the asset with the given id.
