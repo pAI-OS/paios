@@ -1,8 +1,10 @@
 import json
 import re
+import os
+import signal
 from backend.paths import abilities_dir
 from enum import Enum
-import shutil
+from pathlib import Path
 
 class AbilityState(Enum):
     AVAILABLE = "available"
@@ -217,3 +219,73 @@ class AbilitiesManager:
                 (abilities_dir / id / AbilityState.UNINSTALLING.value).replace(abilities_dir / id / AbilityState.INSTALLED.value)
             else:
                 _invalid_state_transition()
+
+    def start_ability(self, ability_id):
+        import stat
+        import os
+        import sys
+        import subprocess
+        import shlex
+        from backend.paths import abilities_dir, abilities_data_dir, venv_bin_dir
+
+        print(f"Starting ability {ability_id}")
+        ability = self.get_ability(ability_id)
+        if ability is None:
+            return {"error": "Ability not found"}, 404
+
+        start_script = ability.get('scripts', {}).get('start', '')
+        if start_script is None:
+            return {"error": "Ability start script not set"}, 404
+
+        start_script_parts = shlex.split(start_script)
+
+        if start_script_parts is None:
+            return {"error": "Unable to determine start script executable"}, 500
+
+        search_paths = [abilities_dir / ability_id, abilities_data_dir / ability_id, venv_bin_dir]
+        script_found = False
+        for path in search_paths:
+            start_script_candidate = os.path.join(path, start_script_parts[0])
+            if os.path.exists(start_script_candidate):
+                start_script_cwd = path
+                start_script_parts[0] = start_script_candidate
+                script_found = True
+                break
+        if not script_found:
+            return {"error": f"Start script {start_script_parts[0]} not found in {search_paths}"}, 404
+
+        if os.name == "posix":
+            if not os.access(start_script_parts[0], os.X_OK):
+                current_permissions = stat.S_IMODE(os.lstat(start_script_parts[0]).st_mode)
+                try:
+                    os.chmod(start_script_parts[0], current_permissions | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+                except Exception as e:
+                    print(f"Warning: Failed to set execute bit on start script: {e}")
+
+        if start_script_parts[0].endswith('.py'):
+            python_executable = str(Path(sys.executable))
+            start_script_parts.insert(0, python_executable)
+
+        stdout_file_path = Path(start_script_cwd) / f"{ability_id}_stdout.log"
+        stderr_file_path = Path(start_script_cwd) / f"{ability_id}_stderr.log"
+
+        stdout_file = open(stdout_file_path, 'w')
+        stderr_file = open(stderr_file_path, 'w')
+
+        process = subprocess.Popen(start_script_parts, cwd=start_script_cwd, shell=False, stdout=stdout_file, stderr=stderr_file, text=True)
+        ability['pid'] = process.pid
+        return self.ok()
+
+    def stop_ability(self, ability_id):
+        ability = self.get_ability(ability_id)
+        if not ability:
+            return {"error": "Ability not found"}, 404
+        if 'pid' in ability:
+            try:
+                os.kill(ability['pid'], signal.SIGTERM)
+            except ProcessLookupError:
+                return {"error": "Ability not running"}, 404
+            del ability['pid']
+            return self.ok()
+        else:
+            return {"error": "Ability not running"}, 404

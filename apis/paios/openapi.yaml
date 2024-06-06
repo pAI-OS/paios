@@ -143,6 +143,7 @@ paths:
         - Abilities Management
       summary: Start ability
       description: Starts the ability with the matching ability ID.
+      operationId: backend.api.AbilitiesView.start
       responses:
         '200':
           description: OK
@@ -161,6 +162,7 @@ paths:
         - Abilities Management
       summary: Stop ability
       description: Stops the ability with the matching ability ID.
+      operationId: backend.api.AbilitiesView.stop
       responses:
         '200':
           description: OK
