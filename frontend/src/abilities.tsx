@@ -67,8 +67,8 @@ export const AbilityList = () => (
             <TextField source="description" />
             <TextField source="versions.package" label="Package Version" />
             <TextField source="versions.product" label="Product Version" />
-            <StartStopButton />
             <ShowButton />
+            <StartStopButton />
         </Datagrid>
     </List>
 );
