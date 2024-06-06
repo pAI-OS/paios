@@ -1,0 +1,33 @@
+{
+    "id": "llama_cpp",
+    "name": "llama.cpp",
+    "versions": {
+        "package": "0.1.0",
+        "product": "3091"
+    },
+    "description": "LLM inference in C/C++",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ggerganov/llama.cpp.git"
+      },
+    "author": {
+        "name": "ggml authors",
+        "url": "https://github.com/ggerganov/llama.cpp"
+    },
+    "maintainer": {
+        "name": "Sam Johnston",
+        "email": "samj@samj.net",
+        "url": "http://samjohnston.org"
+    },
+    "language": "c++",
+    "license": "MIT",
+    "dependencies": [
+        {
+            "type": "python",
+            "id": "fetch_llama_cpp",
+            "name": "fetch_llama_cpp",
+            "description": "Fetches the latest and best version of llama.cpp for your system.",
+            "version": ">=0.1.0"
+        }
+    ]
+}
