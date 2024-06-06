@@ -53,6 +53,16 @@ class AbilitiesView:
         except ValueError as e:
             return JSONResponse(status_code=400, content={"message": str(e)})
 
+    async def upgrade(self, id: str, version: str = None):
+        manager = AbilitiesManager()
+        try:
+            if manager.upgrade_ability(id, version):
+                return JSONResponse(status_code=200, content={"message": "Ability upgraded"})
+            else:
+                return JSONResponse(status_code=400, content={"message": "Upgrade failed"})
+        except ValueError as e:
+            return JSONResponse(status_code=400, content={"message": str(e)})
+
     async def uninstall(self, id: str):
         manager = AbilitiesManager()
         try:

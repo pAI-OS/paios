@@ -2,11 +2,13 @@ import json
 import re
 from backend.paths import abilities_dir
 from enum import Enum
+import shutil
 
 class AbilityState(Enum):
     AVAILABLE = "available"
     INSTALLING = "installing"
     INSTALLED = "installed"
+    UPGRADING = "upgrading"
     UNINSTALLING = "uninstalling"
 
 class AbilitiesManager:
@@ -119,66 +121,99 @@ class AbilitiesManager:
                 if version is None:
                     version = ability['versions']['latest']
                 ability['versions']['installed'] = version
-                self._set_ability_state(id, AbilityState.INSTALLING, version)
+                self._set_ability_state(id, AbilityState.AVAILABLE, AbilityState.INSTALLING, version)
                 try:
                     # TODO: Perform the installation process here
 
                     # If successful, set state to installed
-                    self._set_ability_state(id, AbilityState.INSTALLED)
+                    self._set_ability_state(id, AbilityState.INSTALLING, AbilityState.INSTALLED)
                     return True
                 except Exception as e:
                     # Rollback state to available
-                    self._set_ability_state(id, AbilityState.INSTALLING, rollback=True)
+                    self._set_ability_state(id, AbilityState.INSTALLING, AbilityState.AVAILABLE)
                     raise ValueError(f"Installation failed: {e}")
         raise ValueError("Installation failed: Ability not found")
+
+    def upgrade_ability(self, id, version=None):
+        print(f"Upgrading ability {id} to version {version}")
+        for ability in self.abilities:
+            if ability['id'] == id:
+                old_version = ability['versions']['installed']
+                if old_version == version:
+                    raise ValueError(f"Upgrade failed: Ability {id} is already at version {version}")
+                if version is None:
+                    version = ability['versions']['latest']
+                try:
+                    self._set_ability_state(id, AbilityState.INSTALLED, AbilityState.UPGRADING, version)
+                    # TODO: Perform the upgrade process here
+
+                    # If successful, set state to installed
+                    ability['versions']['installed'] = version
+                    self._set_ability_state(id, AbilityState.UPGRADING, AbilityState.INSTALLED)
+                    return True
+                except Exception as e:
+                    # Rollback state to previous version
+                    ability['versions']['installed'] = old_version
+                    self._set_ability_state(id, AbilityState.UPGRADING, AbilityState.INSTALLED, rollback=True)
+                    raise ValueError(f"Upgrade failed: {e}")
+        raise ValueError("Upgrade failed: Ability not found")
 
     def uninstall_ability(self, id):
         print(f"Uninstalling ability {id}")
         for ability in self.abilities:
             if ability['id'] == id:
-                self._set_ability_state(id, AbilityState.UNINSTALLING)
+                self._set_ability_state(id, AbilityState.INSTALLED, AbilityState.UNINSTALLING)
                 try:
                     # TODO: Perform the uninstallation process here
 
                     # If successful, set state to available
-                    self._set_ability_state(id, AbilityState.AVAILABLE)
+                    self._set_ability_state(id, AbilityState.UNINSTALLING, AbilityState.AVAILABLE)
                     ability['versions']['installed'] = None
                     return True
                 except Exception as e:
                     # Rollback state to installed
-                    self._set_ability_state(id, AbilityState.UNINSTALLING, rollback=True)
+                    self._set_ability_state(id, AbilityState.UNINSTALLING, AbilityState.INSTALLED)
                     raise ValueError(f"Uninstallation failed: {e}")
         raise ValueError("Uninstallation failed: Ability not found")
 
     # Simple state machine using lock files to keep track of state for durability    
-    def _set_ability_state(self, id, state, version=None, rollback=False):
-        state_file = abilities_dir / id / state.value
-        if state in [AbilityState.INSTALLING, AbilityState.UNINSTALLING]:
-            if state_file.exists() and not rollback:
-                raise ValueError(f"Operation failed: Another {state.value} is already in progress")
-            with open(state_file, 'w') as file:
-                file.write(version or state.value)
-        elif state == AbilityState.INSTALLED:
-            installing_file = abilities_dir / id / AbilityState.INSTALLING.value
-            if installing_file.exists():
-                installing_file.replace(state_file)
+    def _set_ability_state(self, id, old_state, new_state, version=None, rollback=False):
+        def _invalid_state_transition():
+            raise ValueError(f"Invalid state transition: {old_state}->{new_state}")
+
+        if old_state == AbilityState.AVAILABLE: # Not installed
+            if new_state == AbilityState.INSTALLING: # Install in progress
+                with open(abilities_dir / id / AbilityState.INSTALLING.value, 'w') as f:
+                    f.write(version)
             else:
-                raise ValueError("Operation failed: No installing file found")
-        elif state == AbilityState.AVAILABLE:
-            uninstalling_file = abilities_dir / id / AbilityState.UNINSTALLING.value
-            if uninstalling_file.exists():
-                uninstalling_file.unlink()
+                _invalid_state_transition()
+        elif old_state == AbilityState.INSTALLING:
+            if new_state == AbilityState.INSTALLED: # Successful install
+                (abilities_dir / id / AbilityState.INSTALLING.value).replace(abilities_dir / id / AbilityState.INSTALLED.value)
+            elif new_state == AbilityState.AVAILABLE: # Failed install (no need for rollback to disambiguate)
+                (abilities_dir / id / AbilityState.INSTALLING.value).unlink()
             else:
-                raise ValueError("Operation failed: No uninstalling file found")
-            
-            # Remove the installed file when setting state to available
-            installed_file = abilities_dir / id / AbilityState.INSTALLED.value
-            if installed_file.exists():
-                installed_file.unlink()
-        elif rollback:
-            if state == AbilityState.INSTALLING:
-                (abilities_dir / id / AbilityState.INSTALLING.value).unlink(missing_ok=True)
-            elif state == AbilityState.UNINSTALLING:
-                (abilities_dir / id / AbilityState.UNINSTALLING.value).replace(
-                    abilities_dir / id / AbilityState.INSTALLED.value
-                )
+                _invalid_state_transition()
+        elif old_state == AbilityState.INSTALLED:
+            if new_state == AbilityState.UPGRADING: # Upgrade in progress
+                with open(abilities_dir / id / AbilityState.UPGRADING.value, 'w') as f:
+                    f.write(version)
+            elif new_state == AbilityState.UNINSTALLING: # Uninstall in progress
+                (abilities_dir / id / AbilityState.INSTALLED.value).replace(abilities_dir / id / AbilityState.UNINSTALLING.value)
+            else:
+                _invalid_state_transition()
+        elif old_state == AbilityState.UPGRADING:
+            if new_state == AbilityState.INSTALLED:
+                if not rollback: # Successful upgrade
+                    (abilities_dir / id / AbilityState.UPGRADING.value).replace(abilities_dir / id / AbilityState.INSTALLED.value)
+                else: # Failed upgrade
+                    (abilities_dir / id / AbilityState.UPGRADING.value).unlink()
+            else:
+                _invalid_state_transition()
+        elif old_state == AbilityState.UNINSTALLING:
+            if new_state == AbilityState.AVAILABLE: # Successful uninstall
+                (abilities_dir / id / AbilityState.UNINSTALLING.value).unlink()
+            elif new_state == AbilityState.INSTALLED: # Unsuccessful uninstall
+                (abilities_dir / id / AbilityState.UNINSTALLING.value).replace(abilities_dir / id / AbilityState.INSTALLED.value)
+            else:
+                _invalid_state_transition()
