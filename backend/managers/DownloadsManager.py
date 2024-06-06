@@ -18,6 +18,7 @@ class DownloadStatus(Enum):
     COMPLETED = "completed"
     VERIFIED = "verified"
     FAILED = "failed"
+    TIMEOUT = "timeout"
     INVALID = "invalid"
 
 class DownloadsManager:
@@ -250,12 +251,13 @@ class DownloadsManager:
         except asyncio.CancelledError:
             # CancelledError is expected when the download is paused or about to be deleted
             return  # Ensure the function exits on cancellation
-        # TODO: Network issues appear to throw TimeoutError
-        # TODO: This may catch download errors and send them to the client instead of the logs
-        #except Exception as e:
-        #    download["status"] = DownloadStatus.FAILED
-        #    download["error"] = str(e)
-        #    raise
+        except asyncio.TimeoutError:
+            download["status"] = DownloadStatus.TIMEOUT
+            download["error"] = "Download timed out"
+        except Exception as e:
+            download["status"] = DownloadStatus.FAILED
+            download["error"] = str(e)
+            raise
 
     def _handle_task_exception(self, task, download):
         try:
