@@ -19,6 +19,7 @@ class DownloadStatus(Enum):
     VERIFIED = "verified"
     FAILED = "failed"
     TIMEOUT = "timeout"
+    CANCELLED = "cancelled"
     INVALID = "invalid"
 
 class DownloadsManager:
@@ -250,6 +251,8 @@ class DownloadsManager:
 
         except asyncio.CancelledError:
             # CancelledError is expected when the download is paused or about to be deleted
+            if download["status"] != DownloadStatus.PAUSED:
+                download["status"] = DownloadStatus.CANCELLED
             return  # Ensure the function exits on cancellation
         except asyncio.TimeoutError:
             download["status"] = DownloadStatus.TIMEOUT
@@ -305,8 +308,8 @@ class DownloadsManager:
 
     async def pause_download(self, id):
         if id in self.downloads and not self.downloads[id]["status"] == DownloadStatus.PAUSED:
-            self.downloads[id]["task"].cancel()
             self.downloads[id]["status"] = DownloadStatus.PAUSED
+            self.downloads[id]["task"].cancel()
             if "transfer_rate" in self.downloads[id]:
                 del self.downloads[id]["transfer_rate"]
             self.downloads[id]["start_byte"] = os.path.getsize(self.downloads[id]["file_path"])
