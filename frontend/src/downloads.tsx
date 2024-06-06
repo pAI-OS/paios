@@ -96,7 +96,7 @@ export const DownloadsList = () => {
         if (!hasError) {
             intervalId.current = setInterval(() => {
                 refreshWithErrorHandling();
-            }, 5000);
+            }, 2000);
         }
 
         return () => {
