@@ -1,6 +1,9 @@
 {
     "name": "my-ability",
-    "version": "1.0.0",
+    "versions": {
+        "package": "0.1.0",
+        "product": "0.2"
+    },
     "description": "A sample ability",
     "main": "main.py",
     "repository": {
