@@ -106,14 +106,28 @@ class AbilitiesManager:
         self._load_abilities()
 
     def install_ability(self, id, version=None):
-        # Logic to install the ability
+        # Create a lockfile to prevent multiple installations
+        installing_file = abilities_dir / id / "installing"
+        installed_file = abilities_dir / id / "installed"
+
+        if installing_file.exists():
+            raise ValueError("Installation failed: Another installation is already in progress")
+
         for ability in self.abilities:
             if ability['id'] == id:
                 if version is None:
                     version = ability['versions']['latest']
                 ability['versions']['installed'] = version
-                installed_file = abilities_dir / id / "installed"
-                with open(installed_file, 'w') as file:
+                with open(installing_file, 'w') as file:
                     file.write(version)
-                return True
-        return False
+                try:
+                    # TODO: Perform the installation process here
+
+                    # If successful, move the lockfile to "installed"
+                    installing_file.replace(installed_file)
+                    return True
+                except Exception as e:
+                    # Clean up the installing file if installation fails
+                    installing_file.unlink(missing_ok=True)
+                    raise ValueError(f"Installation failed: {e}")
+        raise ValueError("Installation failed: Ability not found")

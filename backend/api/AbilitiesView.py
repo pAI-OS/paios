@@ -45,7 +45,10 @@ class AbilitiesView:
 
     async def install(self, id: str, version: str = None):
         manager = AbilitiesManager()
-        success = manager.install_ability(id, version)
-        if success:
-            return JSONResponse(status_code=200, content={"message": "Ability installed"})
-        return JSONResponse(status_code=404, content={"message": "Ability not found or installation failed"})
+        try:
+            if manager.install_ability(id, version):
+                return JSONResponse(status_code=200, content={"message": "Ability installed"})
+            else:
+                return JSONResponse(status_code=400, content={"message": "Installation failed"})
+        except ValueError as e:
+            return JSONResponse(status_code=400, content={"message": str(e)})

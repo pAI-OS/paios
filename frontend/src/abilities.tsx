@@ -61,7 +61,7 @@ const InstallButton = () => {
         const version = record.versions.latest; // or any logic to determine the version
         httpClient(`${apiBase}/abilities/${record.id}/install`, { method: 'POST', params: { version } })
             .then(() => {
-                notify('Ability installed');
+                notify('Ability installation requested');
                 refresh();
             })
             .catch((e) => {
@@ -150,27 +150,9 @@ export const AbilityDependencies = () => {
 
     return (
         <TabbedShowLayout>
-        {debianDeps.length > 0 && (
-            <Tab label="Debian Dependencies">
-                {debianDeps.map((dep, index) => (
-                    <DebianDependency key={index} dependency={dep} />
-                ))}
-            </Tab>
-        )}
-        {pythonDeps.length > 0 && (
-            <Tab label="Python Dependencies">
-                {pythonDeps.map((dep, index) => (
-                    <PythonDependency key={index} dependency={dep} />
-                ))}
-            </Tab>
-        )}
-        {resourceDeps.length > 0 && (
-            <Tab label="Resource Dependencies">
-                {resourceDeps.map((dep, index) => (
-                    <ResourceDependency key={index} dependency={dep} />
-                ))}
-            </Tab>
-        )}
-    </TabbedShowLayout>
+            {debianDeps.length > 0 && (<Tab label="Debian"><DebianDependency dependencies={debianDeps} /></Tab>)}
+            {pythonDeps.length > 0 && (<Tab label="Python"><PythonDependency dependencies={pythonDeps} ability_id={String(record.id)} /></Tab>)}
+            {resourceDeps.length > 0 && (<Tab label="Resource"><ResourceDependency dependencies={resourceDeps} /></Tab>)}
+        </TabbedShowLayout>
     );
 };
