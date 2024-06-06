@@ -3,6 +3,8 @@ import { Button, List, Datagrid, TextField, WrapperField, Show, SimpleShowLayout
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import StopIcon from '@mui/icons-material/Stop';
 import InstallIcon from '@mui/icons-material/GetApp';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
+import UpgradeIcon from '@mui/icons-material/Upgrade';
 import { apiBase, httpClient } from "./apiBackend";
 import { DebianDependency } from './dependencies/DebianDependency';
 import { PythonDependency } from './dependencies/PythonDependency';
@@ -99,7 +101,7 @@ const UninstallButton = () => {
 
     return isInstalled ? (
         <Button label="Uninstall" onClick={handleUninstallClick}>
-            <StopIcon />
+            <HighlightOffIcon />
         </Button>
     ) : null;
 };
@@ -124,7 +126,7 @@ const UpgradeButton = () => {
 
     return (
         <Button label="Upgrade" onClick={handleUpgradeClick}>
-            <InstallIcon />
+            <UpgradeIcon />
         </Button>
     );
 };
