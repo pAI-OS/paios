@@ -3,11 +3,13 @@ import { Button, Datagrid, TextField, useRecordContext, useNotify, useRefresh } 
 import DownloadIcon from '@mui/icons-material/Download';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { apiBase, httpClient } from "../apiBackend";
+import { useNavigate } from 'react-router-dom';
 
 const DownloadButton = ({ ability_id }: { ability_id: string }) => {
     const record = useRecordContext();
     const notify = useNotify();
     const refresh = useRefresh();
+    const navigate = useNavigate();
     const [isDownloading, setIsDownloading] = useState(false);
 
     const handleDownloadClick = (event: React.MouseEvent) => {
@@ -31,6 +33,7 @@ const DownloadButton = ({ ability_id }: { ability_id: string }) => {
             .then(() => {
                 notify('Download started');
                 refresh();
+                navigate('/downloads'); // Redirect to the downloads page
             })
             .catch((e) => {
                 notify(e.body.message, { type: 'warning' });
