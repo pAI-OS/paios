@@ -37,8 +37,6 @@ class AbilitiesManager:
         if metadata_file.exists():
             with open(metadata_file, 'r') as f:
                 metadata = json.load(f)
-                metadata['id'] = ability_path.name
-                metadata['version'] = version
                 return metadata
         return None
 
