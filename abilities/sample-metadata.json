@@ -1,5 +1,5 @@
 {
-    "name": "my-ability",
+    "id": "my_ability",
     "versions": {
         "package": "0.1.0",
         "product": "0.2"
