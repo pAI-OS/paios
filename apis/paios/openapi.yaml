@@ -60,7 +60,7 @@ paths:
       description: Installs the ability with the matching ability id to the specified or latest version.
       operationId: backend.api.AbilitiesView.install
       parameters:
-        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/snake_id'
         - $ref: '#/components/parameters/versionOptional'
       responses:
         '200':
@@ -732,6 +732,7 @@ components:
               $ref: '#/components/schemas/semVer'
             installed:
               $ref: '#/components/schemas/semVer'
+              nullable: true
             available:
               type: array
               items:
