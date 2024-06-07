@@ -363,13 +363,6 @@ paths:
       summary: Retrieve all downloads
       description: Retrieve the information of all downloads.
       parameters:
-        - name: limit
-          in: query
-          description: Limit the number of downloads returned
-          required: false
-          schema:
-            type: integer
-            default: 100
         - $ref: '#/components/parameters/sort'
         - $ref: '#/components/parameters/range'
         - $ref: '#/components/parameters/filter'
