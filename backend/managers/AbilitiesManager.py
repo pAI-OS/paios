@@ -6,7 +6,10 @@ from backend.paths import abilities_dir
 from backend.utils import remove_null_fields
 from enum import Enum
 from pathlib import Path
-from backend.dependencies.DependencyFactory import DependencyFactory
+from backend.dependencies.PythonDependency import PythonDependency
+from backend.dependencies.ResourceDependency import ResourceDependency
+from backend.dependencies.LinuxDependency import LinuxDependency
+from backend.dependencies.ContainerDependency import ContainerDependency
 
 class AbilityState(Enum):
     AVAILABLE = "available"
@@ -22,7 +25,16 @@ class AbilitiesManager:
         if not cls._instance:
             cls._instance = super(AbilitiesManager, cls).__new__(cls, *args, **kwargs)
             cls._instance._load_abilities()
+            cls._instance._initialize_dependency_managers()
         return cls._instance
+
+    def _initialize_dependency_managers(self):
+        self.dependency_managers = {
+            'python': PythonDependency,
+            'resource': ResourceDependency,
+            'linux': LinuxDependency,
+            'container': ContainerDependency
+        }
 
     def _load_abilities(self):
         self.abilities = self._fetch_abilities_from_directory()
@@ -31,7 +43,6 @@ class AbilitiesManager:
         abilities = []
         for ability_path in abilities_dir.iterdir():
             if ability_path.is_dir():
-                #ability_id = ability_path.name
                 versions_info = self._get_versions_info(ability_path)
                 version_to_load = versions_info.get('installed') or versions_info.get('latest')
                 if version_to_load:
@@ -87,7 +98,10 @@ class AbilitiesManager:
     def _refresh_dependencies(self, ability):
         dependencies = ability.get('dependencies', [])
         for dependency in dependencies:
-            DependencyFactory.create_dependency(ability, dependency).refresh_status()
+            dependency_manager = self.dependency_managers.get(dependency.get('type'))
+            if dependency_manager:
+                dependency_instance = dependency_manager(ability, dependency)
+                dependency_instance.refresh_status()
 
     def retrieve_abilities(self, offset=0, limit=100, sort_by=None, sort_order='asc', filters=None, query=None):
         filtered_abilities = self._apply_filters(self.abilities, filters)
@@ -305,3 +319,24 @@ class AbilitiesManager:
             return self.ok()
         else:
             return {"error": "Ability not running"}, 404
+
+    def install_dependency(self, ability_id, dependency_id):
+        ability = self.get_ability(ability_id)
+        if not ability:
+            raise ValueError("Ability not found")
+
+        dependency_data = next((dep for dep in ability.get('dependencies', []) if dep['id'] == dependency_id), None)
+        if not dependency_data:
+            raise ValueError("Dependency not found")
+
+        dependency_type = dependency_data.get('type')
+        dependency_manager_class = self.dependency_managers.get(dependency_type)
+        if not dependency_manager_class:
+            raise ValueError(f"Unsupported dependency type: {dependency_type}")
+
+        dependency_manager = dependency_manager_class(ability, dependency_data)
+        try:
+            result, status_code = dependency_manager.install()
+            return result, status_code
+        except Exception as e:
+            raise ValueError(f"Installation failed: {e}")
