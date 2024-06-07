@@ -7,13 +7,7 @@ from backend.paths import abilities_dir
 from backend.utils import remove_null_fields
 from enum import Enum
 from pathlib import Path
-from backend.dependencies.PythonDependency import PythonDependency
-from backend.dependencies.ResourceDependency import ResourceDependency
-from backend.dependencies.LinuxDependency import LinuxDependency
-from backend.dependencies.ContainerDependency import ContainerDependency
-
-import logging
-logger = logging.getLogger(__name__)
+from backend.dependencies.DependencyFactory import DependencyFactory
 
 class AbilityState(Enum):
     AVAILABLE = "available"
@@ -54,6 +48,7 @@ class AbilitiesManager:
         abilities = []
         for ability_path in abilities_dir.iterdir():
             if ability_path.is_dir():
+                #ability_id = ability_path.name
                 versions_info = self._get_versions_info(ability_path)
                 version_to_load = versions_info.get('installed') or versions_info.get('latest')
                 if version_to_load:
@@ -96,22 +91,18 @@ class AbilitiesManager:
         if installed_version:
             versions_info['installed'] = installed_version
 
-        return versions_info
-
     def get_ability(self, id, version=None, refresh=True):
         for ability in self.abilities:
             if ability.get('id') == id and (version is None or ability.get('version') == version):
                 if refresh:
                     self._refresh_dependencies(ability)
-                return remove_null_fields(ability)
+                return ability
         return None
 
     def _refresh_dependencies(self, ability):
         dependencies = ability.get('dependencies', [])
         for dependency in dependencies:
-            dependency_manager = self.dependency_managers.get(dependency.get('type'))
-            if dependency_manager:
-                dependency_manager.refresh_status(ability, dependency)
+            DependencyFactory.create_dependency(ability, dependency).refresh_status()
 
     def retrieve_abilities(self, offset=0, limit=100, sort_by=None, sort_order='asc', filters=None, query=None):
         filtered_abilities = self._apply_filters(self.abilities, filters)

@@ -9,14 +9,8 @@ class LinuxDependency(Dependency):
         #result = subprocess.run(['dpkg', '-s', package_name], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         #self.dependency['status'] = result.returncode == 0
 
-    def start(self, ability, dependency):
-        # Implementation for starting the dependency
+    def start(self):
         pass
 
-    def stop(self, ability, dependency):
-        # Implementation for stopping the dependency
+    def stop(self):
         pass
-
-    async def install(self, ability, dependency):
-        # Placeholder implementation for installing the dependency
-        return {"message": "Dependency installation not yet implemented"}
