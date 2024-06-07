@@ -268,30 +268,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - title
-              properties:
-                user_id:
-                  type: string
-                  x-stoplight:
-                    id: tcrecsxwclhod
-                title:
-                  type: string
-                  x-stoplight:
-                    id: ewm2l63kcoemr
-                creator:
-                  type: string
-                  x-stoplight:
-                    id: z31hnyze67lcw
-                subject:
-                  type: string
-                  x-stoplight:
-                    id: wpa1675fg6r1s
-                description:
-                  type: string
-                  x-stoplight:
-                    id: fth78lwtn3nw3
+                $ref: '#/components/schemas/AssetCreate'
   '/assets/{id}':
     get:
       tags:
@@ -884,26 +861,34 @@ components:
           properties:
             name:
               type: string
+              example: Mozilla
             url:
               type: string
+              example: https://mozilla.org
         maintainer:
           type: object
           properties:
             name:
               type: string
+              example: Sam Johnston
             email:
               type: string
+              example: samj@samj.net
             url:
               type: string
+              example: https://samjohnston.org
         language:
           type: string
+          example: python
         scripts:
           type: object
           properties:
             start:
               type: string
+              example: chroma run
         license:
           type: string
+          example: MIT
         dependencies:
           type: array
           items:
@@ -923,9 +908,6 @@ components:
                 example: '>=2.8'
           x-stoplight:
             id: 97skm0furiybt
-        installed_version:
-          type: string
-          nullable: true
     Asset:
       type: object
       title: Asset
@@ -933,27 +915,50 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
           example: abf83ff3-3b8c-4e52-b378-4a6ad4aca448
         user_id:
           type: string
           format: uuid
           example: a9cab4c3-65d3-4871-83b9-165b2e9d5947
-          nullable: true
         title:
           type: string
           example: Attention Is All You Need
         creator:
           type: string
           example: Ashish Vaswani et al
-          nullable: true
         subject:
           type: string
           example: Artificial Intelligence
-          nullable: true
         description:
           type: string
           example: 'We propose a new simple network architecture, the Transformer...'
-          nullable: true
+      required:
+        - id
+        - title
+    AssetCreate:
+      type: object
+      title: AssetCreate
+      description: Asset without id which is server-generated.
+      properties:
+        user_id:
+          type: string
+          format: uuid
+          example: a9cab4c3-65d3-4871-83b9-165b2e9d5947
+        title:
+          type: string
+          example: Attention Is All You Need
+        creator:
+          type: string
+          example: Ashish Vaswani et al
+        subject:
+          type: string
+          example: Artificial Intelligence
+        description:
+          type: string
+          example: 'We propose a new simple network architecture, the Transformer...'
+      required:
+        - title
     Channel:
       type: object
       title: Channel
