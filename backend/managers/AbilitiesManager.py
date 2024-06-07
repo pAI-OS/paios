@@ -3,6 +3,7 @@ import re
 import os
 import signal
 from backend.paths import abilities_dir
+from backend.utils import remove_null_fields
 from enum import Enum
 from pathlib import Path
 
@@ -31,7 +32,7 @@ class AbilitiesManager:
             if ability_path.is_dir():
                 ability_id = ability_path.name
                 versions_info = self._get_versions_info(ability_path)
-                version_to_load = versions_info['installed'] or versions_info['latest']
+                version_to_load = versions_info.get('installed') or versions_info.get('latest')
                 if version_to_load:
                     ability_data = self._fetch_ability_from_directory(ability_path, version_to_load)
                     if ability_data:
@@ -64,16 +65,20 @@ class AbilitiesManager:
                     installed_version = f.read().strip()
 
         latest_version = max(versions, key=lambda v: list(map(int, v.split('.'))), default=None)
-        return {
+
+        versions_info = {
             'available': versions,
             'latest': latest_version,
-            'installed': installed_version
         }
+        if installed_version:
+            versions_info['installed'] = installed_version
+
+        return versions_info
 
     def get_ability(self, id, version=None):
         for ability in self.abilities:
             if ability.get('id') == id and (version is None or ability.get('version') == version):
-                return ability
+                return remove_null_fields(ability)
         return None
 
     def retrieve_abilities(self, offset=0, limit=100, sort_by=None, sort_order='asc', filters=None, query=None):
@@ -83,7 +88,10 @@ class AbilitiesManager:
         sorted_abilities = self._apply_sorting(filtered_abilities, sort_by, sort_order)
         total_count = len(sorted_abilities)
         paginated_abilities = sorted_abilities[offset:offset + limit]
-        
+
+        # Apply remove_null_fields to each ability in the paginated list
+        paginated_abilities = [remove_null_fields(ability) for ability in paginated_abilities]
+
         return paginated_abilities, total_count
 
     def _apply_filters(self, abilities, filters):

@@ -9,6 +9,7 @@ from enum import Enum
 from pathlib import Path
 from urllib.parse import urlparse
 from backend.paths import data_dir, downloads_dir
+from backend.utils import filter_dict, remove_null_fields
 import time
 
 class DownloadStatus(Enum):
@@ -71,9 +72,10 @@ class DownloadsManager:
             else:
                 keys_to_include = ["id", "source_url", "file_name", "file_hash", "file_size", "target_directory", "downloaded", "progress", "start_time", "finish_time", "transfer_rate"]
                 download["transfer_rate"] = self._calculate_transfer_rate(download)
-                filtered_dict = {k: download[k] for k in keys_to_include if k in download and download[k] is not None}
+                filtered_dict = filter_dict(download, keys_to_include)
                 filtered_dict["id"] = id
                 filtered_dict["status"] = download["status"].value
+                filtered_dict = remove_null_fields(filtered_dict)
                 all_downloads.append(filtered_dict)
 
         total_count = len(all_downloads)
