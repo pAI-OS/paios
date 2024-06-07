@@ -23,7 +23,7 @@
             "id": "ansible",
             "name": "Ansible",
             "versions": {
-                "required": ">=9.0.0"
+                "specifiers": ">=9.0.0"
             }
         }
     ]
