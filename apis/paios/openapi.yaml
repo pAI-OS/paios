@@ -202,7 +202,7 @@ paths:
         content:
           application/json:
             schema:
-                $ref: '#/components/schemas/AssetCreate'
+              $ref: '#/components/schemas/AssetCreate'
   '/assets/{id}':
     get:
       tags:
@@ -252,7 +252,7 @@ paths:
       x-stoplight:
         id: qzbqf3cyubxfh
     parameters:
-      - $ref: '#/components/parameters/abilityId'
+      - $ref: '#/components/parameters/id'
   /channels:
     get:
       tags:
@@ -347,12 +347,7 @@ paths:
       summary: Retrieve config by key
       description: Retrieve the config item with the specified key.
       parameters:
-        - name: key
-          in: path
-          description: Key for Config item
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/key'
       responses:
         '200':
           description: OK
@@ -368,12 +363,7 @@ paths:
       summary: Update config by key
       description: Set a config item with the specified key.
       parameters:
-        - name: key
-          in: path
-          description: Key for Config item
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/key'
       requestBody:
         content:
           application/json:
@@ -388,12 +378,7 @@ paths:
       summary: Delete config by key
       description: Delete a config item with the specified key.
       parameters:
-        - name: key
-          in: path
-          description: Key for Config item
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/key'
       responses:
         '204':
           description: No Content
@@ -445,6 +430,7 @@ paths:
                 properties:
                   source_url:
                     type: string
+                    format: uri
                     description: The URL of the file to download.
                   file_name:
                     type: string
@@ -478,12 +464,7 @@ paths:
       summary: Delete download
       description: Deletes the download with the specified ID and removes the file.
       parameters:
-        - name: id
-          in: path
-          description: ID of the download
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/id'
       responses:
         '204':
           description: No Content
@@ -499,12 +480,7 @@ paths:
       description: Pauses the download with the specified ID.
       operationId: backend.api.DownloadsView.pause
       parameters:
-        - name: id
-          in: path
-          description: ID of the download
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/id'
       responses:
         '200':
           description: Download paused
@@ -518,12 +494,7 @@ paths:
       description: Resumes the download with the specified ID.
       operationId: backend.api.DownloadsView.resume
       parameters:
-        - name: id
-          in: path
-          description: ID of the download
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/id'
       responses:
         '200':
           description: Download resumed
@@ -563,15 +534,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required:
-                - name
-                - email
-              properties:
-                name:
-                  type: string
-                email:
-                  type: string
+              $ref: '#/components/schemas/UserCreate'
       responses:
         '201':
           description: User Created
@@ -594,13 +557,7 @@ paths:
       summary: Retrieve user by id
       description: Retrieve the information of the user with the matching user ID.
       parameters:
-        - name: id
-          in: path
-          description: UUID of user
-          required: true
-          schema:
-            type: string
-            format: uuid
+        - $ref: '#/components/parameters/id'
       responses:
         '200':
           description: User Found
@@ -618,13 +575,7 @@ paths:
       summary: Delete user by id
       description: Delete the user with the specified id
       parameters:
-        - name: id
-          in: path
-          description: UUID of user
-          required: true
-          schema:
-            type: string
-            format: uuid
+        - $ref: '#/components/parameters/id'
       responses:
         '204':
           description: No Content
@@ -638,31 +589,13 @@ paths:
       summary: Update user
       description: Update the information of an existing user.
       parameters:
-        - name: id
-          in: path
-          description: id of user
-          required: true
-          schema:
-            type: string
-            format: uuid
+        - $ref: '#/components/parameters/id'
       requestBody:
         description: User to update.
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                email:
-                  type: string
-            examples:
-              Update Name:
-                value:
-                  name: Rebecca Baker
-              Update Email:
-                value:
-                  email: rebecca.baker@example.com
+              $ref: '#/components/schemas/UserCreate'
       responses:
         '200':
           description: User Updated
@@ -703,8 +636,7 @@ components:
       description: id of the object
       required: true
       schema:
-        type: string
-        format: uuid
+        $ref: '#/components/schemas/uuid4'
     abilityId:
       name: id
       in: path
@@ -712,6 +644,7 @@ components:
       required: true
       schema:
         type: string
+        example: llama_cpp
         pattern: '^[a-z0-9]+(_[a-z0-9]+)*$'
     dependencyId:
       name: dependency_id
@@ -720,23 +653,31 @@ components:
       required: true
       schema:
         type: string
+        example: fetch_llama_cpp
         pattern: '^[a-z0-9]+(_[a-z0-9]+)*$'
+    key:
+      name: key
+      in: path
+      description: key for config item
+      required: true
+      schema:
+        type: string
+        example: api_key
+        pattern: '^[a-zA-Z0-9_]+$'
     versionOptional:
       name: version
       in: query
       description: Semantic version of the object
       required: false
       schema:
-        type: string
-        pattern: '^(0|[1-9]\d+)\.(0|[1-9]\d+)\.(0|[1-9]\d+)$'
+        $ref: '#/components/schemas/semVer'
     versionRequired:
       name: version
       in: query
       description: Semantic version of the object
       required: true
       schema:
-        type: string
-        pattern: '^(0|[1-9]\d+)\.(0|[1-9]\d+)\.(0|[1-9]\d+)$'
+        $ref: '#/components/schemas/semVer'
     sort:
       name: sort
       in: query
@@ -762,6 +703,35 @@ components:
         type: string
         example: '{"title":"bar"}'
   schemas:
+    semVer:
+      type: string
+      example: '1.1.0'
+      pattern: '^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$'
+    uuid4:
+      type: string
+      format: uuid
+      example: 7bea4732-214f-40e7-9161-4e7241a2b97e
+      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+    uuid4ReadOnly:
+      type: string
+      format: uuid
+      readOnly: true
+      example: 7bea4732-214f-40e7-9161-4e7241a2b97e
+      pattern: ^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$
+    uri:
+      type: string
+      format: uri
+      example: 'https://localhost:8080/v1/api'
+      pattern: ^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?$
+    email:
+      type: string
+      format: email
+      example: contact@kwaai.ai
+      pattern: (?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])
+    name:
+      type: string
+      example: Kwaai
+      pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
     Ability:
       type: object
       title: Ability
@@ -769,60 +739,62 @@ components:
       properties:
         id:
           type: string
-          pattern: '^[a-z0-9]+(_[a-z0-9]+)*$'
           minLength: 2
           maxLength: 100
           example: optical_character_recognition
+          pattern: ^[a-z0-9]+(_[a-z0-9]+)*$
         name:
           type: string
           example: Optical Character Recognition
+          pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
         description:
           type: string
           example: Conversion of images to text
+          pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
         versions:
           type: object
           properties:
             package:
               type: string
-              example: 0.1.0
+              example: '0.1.0'
+              pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$
             product:
               type: string
-              example: '0.2'
+              example: '0.2beta3'
+              pattern: ^\d+(\.\d+)*([a-zA-Z0-9]+)?$|^[rb]\d+$|^\d+:\d+(\.\d+)*-\d+[a-zA-Z0-9]+
             latest:
               type: string
-              example: 0.1.1
+              example: '0.1.1'
+              pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$
             installed:
               type: string
-              example: 0.1.0
+              example: '0.1.0'
+              pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$
               nullable: true
             available:
               type: array
               items:
                 type: string
+                pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$
               example:
-                - 0.1.0
-                - 0.2.0
+                - '0.1.0'
+                - '0.2.0'
         author:
           type: object
           properties:
             name:
-              type: string
-              example: Mozilla
+              $ref: '#/components/schemas/name'
             url:
-              type: string
-              example: https://mozilla.org
+              $ref: '#/components/schemas/uri'
         maintainer:
           type: object
           properties:
             name:
-              type: string
-              example: Sam Johnston
+              $ref: '#/components/schemas/name'
             email:
-              type: string
-              example: samj@samj.net
+              $ref: '#/components/schemas/email'
             url:
-              type: string
-              example: https://samjohnston.org
+              $ref: '#/components/schemas/uri'
         language:
           type: string
           example: python
@@ -859,26 +831,25 @@ components:
       title: Asset
       properties:
         id:
-          type: string
-          format: uuid
-          readOnly: true
-          example: abf83ff3-3b8c-4e52-b378-4a6ad4aca448
+          $ref: '#/components/schemas/uuid4ReadOnly'
         user_id:
-          type: string
-          format: uuid
-          example: a9cab4c3-65d3-4871-83b9-165b2e9d5947
+          $ref: '#/components/schemas/uuid4'
         title:
           type: string
           example: Attention Is All You Need
+          pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
         creator:
           type: string
           example: Ashish Vaswani et al
+          pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
         subject:
           type: string
           example: Artificial Intelligence
+          pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
         description:
           type: string
-          example: 'We propose a new simple network architecture, the Transformer...'
+          example: We propose a new simple network architecture, the Transformer...
+          pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
       required:
         - id
         - title
@@ -888,21 +859,23 @@ components:
       description: Asset without id which is server-generated.
       properties:
         user_id:
-          type: string
-          format: uuid
-          example: a9cab4c3-65d3-4871-83b9-165b2e9d5947
+          $ref: '#/components/schemas/uuid4'
         title:
           type: string
           example: Attention Is All You Need
+          pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
         creator:
           type: string
           example: Ashish Vaswani et al
+          pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
         subject:
           type: string
           example: Artificial Intelligence
+          pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
         description:
           type: string
-          example: 'We propose a new simple network architecture, the Transformer...'
+          example: We propose a new simple network architecture, the Transformer...
+          pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
       required:
         - title
     Channel:
@@ -911,18 +884,13 @@ components:
       description: Channels (input/output)
       properties:
         id:
-          type: string
-          format: uuid
-          readOnly: true
-          example: cb48173b-1db5-40e7-8373-00bb217bdb98
+          $ref: '#/components/schemas/uuid4ReadOnly'
         name:
           type: string
           example: LLM API
-          example: "^[A-Za-z0-9\\s\\-_,.;:()!@#$%&*+=?\\/\\\\|~^'\"\\[\\]{}áéíóúñ©€£¥]+$"
+          pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
         uri:
-          type: string
-          example: 'https://localhost:8080/v1/api'
-          pattern: '^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?$'
+          $ref: '#/components/schemas/uri'
       required:
         - id
         - name
@@ -935,11 +903,9 @@ components:
         name:
           type: string
           example: LLM API
-          pattern: "^[A-Za-z0-9\\s\\-_,.;:()!@#$%&*+=?\\/\\\\|~^'\"\\[\\]{}áéíóúñ©€£¥]+$"
+          pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
         uri:
-          type: string
-          example: 'https://localhost:8080/v1/api'
-          pattern: '^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?$'
+          $ref: '#/components/schemas/uri'
       required:
         - name
         - uri
@@ -949,14 +915,16 @@ components:
       properties:
         key:
           type: string
-          description: The key for the config item.
-          example: example_key
+          description: key for the config item.
+          example: api_key
+          pattern: '^[a-zA-Z0-9_]+$'
         value:
           anyOf:
+            - type: string
+              example: api-pk-1aEN2XGPUEKxMCcTsUZXFVEUu9GbtAjTEVc16dZBVxjfHeZACKO86vTRX
             - type: boolean
             - type: integer
             - type: number
-            - type: string
             - type: object
             - type: array
               items:
@@ -972,13 +940,9 @@ components:
       type: object
       properties:
         id:
-          type: string
-          description: Unique identifier for the given download.
-          format: uuid
-          example: e2b55b15-4080-41b2-bbbf-cbac0a282880
+          $ref: '#/components/schemas/uuid4ReadOnly'
         source_url:
-          type: string
-          example: 'https://releases.ubuntu.com/24.04/ubuntu-24.04-desktop-amd64.iso'
+          $ref: '#/components/schemas/uri'
         file_name:
           type: string
           nullable: true
@@ -991,6 +955,7 @@ components:
           type: string
           description: The hash type and hash of the file separated by colon
           example: 'sha256:db32e79624c8f2627b051e46de7007a556a43c3e8ddf573214eab5d4fdabdadf'
+          pattern: ^[a-z0-9]+:[a-f0-9]{1,128}$
         file_size:
           type: integer
           nullable: true
@@ -1027,21 +992,27 @@ components:
     User:
       type: object
       title: User
-      description: pAI-OS users
+      description: User of the system
       properties:
         id:
-          type: string
-          description: Unique identifier for the given user.
-          format: uuid
-          example: 7ea85f9e-0c5f-450c-9b6d-3cb7a42f5242
+          $ref: '#/components/schemas/uuid4ReadOnly'
         name:
-          type: string
-          example: Sally Smith
+          $ref: '#/components/schemas/name'
         email:
-          type: string
-          format: email
-          example: sally.smith@example.com
+          $ref: '#/components/schemas/email'
       required:
         - id
+        - name
+        - email
+    UserCreate:
+      type: object
+      title: User
+      description: User of the system
+      properties:
+        name:
+          $ref: '#/components/schemas/name'
+        email:
+          $ref: '#/components/schemas/email'
+      required:
         - name
         - email
