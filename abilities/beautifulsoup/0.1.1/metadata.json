@@ -5,7 +5,7 @@
         "package": "0.1.1",
         "product": "4"
     },
-    "description": "Screen-scraping library",
+    "description": "Python library for pulling data out of HTML and XML files.",
     "author": {
         "name": "Leonard Richardson",
         "url": "https://www.crummy.com/software/BeautifulSoup/"
