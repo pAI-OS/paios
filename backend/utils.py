@@ -1,7 +1,12 @@
 # Returns dict with null fields removed (e.g., for OpenAPI spec compliant
 # responses without having to set nullable: true)
 def remove_null_fields(data):
-    return {k: v for k, v in data.items() if v is not None}
+    if isinstance(data, dict):
+        return {k: remove_null_fields(v) for k, v in data.items() if v is not None}
+    elif isinstance(data, list):
+        return [remove_null_fields(item) for item in data if item is not None]
+    else:
+        return data
 
 # Returns dict with only keys_to_include (e.g., for OpenAPI spec compliant
 # responses without unexpected fields present)
