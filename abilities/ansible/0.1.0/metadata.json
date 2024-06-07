@@ -22,7 +22,9 @@
             "type": "python",
             "id": "ansible",
             "name": "Ansible",
-            "version": ">=9.0.0"
+            "versions": {
+                "specifiers": ">=9.0.0"
+            }
         }
     ]
 }
