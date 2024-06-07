@@ -36,10 +36,7 @@ paths:
                   $ref: '#/components/schemas/Ability'
           headers:
             X-Total-Count:
-              schema:
-                type: string
-                example: '2'
-              description: Count of results required by jsonServer Data Provider for pagination
+              $ref: '#/components/headers/X-Total-Count'
   '/abilities/{id}':
     get:
       tags:
@@ -58,6 +55,7 @@ paths:
     parameters:
       - schema:
           type: string
+          format: uuid
         name: id
         description: id of the ability
         in: path
@@ -244,10 +242,7 @@ paths:
                   $ref: '#/components/schemas/Asset'
           headers:
             X-Total-Count:
-              schema:
-                type: string
-                example: '2'
-              description: Count of results required by jsonServer Data Provider for pagination
+              $ref: '#/components/headers/X-Total-Count'
     post:
       summary: Create new asset
       tags:
@@ -350,10 +345,7 @@ paths:
                   $ref: '#/components/schemas/Channel'
           headers:
             X-Total-Count:
-              schema:
-                type: string
-                example: '2'
-              description: Count of results required by jsonServer Data Provider for pagination
+              $ref: '#/components/headers/X-Total-Count'
     post:
       summary: Create new channel
       tags:
@@ -521,10 +513,7 @@ paths:
                   $ref: '#/components/schemas/Download'
           headers:
             X-Total-Count:
-              schema:
-                type: string
-                example: '2'
-              description: Count of results required by jsonServer Data Provider for pagination
+              $ref: '#/components/headers/X-Total-Count'
     post:
       tags:
         - Downloads Management
@@ -647,10 +636,7 @@ paths:
                   $ref: '#/components/schemas/User'
           headers:
             X-Total-Count:
-              schema:
-                type: integer
-                example: 2
-              description: Count of results required by jsonServer Data Provider for pagination
+              $ref: '#/components/headers/X-Total-Count'
     post:
       tags:
         - User Management
@@ -790,6 +776,12 @@ tags:
   - name: User Management
     description: Management of user accounts
 components:
+  headers:
+    X-Total-Count:
+      description: The total number of items
+      schema:
+        type: integer
+      required: true
   parameters:
     Sort:
       name: sort
