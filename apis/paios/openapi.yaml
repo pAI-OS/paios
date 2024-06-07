@@ -423,10 +423,7 @@ paths:
               schema:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
+                  $ref: '#/components/schemas/uuid4'
         '400':
           description: Invalid request
   '/downloads/{id}':
@@ -505,11 +502,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    format: uuid
+                $ref: '#/components/schemas/uuid4'
         '400':
           description: Missing Required Information
         '409':
@@ -698,6 +691,20 @@ components:
       type: string
       example: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
       pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
+    bytes:
+      type: integer
+      description: Bytes
+      example: 7702565088
+    fileName:
+      type: string
+      description: A filename that is valid on macOS, Windows, and Linux
+      example: Mistral-7B-Instruct-v0.3-Q8_0.gguf
+      pattern: '^[^<>:;,?"*|/]+$'
+    fileHash:
+      type: string
+      description: The hash type and hash of the file separated by colon
+      example: 'sha256:404857e776114baada71a08ebd3bba79d721ec7fca99705e7e7b892ae8bc583f'
+      pattern: ^[a-z0-9]+:[a-f0-9]{1,128}$
     Ability:
       type: object
       title: Ability
@@ -888,18 +895,11 @@ components:
           nullable: true
           example: abilities/virtual-machine/isos
         file_hash:
-          type: string
-          description: The hash type and hash of the file separated by colon
-          example: 'sha256:db32e79624c8f2627b051e46de7007a556a43c3e8ddf573214eab5d4fdabdadf'
-          pattern: ^[a-z0-9]+:[a-f0-9]{1,128}$
+          $ref: '#/components/schemas/fileHash'
         file_size:
-          type: integer
-          nullable: true
-          example: 6114656256
+          $ref: '#/components/schemas/bytes'
         downloaded:
-          type: integer
-          nullable: true
-          example: 614252544
+          $ref: '#/components/schemas/bytes'
         progress:
           type: number
           nullable: true
@@ -922,6 +922,26 @@ components:
           type: number
           nullable: true
           example: 49028995.95526451
+      required:
+        - id
+        - source_url
+    DownloadCreate:
+      type: object
+      properties:
+        source_url:
+          $ref: '#/components/schemas/uri'
+        file_name:
+          type: string
+          nullable: true
+          example: ubuntu-24.04-desktop-amd64.iso
+        target_directory:
+          type: string
+          nullable: true
+          example: abilities/virtual-machine/isos
+        file_hash:
+          $ref: '#/components/schemas/fileHash'
+        file_size:
+          $ref: '#/components/schemas/bytes'
       required:
         - id
         - source_url
