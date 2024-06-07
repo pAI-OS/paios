@@ -423,7 +423,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/uuid4'
+                  $ref: '#/components/schemas/download'
         '400':
           description: Invalid request
   '/downloads/{id}':
@@ -695,6 +695,11 @@ components:
       type: integer
       description: Bytes
       example: 7702565088
+    relativePath:
+      type: string
+      description: A uri-style relative path that is valid on macOS, Windows, and Linux
+      example: folder/subfolder/file.txt
+      pattern: '^(?![./])[^\0<>:;,?"*|]+(?:/[^\0<>:;,?"*|]+)*$'
     fileName:
       type: string
       description: A filename that is valid on macOS, Windows, and Linux
@@ -705,6 +710,11 @@ components:
       description: The hash type and hash of the file separated by colon
       example: 'sha256:404857e776114baada71a08ebd3bba79d721ec7fca99705e7e7b892ae8bc583f'
       pattern: ^[a-z0-9]+:[a-f0-9]{1,128}$
+    download:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/uuid4'
     Ability:
       type: object
       title: Ability
@@ -887,13 +897,9 @@ components:
         source_url:
           $ref: '#/components/schemas/uri'
         file_name:
-          type: string
-          nullable: true
-          example: ubuntu-24.04-desktop-amd64.iso
+          $ref: '#/components/schemas/fileName'
         target_directory:
-          type: string
-          nullable: true
-          example: abilities/virtual-machine/isos
+          $ref: '#/components/schemas/relativePath'
         file_hash:
           $ref: '#/components/schemas/fileHash'
         file_size:
