@@ -22,9 +22,9 @@ paths:
       summary: Retrieve all abilities
       description: Retrieve the information of all abilities.
       parameters:
-        - $ref: '#/components/parameters/Sort'
-        - $ref: '#/components/parameters/Range'
-        - $ref: '#/components/parameters/Filter'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/range'
+        - $ref: '#/components/parameters/filter'
       responses:
         '200':
           description: OK
@@ -53,13 +53,7 @@ paths:
       x-stoplight:
         id: dyrvaak9tni3i
     parameters:
-      - schema:
-          type: string
-          format: uuid
-        name: id
-        description: id of the ability
-        in: path
-        required: true
+      - $ref: '#/components/parameters/abilityId'
   '/abilities/{id}/install':
     post:
       tags:
@@ -68,18 +62,8 @@ paths:
       description: Installs the ability with the matching ability id to the specified or latest version.
       operationId: backend.api.AbilitiesView.install
       parameters:
-        - name: id
-          in: path
-          description: ID of the ability
-          required: true
-          schema:
-            type: string
-        - name: version
-          in: query
-          description: Version of the ability to install (optional)
-          required: false
-          schema:
-            type: string
+        - $ref: '#/components/parameters/id'
+        - $ref: '#/components/parameters/versionOptional'
       responses:
         '200':
           description: Ability installed
@@ -95,18 +79,8 @@ paths:
       description: Upgrades the ability with the matching ability id to the specified or latest version.
       operationId: backend.api.AbilitiesView.upgrade
       parameters:
-        - name: id
-          in: path
-          description: id of the ability
-          required: true
-          schema:
-            type: string
-        - name: version
-          in: query
-          description: Version of the ability to upgrade to (optional)
-          required: false
-          schema:
-            type: string
+        - $ref: '#/components/parameters/abilityId'
+        - $ref: '#/components/parameters/versionOptional'
       responses:
         '200':
           description: Ability upgraded
@@ -122,12 +96,7 @@ paths:
       description: Uninstalls the ability with the matching ability id.
       operationId: backend.api.AbilitiesView.uninstall
       parameters:
-        - name: id
-          in: path
-          description: id of the ability
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/abilityId'
       responses:
         '200':
           description: Ability uninstalled
@@ -148,12 +117,7 @@ paths:
       x-stoplight:
         id: oymowererbmk1
     parameters:
-      - schema:
-          type: string
-        name: id
-        description: id of an existing ability
-        in: path
-        required: true
+      - $ref: '#/components/parameters/abilityId'
   '/abilities/{id}/stop':
     post:
       tags:
@@ -167,12 +131,7 @@ paths:
       x-stoplight:
         id: rl7akdqs5zokh
     parameters:
-      - schema:
-          type: string
-        name: id
-        description: id of an existing ability
-        in: path
-        required: true
+      - $ref: '#/components/parameters/abilityId'
   '/abilities/{id}/dependencies/{dependency_id}/download':
     post:
       tags:
@@ -185,18 +144,8 @@ paths:
       x-stoplight:
         id: xngy10ictavd9
     parameters:
-      - schema:
-          type: string
-        name: id
-        description: id of the ability
-        in: path
-        required: true
-      - schema:
-          type: string
-        name: dependency_id
-        description: id of a dependency
-        in: path
-        required: true
+      - $ref: '#/components/parameters/abilityId'
+      - $ref: '#/components/parameters/dependencyId'
   '/abilities/{id}/dependencies/{dependency_id}/install':
     post:
       tags:
@@ -209,18 +158,8 @@ paths:
       x-stoplight:
         id: s0cmunju1qpd7
     parameters:
-      - schema:
-          type: string
-        name: id
-        description: id of the ability
-        in: path
-        required: true
-      - schema:
-          type: string
-        name: dependency_id
-        description: id of the dependency
-        in: path
-        required: true
+      - $ref: '#/components/parameters/abilityId'
+      - $ref: '#/components/parameters/dependencyId'
   /assets:
     get:
       tags:
@@ -228,9 +167,9 @@ paths:
       summary: Retrieve all assets
       description: Retrieve the information of all assets.
       parameters:
-        - $ref: '#/components/parameters/Sort'
-        - $ref: '#/components/parameters/Range'
-        - $ref: '#/components/parameters/Filter'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/range'
+        - $ref: '#/components/parameters/filter'
       responses:
         '200':
           description: OK
@@ -307,7 +246,7 @@ paths:
               $ref: '#/components/schemas/Asset'
     delete:
       summary: Delete asset by id
-      description: Deletes the asset with the specified id.
+      description: Deletes the asset with the given id.
       tags:
         - Asset Management
       responses:
@@ -318,12 +257,7 @@ paths:
       x-stoplight:
         id: qzbqf3cyubxfh
     parameters:
-      - schema:
-          type: string
-        name: id
-        description: id of an existing asset.
-        in: path
-        required: true
+      - $ref: '#/components/parameters/abilityId'
   /channels:
     get:
       tags:
@@ -331,9 +265,9 @@ paths:
       summary: Retrieve all channels
       description: Retrieve the information of all channels.
       parameters:
-        - $ref: '#/components/parameters/Sort'
-        - $ref: '#/components/parameters/Range'
-        - $ref: '#/components/parameters/Filter'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/range'
+        - $ref: '#/components/parameters/filter'
       responses:
         '200':
           description: OK
@@ -499,9 +433,9 @@ paths:
           schema:
             type: integer
             default: 100
-        - $ref: '#/components/parameters/Sort'
-        - $ref: '#/components/parameters/Range'
-        - $ref: '#/components/parameters/Filter'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/range'
+        - $ref: '#/components/parameters/filter'
       responses:
         '200':
           description: OK
@@ -622,9 +556,9 @@ paths:
       summary: Retrieve all users
       description: Get all users.
       parameters:
-        - $ref: '#/components/parameters/Sort'
-        - $ref: '#/components/parameters/Range'
-        - $ref: '#/components/parameters/Filter'
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/range'
+        - $ref: '#/components/parameters/filter'
       responses:
         '200':
           description: OK
@@ -702,7 +636,7 @@ paths:
       tags:
         - User Management
       summary: Delete user by id
-      description: Delete the user with the specified ID
+      description: Delete the user with the specified id
       parameters:
         - name: id
           in: path
@@ -783,7 +717,47 @@ components:
         type: integer
       required: true
   parameters:
-    Sort:
+    id:
+      name: id
+      in: path
+      description: id of the object
+      required: true
+      schema:
+        type: string
+        format: uuid
+    abilityId:
+      name: id
+      in: path
+      description: id of the ability
+      required: true
+      schema:
+        type: string
+        pattern: '^[a-z0-9]+(_[a-z0-9]+)*$'
+    dependencyId:
+      name: dependency_id
+      in: path
+      description: id of the dependency
+      required: true
+      schema:
+        type: string
+        pattern: '^[a-z0-9]+(_[a-z0-9]+)*$'
+    versionOptional:
+      name: version
+      in: query
+      description: Semantic version of the object
+      required: false
+      schema:
+        type: string
+        pattern: '^(0|[1-9]\d+)\.(0|[1-9]\d+)\.(0|[1-9]\d+)$'
+    versionRequired:
+      name: version
+      in: query
+      description: Semantic version of the object
+      required: true
+      schema:
+        type: string
+        pattern: '^(0|[1-9]\d+)\.(0|[1-9]\d+)\.(0|[1-9]\d+)$'
+    sort:
       name: sort
       in: query
       description: 'Specifies the sorting order and field (e.g., ["title", "ASC"]).'
@@ -791,7 +765,7 @@ components:
       schema:
         type: string
         example: '["title","ASC"]'
-    Range:
+    range:
       name: range
       in: query
       description: 'Specifies the range of results to return (e.g., [0, 24]).'
@@ -799,7 +773,7 @@ components:
       schema:
         type: string
         example: '[0, 24]'
-    Filter:
+    filter:
       name: filter
       in: query
       description: 'JSON string specifying the filter conditions (e.g., {"title":"bar"}).'
@@ -815,10 +789,10 @@ components:
       properties:
         id:
           type: string
-          pattern: '^[a-z0-9-]+'
+          pattern: '^[a-z0-9]+(_[a-z0-9]+)*$'
           minLength: 2
           maxLength: 100
-          example: optical-character-recognition
+          example: optical_character_recognition
         name:
           type: string
           example: Optical Character Recognition
