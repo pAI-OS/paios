@@ -142,7 +142,7 @@ paths:
         description: id of the dependency
         required: true
         schema:
-          $ref: '#/components/schemas/snake_id'
+          $ref: '#/components/schemas/kebab-snake_id'
   '/abilities/{id}/dependencies/{dependency_id}/install':
     post:
       tags:
@@ -159,7 +159,7 @@ paths:
         description: id of the dependency
         required: true
         schema:
-          $ref: '#/components/schemas/snake_id'
+          $ref: '#/components/schemas/kebab-snake_id'
   /assets:
     get:
       tags:
@@ -580,6 +580,13 @@ components:
       required: true
       schema:
         $ref: '#/components/schemas/snake_id'
+    kebab-snake_id:
+      name: id
+      in: path
+      description: id of the object
+      required: true
+      schema:
+        $ref: '#/components/schemas/kebab-snake_id'
     key:
       name: key
       in: path
@@ -634,6 +641,12 @@ components:
       maxLength: 100
       example: fetch_llama_cpp
       pattern: ^[a-z0-9]+(_[a-z0-9]+)*$
+    kebab-snake_id:
+      type: string
+      minLength: 2
+      maxLength: 100
+      example: langchain-core
+      pattern: ^[a-z0-9]+([_-][a-z0-9]+)*$
     semVer:
       type: string
       example: '1.1.0'
@@ -701,11 +714,7 @@ components:
       description: Additional abilities (plug-ins)
       properties:
         id:
-          type: string
-          minLength: 2
-          maxLength: 100
-          example: optical_character_recognition
-          pattern: ^[a-z0-9]+(_[a-z0-9]+)*$
+          $ref: '#/components/schemas/snake_id'
         name:
           $ref: '#/components/schemas/name'
         description:
@@ -722,10 +731,7 @@ components:
             latest:
               $ref: '#/components/schemas/semVer'
             installed:
-              type: string
-              example: '0.1.0'
-              pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$
-              nullable: true
+              $ref: '#/components/schemas/semVer'
             available:
               type: array
               items:
@@ -751,8 +757,7 @@ components:
             url:
               $ref: '#/components/schemas/uri'
         language:
-          type: string
-          example: python
+          $ref: '#/components/schemas/textShort'
         scripts:
           type: object
           properties:
@@ -768,14 +773,11 @@ components:
             type: object
             properties:
               type:
-                type: string
-                example: python
+                $ref: '#/components/schemas/snake_id'
               id:
-                type: string
-                example: airllm
+                $ref: '#/components/schemas/kebab-snake_id'
               name:
-                type: string
-                example: AirLLM
+                $ref: '#/components/schemas/textShort'
               version:
                 type: string
                 example: '>=2.8'
