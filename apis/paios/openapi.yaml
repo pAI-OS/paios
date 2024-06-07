@@ -210,12 +210,7 @@ paths:
       summary: Retrieve asset by id
       description: Retrieve the information of the asset with the matching asset ID.
       parameters:
-        - name: id
-          in: path
-          description: Id of an existing asset.
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/id'
       responses:
         '200':
           description: OK
@@ -296,20 +291,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Channel'
-  '/channels/{channel_id}':
+              $ref: '#/components/schemas/ChannelCreate'
+  '/channels/{id}':
     get:
       tags:
         - Channel Management
       summary: Retrieve channel by id
       description: Retrieve the information of the channel with the matching channel ID.
       parameters:
-        - name: channel_id
-          in: path
-          description: ID of an existing channel
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/id'
       responses:
         '200':
           description: OK
@@ -327,12 +317,7 @@ paths:
       summary: Update channel by key
       description: Updates the channel with the specified id.
       parameters:
-        - name: channel_id
-          in: path
-          description: ID of channel
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/id'
       requestBody:
         content:
           application/json:
@@ -347,12 +332,7 @@ paths:
       summary: Delete channel by key
       description: Delete a channel with the specified ID.
       parameters:
-        - name: channel_id
-          in: path
-          description: ID of channel
-          required: true
-          schema:
-            type: string
+        - $ref: '#/components/parameters/id'
       responses:
         '204':
           description: No Content
@@ -932,13 +912,37 @@ components:
       properties:
         id:
           type: string
-          example: llm-api
+          format: uuid
+          readOnly: true
+          example: cb48173b-1db5-40e7-8373-00bb217bdb98
         name:
           type: string
           example: LLM API
+          example: "^[A-Za-z0-9\\s\\-_,.;:()!@#$%&*+=?\\/\\\\|~^'\"\\[\\]{}áéíóúñ©€£¥]+$"
         uri:
           type: string
           example: 'https://localhost:8080/v1/api'
+          pattern: '^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?$'
+      required:
+        - id
+        - name
+        - uri
+    ChannelCreate:
+      type: object
+      title: Channel
+      description: Channels (input/output)
+      properties:
+        name:
+          type: string
+          example: LLM API
+          pattern: "^[A-Za-z0-9\\s\\-_,.;:()!@#$%&*+=?\\/\\\\|~^'\"\\[\\]{}áéíóúñ©€£¥]+$"
+        uri:
+          type: string
+          example: 'https://localhost:8080/v1/api'
+          pattern: '^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?$'
+      required:
+        - name
+        - uri
     Config:
       title: Config
       type: object
