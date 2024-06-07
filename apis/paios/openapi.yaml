@@ -732,6 +732,14 @@ components:
       type: string
       example: Kwaai
       pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
+    textShort:
+      type: string
+      example: Lorem Ipsum
+      pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
+    textLong:
+      type: string
+      example: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+      pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
     Ability:
       type: object
       title: Ability
@@ -744,28 +752,20 @@ components:
           example: optical_character_recognition
           pattern: ^[a-z0-9]+(_[a-z0-9]+)*$
         name:
-          type: string
-          example: Optical Character Recognition
-          pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
+          $ref: '#/components/schemas/name'
         description:
-          type: string
-          example: Conversion of images to text
-          pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
+          $ref: '#/components/schemas/textLong'
         versions:
           type: object
           properties:
             package:
-              type: string
-              example: '0.1.0'
-              pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$
+              $ref: '#/components/schemas/semVer'
             product:
               type: string
               example: '0.2beta3'
               pattern: ^\d+(\.\d+)*([a-zA-Z0-9]+)?$|^[rb]\d+$|^\d+:\d+(\.\d+)*-\d+[a-zA-Z0-9]+
             latest:
-              type: string
-              example: '0.1.1'
-              pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$
+              $ref: '#/components/schemas/semVer'
             installed:
               type: string
               example: '0.1.0'
@@ -774,8 +774,8 @@ components:
             available:
               type: array
               items:
-                type: string
-                pattern: ^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$
+                $ref: '#/components/schemas/semVer'
+              uniqueItems: true
               example:
                 - '0.1.0'
                 - '0.2.0'
@@ -835,21 +835,13 @@ components:
         user_id:
           $ref: '#/components/schemas/uuid4'
         title:
-          type: string
-          example: Attention Is All You Need
-          pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
+          $ref: '#/components/schemas/textShort'
         creator:
-          type: string
-          example: Ashish Vaswani et al
-          pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
+          $ref: '#/components/schemas/name'
         subject:
-          type: string
-          example: Artificial Intelligence
-          pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
+          $ref: '#/components/schemas/textShort'
         description:
-          type: string
-          example: We propose a new simple network architecture, the Transformer...
-          pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
+          $ref: '#/components/schemas/textLong'
       required:
         - id
         - title
@@ -861,21 +853,13 @@ components:
         user_id:
           $ref: '#/components/schemas/uuid4'
         title:
-          type: string
-          example: Attention Is All You Need
-          pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
+          $ref: '#/components/schemas/textShort'
         creator:
-          type: string
-          example: Ashish Vaswani et al
-          pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
+          $ref: '#/components/schemas/name'
         subject:
-          type: string
-          example: Artificial Intelligence
-          pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
+          $ref: '#/components/schemas/textShort'
         description:
-          type: string
-          example: We propose a new simple network architecture, the Transformer...
-          pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
+          $ref: '#/components/schemas/textShort'
       required:
         - title
     Channel:
@@ -886,9 +870,7 @@ components:
         id:
           $ref: '#/components/schemas/uuid4ReadOnly'
         name:
-          type: string
-          example: LLM API
-          pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
+          $ref: '#/components/schemas/name'
         uri:
           $ref: '#/components/schemas/uri'
       required:
@@ -901,9 +883,7 @@ components:
       description: Channels (input/output)
       properties:
         name:
-          type: string
-          example: LLM API
-          pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
+          $ref: '#/components/schemas/name'
         uri:
           $ref: '#/components/schemas/uri'
       required:
