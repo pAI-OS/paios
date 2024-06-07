@@ -1,5 +1,6 @@
 from uuid import uuid4
 import backend.db as db
+from backend.utils import remove_null_fields, zip_fields
 
 class AssetsManager:
     def __init__(self):
@@ -23,7 +24,10 @@ class AssetsManager:
         query = 'SELECT user_id, title, creator, subject, description FROM asset WHERE id = ?'
         result = await db.execute_query(query, (id,))
         if result:
-            return {'id': id, 'user_id': result[0][0], 'title': result[0][1], 'creator': result[0][2], 'subject': result[0][3], 'description': result[0][4]}
+            fields = ['user_id', 'title', 'creator', 'subject', 'description']
+            asset = remove_null_fields(zip_fields(fields, result[0]))
+            asset['id'] = id
+            return asset
         return None
 
     async def retrieve_assets(self, offset=0, limit=100, sort_by=None, sort_order='asc', filters=None, query=None):
@@ -64,7 +68,8 @@ class AssetsManager:
         # Execute the main query
         results = await db.execute_query(base_query, tuple(query_params))
         
-        assets = [{'id': result[0], 'user_id': result[1], 'title': result[2], 'creator': result[3], 'subject': result[4], 'description': result[5]} for result in results]
+        fields = ['id', 'user_id', 'title', 'creator', 'subject', 'description']
+        assets = [remove_null_fields(zip_fields(fields, result)) for result in results]
 
         # Get the total count of assets
         total_count_query = 'SELECT COUNT(*) FROM asset'
