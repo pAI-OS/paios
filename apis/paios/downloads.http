@@ -81,7 +81,19 @@ Content-Type: application/json
     }
 ]
 
-###
+### Path traversal attack
+
+POST http://localhost:3080/api/v1/downloads
+Content-Type: application/json
+
+[
+    {
+        "source_url": "https://example.com/passwd",
+        "file_name": "../../etc"
+    }
+]
+
+### 
 
 POST http://localhost:3080/api/v1/downloads/ac56536c-96a1-4dda-a664-d2262cbf5c7e/pause
 Content-Type: application/json
