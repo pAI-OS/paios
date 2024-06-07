@@ -51,7 +51,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/Ability'
     parameters:
-      - $ref: '#/components/parameters/abilityId'
+      - $ref: '#/components/parameters/snake_id'
   '/abilities/{id}/install':
     post:
       tags:
@@ -77,7 +77,7 @@ paths:
       description: Upgrades the ability with the matching ability id to the specified or latest version.
       operationId: backend.api.AbilitiesView.upgrade
       parameters:
-        - $ref: '#/components/parameters/abilityId'
+        - $ref: '#/components/parameters/snake_id'
         - $ref: '#/components/parameters/versionOptional'
       responses:
         '200':
@@ -94,7 +94,7 @@ paths:
       description: Uninstalls the ability with the matching ability id.
       operationId: backend.api.AbilitiesView.uninstall
       parameters:
-        - $ref: '#/components/parameters/abilityId'
+        - $ref: '#/components/parameters/snake_id'
       responses:
         '200':
           description: Ability uninstalled
@@ -113,7 +113,7 @@ paths:
         '200':
           description: OK
     parameters:
-      - $ref: '#/components/parameters/abilityId'
+      - $ref: '#/components/parameters/snake_id'
   '/abilities/{id}/stop':
     post:
       tags:
@@ -125,7 +125,7 @@ paths:
         '200':
           description: OK
     parameters:
-      - $ref: '#/components/parameters/abilityId'
+      - $ref: '#/components/parameters/snake_id'
   '/abilities/{id}/dependencies/{dependency_id}/download':
     post:
       tags:
@@ -136,8 +136,13 @@ paths:
         '200':
           description: Download started
     parameters:
-      - $ref: '#/components/parameters/abilityId'
-      - $ref: '#/components/parameters/dependencyId'
+      - $ref: '#/components/parameters/snake_id'
+      - name: dependency_id
+        in: path
+        description: id of the dependency
+        required: true
+        schema:
+          $ref: '#/components/schemas/snake_id'
   '/abilities/{id}/dependencies/{dependency_id}/install':
     post:
       tags:
@@ -148,8 +153,13 @@ paths:
         '200':
           description: Install started
     parameters:
-      - $ref: '#/components/parameters/abilityId'
-      - $ref: '#/components/parameters/dependencyId'
+      - $ref: '#/components/parameters/snake_id'
+      - name: dependency_id
+        in: path
+        description: id of the dependency
+        required: true
+        schema:
+          $ref: '#/components/schemas/snake_id'
   /assets:
     get:
       tags:
@@ -563,17 +573,10 @@ components:
       required: true
       schema:
         $ref: '#/components/schemas/uuid4'
-    abilityId:
+    snake_id:
       name: id
       in: path
-      description: id of the ability
-      required: true
-      schema:
-        $ref: '#/components/schemas/snake_id'
-    dependencyId:
-      name: dependency_id
-      in: path
-      description: id of the dependency
+      description: id of the object
       required: true
       schema:
         $ref: '#/components/schemas/snake_id'
