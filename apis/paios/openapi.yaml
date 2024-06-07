@@ -50,8 +50,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Ability'
-      x-stoplight:
-        id: dyrvaak9tni3i
     parameters:
       - $ref: '#/components/parameters/abilityId'
   '/abilities/{id}/install':
@@ -114,8 +112,6 @@ paths:
       responses:
         '200':
           description: OK
-      x-stoplight:
-        id: oymowererbmk1
     parameters:
       - $ref: '#/components/parameters/abilityId'
   '/abilities/{id}/stop':
@@ -128,8 +124,6 @@ paths:
       responses:
         '200':
           description: OK
-      x-stoplight:
-        id: rl7akdqs5zokh
     parameters:
       - $ref: '#/components/parameters/abilityId'
   '/abilities/{id}/dependencies/{dependency_id}/download':
@@ -141,8 +135,6 @@ paths:
       responses:
         '200':
           description: Download started
-      x-stoplight:
-        id: xngy10ictavd9
     parameters:
       - $ref: '#/components/parameters/abilityId'
       - $ref: '#/components/parameters/dependencyId'
@@ -155,8 +147,6 @@ paths:
       responses:
         '200':
           description: Install started
-      x-stoplight:
-        id: s0cmunju1qpd7
     parameters:
       - $ref: '#/components/parameters/abilityId'
       - $ref: '#/components/parameters/dependencyId'
@@ -195,8 +185,6 @@ paths:
                 $ref: '#/components/schemas/Asset'
         '400':
           description: Missing Required Information
-      x-stoplight:
-        id: xk3th6kh2xaea
       description: Creates a new asset.
       requestBody:
         content:
@@ -218,8 +206,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Asset'
-      x-stoplight:
-        id: 2zks0jok3godg
     put:
       summary: Update asset by id
       tags:
@@ -231,8 +217,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Asset'
-      x-stoplight:
-        id: y45hktoao8x1p
       description: Updates the asset with the given id.
       requestBody:
         content:
@@ -249,8 +233,6 @@ paths:
           description: No Content
         '404':
           description: Not Found
-      x-stoplight:
-        id: qzbqf3cyubxfh
     parameters:
       - $ref: '#/components/parameters/id'
   /channels:
@@ -284,8 +266,6 @@ paths:
           description: OK
         '400':
           description: Missing Required Information
-      x-stoplight:
-        id: 7kb6p8nsmdmcz
       description: Create a new channel.
       requestBody:
         content:
@@ -307,13 +287,9 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Channel'
-      x-stoplight:
-        id: n2y8xwoqwy42p
     put:
       tags:
         - Channel Management
-      x-stoplight:
-        id: ecf6d452243db
       summary: Update channel by key
       description: Updates the channel with the specified id.
       parameters:
@@ -338,8 +314,6 @@ paths:
           description: No Content
         '404':
           description: Not Found
-      x-stoplight:
-        id: 1tecqsp0tdwoy
   '/config/{key}':
     get:
       tags:
@@ -358,8 +332,6 @@ paths:
     put:
       tags:
         - Configuration Management
-      x-stoplight:
-        id: 90bb04de57693
       summary: Update config by key
       description: Set a config item with the specified key.
       parameters:
@@ -470,8 +442,6 @@ paths:
           description: No Content
         '404':
           description: Download Not Found
-      x-stoplight:
-        id: dduck5g3v903s
   '/downloads/{id}/pause':
     post:
       tags:
@@ -484,8 +454,6 @@ paths:
       responses:
         '200':
           description: Download paused
-      x-stoplight:
-        id: jfzldt7n6zi4y
   '/downloads/{id}/resume':
     post:
       tags:
@@ -498,8 +466,6 @@ paths:
       responses:
         '200':
           description: Download resumed
-      x-stoplight:
-        id: rwumyu04mqxrw
   /users:
     get:
       tags:
@@ -525,8 +491,6 @@ paths:
     post:
       tags:
         - User Management
-      x-stoplight:
-        id: 529fe234619a5
       summary: Create new user
       description: Create a new user.
       requestBody:
@@ -567,8 +531,6 @@ paths:
                 $ref: '#/components/schemas/User'
         '404':
           description: User Not Found
-      x-stoplight:
-        id: 1ghm6r4v82ch1
     delete:
       tags:
         - User Management
@@ -581,8 +543,6 @@ paths:
           description: No Content
         '404':
           description: Not Found
-      x-stoplight:
-        id: g3lg9dif14k5r
     put:
       tags:
         - User Management
@@ -607,8 +567,6 @@ paths:
           description: User Not Found
         '409':
           description: Email Already Taken
-      x-stoplight:
-        id: 2fpaptklpmtue
 tags:
   - name: Abilities Management
     description: Installation and configuration of abilities
@@ -824,8 +782,6 @@ components:
               version:
                 type: string
                 example: '>=2.8'
-          x-stoplight:
-            id: 97skm0furiybt
     Asset:
       type: object
       title: Asset
