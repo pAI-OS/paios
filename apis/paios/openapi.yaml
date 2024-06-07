@@ -277,7 +277,7 @@ paths:
       tags:
         - Channel Management
       summary: Retrieve channel by id
-      description: Retrieve the information of the channel with the matching channel ID.
+      description: Retrieve the information of the channel with the specified id.
       parameters:
         - $ref: '#/components/parameters/id'
       responses:
@@ -396,25 +396,7 @@ paths:
             schema:
               type: array
               items:
-                type: object
-                required:
-                  - source_url
-                properties:
-                  source_url:
-                    type: string
-                    format: uri
-                    description: The URL of the file to download.
-                  file_name:
-                    type: string
-                    description: The optional filename for the downloaded file.
-                  target_directory:
-                    type: string
-                    description: The optional target directory for the downloaded file (default is 'downloads').
-                  file_hash:
-                    type: string
-                    description: 'The hash type and hash of the file separated by colon (e.g., md5, sha256).'
-                    example: 'sha256:db32e79624c8f2627b051e46de7007a556a43c3e8ddf573214eab5d4fdabdadf'
-                    nullable: true
+                $ref: '#/components/schemas/DownloadCreate'
       responses:
         '200':
           description: Downloads started
@@ -594,18 +576,14 @@ components:
       description: id of the ability
       required: true
       schema:
-        type: string
-        example: llama_cpp
-        pattern: '^[a-z0-9]+(_[a-z0-9]+)*$'
+        $ref: '#/components/schemas/snake_id'
     dependencyId:
       name: dependency_id
       in: path
       description: id of the dependency
       required: true
       schema:
-        type: string
-        example: fetch_llama_cpp
-        pattern: '^[a-z0-9]+(_[a-z0-9]+)*$'
+        $ref: '#/components/schemas/snake_id'
     key:
       name: key
       in: path
@@ -654,6 +632,12 @@ components:
         type: string
         example: '{"title":"bar"}'
   schemas:
+    snake_id:
+      type: string
+      minLength: 2
+      maxLength: 100
+      example: fetch_llama_cpp
+      pattern: ^[a-z0-9]+(_[a-z0-9]+)*$
     semVer:
       type: string
       example: '1.1.0'
@@ -937,19 +921,14 @@ components:
         source_url:
           $ref: '#/components/schemas/uri'
         file_name:
-          type: string
-          nullable: true
-          example: ubuntu-24.04-desktop-amd64.iso
+          $ref: '#/components/schemas/fileName'
         target_directory:
-          type: string
-          nullable: true
-          example: abilities/virtual-machine/isos
+          $ref: '#/components/schemas/relativePath'
         file_hash:
           $ref: '#/components/schemas/fileHash'
         file_size:
           $ref: '#/components/schemas/bytes'
       required:
-        - id
         - source_url
     User:
       type: object
