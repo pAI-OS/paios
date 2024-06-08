@@ -88,7 +88,13 @@ class PythonDependency(Dependency):
             return None
         return available_versions[0]
 
-    async def install(self, ability, dependency):
+    async def install(self, ability, dependency, background=False):
+        if background:
+            await self.run_in_background(self._install_task, ability, dependency)
+        else:
+            return await self._install_task(ability, dependency)
+
+    async def _install_task(self, ability, dependency):
         package_name = dependency.get('id')
         required_version = dependency.get('required', '')
 
@@ -133,29 +139,18 @@ class PythonDependency(Dependency):
                 logger.error(f"Unexpected error occurred while retrieving package version for {package_name}: {e}")
             return None
 
-        try:
-            loop = asyncio.get_event_loop()
-            result = await loop.run_in_executor(None, run_subprocess)
-            if result.returncode == 0:
-                logger.info(f"Successfully installed {package_with_version}")
-                reload_package(package_name)
-                package_version = get_installed_package_version(package_name)
-                dependency['version-installed'] = package_version
-                dependency['satisfied'] = self._is_satisfied(package_version, dependency['versions'].get('satisfactory', []))
-                return {"message": f"Successfully installed {package_with_version} ({package_version})."}
-            else:
-                error_message = result.stderr
-                logger.error(f"Failed to install {package_with_version}: {error_message}")
-                raise ValueError(f"Installation failed: {error_message}")
-        except asyncio.CancelledError:
-            logger.warning(f"Installation of {package_with_version} was cancelled")
-            raise ValueError(f"Installation of {package_with_version} was cancelled")
-        except pkg_resources.ContextualVersionConflict as e:
-            logger.error(f"Version conflict during installation of {package_with_version}: {e}")
-            raise ValueError(f"Version conflict: {str(e)}")
-        except Exception as e:
-            logger.error(f"Unexpected error during dependency installation: {e}", exc_info=True)
-            raise ValueError(f"An unexpected error occurred: {str(e)}")
+        result = await asyncio.get_event_loop().run_in_executor(None, run_subprocess)
+        if result.returncode == 0:
+            logger.info(f"Successfully installed {package_with_version}")
+            reload_package(package_name)
+            package_version = get_installed_package_version(package_name)
+            dependency['version-installed'] = package_version
+            dependency['satisfied'] = self._is_satisfied(package_version, dependency['versions'].get('satisfactory', []))
+            return {"message": f"Successfully installed {package_with_version} ({package_version})."}
+        else:
+            error_message = result.stderr
+            logger.error(f"Failed to install {package_with_version}: {error_message}")
+            raise ValueError(f"Installation failed: {error_message}")
 
     def start(self, ability, dependency):
         pass
