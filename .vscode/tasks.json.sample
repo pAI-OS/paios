@@ -5,7 +5,6 @@
             "label": "Start Frontend Server",
             "type": "shell",
             "command": "npm run dev",
-            "isBackground": true,
             "presentation": {
                 "reveal": "always",
                 "panel": "new",
@@ -13,50 +12,22 @@
             },
             "options": {
                 "cwd": "${workspaceFolder}/frontend"
-            },
-            "problemMatcher": {
-                "owner": "custom",
-                "pattern": [
-                    {
-                        "regexp": ".",
-                        "file": 1,
-                        "location": 2,
-                        "message": 3
-                    }
-                ],
-                "background": {
-                    "activeOnStart": true,
-                    "beginsPattern": ".",
-                    "endsPattern": "."
-                }
             }
         },
         {
             "label": "Start Backend Server",
             "type": "shell",
-            "command": "./.vscode/tasks/start_backend.sh",
-            "windows": {
-                "command": "pwsh .vscode/tasks/start_backend.ps1",
-            },
+            "command": "${config:python.pythonPath} -m paios",
             "presentation": {
                 "reveal": "always",
                 "panel": "new",
                 "group": "backend"
             },
-            "problemMatcher": {
-                "owner": "custom",
-                "pattern": [
-                    {
-                        "regexp": ".",
-                        "file": 1,
-                        "location": 2,
-                        "message": 3
-                    }
-                ],
-                "background": {
-                    "activeOnStart": true,
-                    "beginsPattern": ".",
-                    "endsPattern": "."
+            "options": {
+                "cwd": "${workspaceFolder}/..",
+                "env": {
+                    "VIRTUAL_ENV": "${workspaceFolder}/.venv",
+                    "PATH": "${workspaceFolder}/.venv/bin:${env:PATH}"
                 }
             }
         },
