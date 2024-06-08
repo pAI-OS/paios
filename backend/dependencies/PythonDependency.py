@@ -90,7 +90,7 @@ class PythonDependency(Dependency):
 
     async def install(self, ability, dependency, background=False):
         if background:
-            await self.run_in_background(self._install_task, ability, dependency)
+            await self._run_in_background(self._install_task, ability, dependency)
         else:
             return await self._install_task(ability, dependency)
 
