@@ -34,24 +34,14 @@
         {
             "label": "Start Backend Server",
             "type": "shell",
-            "command": "echo This should not run",
+            "command": "./.vscode/tasks/start_backend.sh",
             "windows": {
-                "command": ".\\.venv\\Scripts\\activate && python -m paios"
+                "command": "pwsh .vscode/tasks/start_backend.ps1",
             },
-            "osx": {
-                "command": "source .venv/bin/activate && python -m paios"
-            },
-            "linux": {
-                "command": "source .venv/bin/activate && python -m paios"
-            },
-            "isBackground": true,
             "presentation": {
                 "reveal": "always",
                 "panel": "new",
                 "group": "backend"
-            },
-            "options": {
-                "cwd": "${workspaceFolder}/.."
             },
             "problemMatcher": {
                 "owner": "custom",
