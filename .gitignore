@@ -163,7 +163,7 @@ cython_debug/
 .vscode/*
 !.vscode/extensions.json
 !.vscode/*.sample
-!.vscode/tasks/*
+!.vscode/tasks
 .idea
 .DS_Store
 *.suo

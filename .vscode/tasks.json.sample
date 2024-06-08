@@ -5,6 +5,7 @@
             "label": "Start Frontend Server",
             "type": "shell",
             "command": "npm run dev",
+            "isBackground": true,
             "presentation": {
                 "reveal": "always",
                 "panel": "new",
@@ -12,22 +13,60 @@
             },
             "options": {
                 "cwd": "${workspaceFolder}/frontend"
+            },
+            "problemMatcher": {
+                "owner": "custom",
+                "pattern": [
+                    {
+                        "regexp": ".",
+                        "file": 1,
+                        "location": 2,
+                        "message": 3
+                    }
+                ],
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": ".",
+                    "endsPattern": "."
+                }
             }
         },
         {
             "label": "Start Backend Server",
             "type": "shell",
-            "command": "${config:python.pythonPath} -m paios",
+            "command": "echo This should not run",
+            "windows": {
+                "command": ".\\.venv\\Scripts\\activate && python -m paios"
+            },
+            "osx": {
+                "command": "source .venv/bin/activate && python -m paios"
+            },
+            "linux": {
+                "command": "source .venv/bin/activate && python -m paios"
+            },
+            "isBackground": true,
             "presentation": {
                 "reveal": "always",
                 "panel": "new",
                 "group": "backend"
             },
             "options": {
-                "cwd": "${workspaceFolder}/..",
-                "env": {
-                    "VIRTUAL_ENV": "${workspaceFolder}/.venv",
-                    "PATH": "${workspaceFolder}/.venv/bin:${env:PATH}"
+                "cwd": "${workspaceFolder}/.."
+            },
+            "problemMatcher": {
+                "owner": "custom",
+                "pattern": [
+                    {
+                        "regexp": ".",
+                        "file": 1,
+                        "location": 2,
+                        "message": 3
+                    }
+                ],
+                "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": ".",
+                    "endsPattern": "."
                 }
             }
         },
