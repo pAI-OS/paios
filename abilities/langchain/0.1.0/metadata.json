@@ -28,7 +28,7 @@
             "name": "LangChain",
             "description": "This will install the bare minimum requirements of LangChain. A lot of the value of LangChain comes when integrating it with various model providers, datastores, etc.",
             "versions": {
-                "specifiers": ">=0.2.0"
+                "required": ">=0.2.0"
             }
         },
         {
@@ -37,7 +37,7 @@
             "name": "LangChain Core",
             "description": "Base abstractions that the rest of the LangChain ecosystem uses, along with the LangChain Expression Language. It is automatically installed by langchain, but can also be used separately.",
             "versions": {
-                "specifiers": ">=0.2.0"
+                "required": ">=0.2.0"
             }
         },
         {
@@ -46,7 +46,7 @@
             "name": "LangChain CLI",
             "description": "CLI for working with LangChain templates and other LangServe projects.",
             "versions": {
-                "specifiers": ">=0.0.22"
+                "required": ">=0.0.22"
             }
         },
         {
@@ -55,7 +55,7 @@
             "name": "LangChain Community",
             "description": "Third-party integrations. It is automatically installed by langchain, but can also be used separately.",
             "versions": {
-                "specifiers": ">=0.2.0"
+                "required": ">=0.2.0"
             }
         },
         {
@@ -64,7 +64,7 @@
             "name": "LangChain Experimental",
             "description": "experimental LangChain code, intended for research and experimental uses.",
             "versions": {
-                "specifiers": ">=0.0.59"
+                "required": ">=0.0.59"
             }
         },
         {
@@ -73,7 +73,7 @@
             "name": "LangChain Text Splitters",
             "description": "LangChain text splitting utilities",
             "versions": {
-                "specifiers": ">=0.2.0"
+                "required": ">=0.2.0"
             }
         },
         {
@@ -82,7 +82,7 @@
             "name": "LangChain Hub",
             "description": "LangChain Hub API client.",
             "versions": {
-                "specifiers": ">=0.1.16"
+                "required": ">=0.1.16"
             }
         },
         {
@@ -91,7 +91,7 @@
             "name": "LangChain OpenAI",
             "description": "LangChain integrations for OpenAI through their openai SDK.",
             "versions": {
-                "specifiers": ">=0.1.7"
+                "required": ">=0.1.7"
             }
         },
         {
@@ -100,7 +100,7 @@
             "name": "LangChain Chroma",
             "description": "LangChain integration with Chroma.",
             "versions": {
-                "specifiers": ">=0.1.1"
+                "required": ">=0.1.1"
             }
         },
         {
@@ -109,7 +109,7 @@
             "name": "LangGraph",
             "description": "Building language agents as graphs. Library for building stateful, multi-actor applications with LLMs, built on top of (and intended to be used with) LangChain.",
             "versions": {
-                "specifiers": ">=0.0.50"
+                "required": ">=0.0.50"
             }
         },
         {
@@ -118,7 +118,7 @@
             "name": "LangServe",
             "description": "Building language agents as graphs. Library for building stateful, multi-actor applications with LLMs, built on top of (and intended to be used with) LangChain.",
             "versions": {
-                "specifiers": ">=0.2.0"
+                "required": ">=0.2.0"
             },
             "extras": [
                 "all",
@@ -132,7 +132,7 @@
             "name": "LangSmith",
             "description": "Python client for interacting with the LangSmith platform.",
             "versions": {
-                "specifiers": ">=0.1.59"
+                "required": ">=0.1.59"
             }
         }
     ]

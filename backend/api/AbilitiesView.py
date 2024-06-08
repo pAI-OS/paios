@@ -1,6 +1,9 @@
 from starlette.responses import JSONResponse
 from backend.managers.AbilitiesManager import AbilitiesManager
 from backend.pagination import parse_pagination_params
+from pkg_resources import ContextualVersionConflict
+import logging
+logger = logging.getLogger(__name__)
 
 class AbilitiesView:
     def error_immutable(self):
@@ -72,6 +75,21 @@ class AbilitiesView:
                 return JSONResponse(status_code=400, content={"message": "Uninstallation failed"})
         except ValueError as e:
             return JSONResponse(status_code=400, content={"message": str(e)})
+
+    async def install_dependency(self, id: str, dependency_id: str):
+        manager = AbilitiesManager()
+        try:
+            result = await manager.install_dependency(id, dependency_id)
+            return JSONResponse(status_code=200, content=result)
+        except ContextualVersionConflict as e:
+            logger.error(f"Version conflict during dependency installation: {e}")
+            return JSONResponse(status_code=409, content={"message": str(e)})
+        except ValueError as e:
+            logger.error(f"ValueError during dependency installation: {e}")
+            return JSONResponse(status_code=400, content={"message": str(e)})
+        except Exception as e:
+            logger.error(f"Unexpected error during dependency installation: {e}", exc_info=True)
+            return JSONResponse(status_code=500, content={"error": str(e)})
 
     async def start(self, id: str):
         manager = AbilitiesManager()

@@ -27,7 +27,7 @@
             "name": "AirLLM",
             "versions":
                 {
-                    "specifiers": ">=2.8"
+                    "required": ">=2.8"
                 }
         },
         {
@@ -36,7 +36,7 @@
             "name": "MLX",
             "versions":
                 {
-                    "specifiers": ">=0.12"
+                    "required": ">=0.12"
                 }
         }
     ]

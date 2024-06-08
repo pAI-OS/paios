@@ -11,14 +11,13 @@ export const PythonDependency = (props: { dependencies: any, ability_id: string 
         <Datagrid data={props.dependencies} sort={{ field: 'name', order: 'ASC' }}>
             <TextField source="id" />
             <TextField source="name" />
-            <TextField source="version-installed" label="Installed" />
-            <TextField source="version" label="Required" />
-            <CheckedField source="satisfied" />
+            <TextField source="versions.installed" label="Installed" />
+            <TextField source="versions.required" label="Required" />
+            <CheckedField source="versions.satisfied" label="Satisfied" />
             <InstallButton ability_id={props.ability_id} />
         </Datagrid>
     );
 };
-
 
 const InstallButton = ({ ability_id }: { ability_id: string }) => {
     const record = useRecordContext();
@@ -66,10 +65,10 @@ const InstallButton = ({ ability_id }: { ability_id: string }) => {
             });
     };
 
-    const buttonLabel = isInstalling ? "Installing" : (record.installed ? (record.satisfied ? "Install" : "Upgrade") : "Install");
+    const buttonLabel = isInstalling ? "Installing" : (record.versions.installed ? (record.versions.satisfied ? "Install" : "Upgrade") : "Install");
 
     return (
-        !record.satisfied && (
+        !record.versions.satisfied && (
             <Button label={buttonLabel} onClick={handleInstallClick} disabled={isInstalling}>
                 <GetAppIcon />
             </Button>
