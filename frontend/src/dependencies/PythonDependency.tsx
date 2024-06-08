@@ -53,7 +53,7 @@ const InstallButton = ({ ability_id }: { ability_id: string }) => {
         event.stopPropagation();
         setIsInstalling(true);
 
-        httpClient(`${apiBase}/abilities/${ability_id}/dependencies/python/${record.id}/install`, { method: 'POST' })
+        httpClient(`${apiBase}/abilities/${ability_id}/dependencies/${record.id}/install`, { method: 'POST' })
             .then(() => {
                 notify('Python dependency installation requested');
                 refresh();

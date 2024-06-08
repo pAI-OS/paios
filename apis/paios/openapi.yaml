@@ -149,6 +149,7 @@ paths:
         - Abilities Management
       summary: Start dependency install
       description: Installs an ability's dependency.
+      operationId: backend.api.AbilitiesView.install_dependency
       responses:
         '200':
           description: Install started
