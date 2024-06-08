@@ -162,7 +162,8 @@ cython_debug/
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-!.vscode/settings.json.sample
+!.vscode/*.sample
+!.vscode/tasks/*
 .idea
 .DS_Store
 *.suo
