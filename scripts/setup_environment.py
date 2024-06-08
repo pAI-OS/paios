@@ -38,9 +38,22 @@ def build_frontend():
         print("Skipped as npm command not found.")
         print("Download Node.js to build the frontend or use a prebuilt version (e.g. canary branch): https://nodejs.org/en/download")
 
+def setup_vscode():
+    print("Setting up VSCode configuration...")
+    vscode_dir = base_dir / '.vscode'
+    vscode_dir.mkdir(exist_ok=True)
+    
+    sample_files = list(vscode_dir.glob('*.sample'))
+    for sample_file in sample_files:
+        target_file = vscode_dir / sample_file.stem
+        if not target_file.exists():
+            shutil.copy(sample_file, target_file)
+            print(f"Copied {sample_file} to {target_file}")
+
 def main():
     setup_backend()
     build_frontend()
+    setup_vscode()
 
     print("Setup complete.")
 
