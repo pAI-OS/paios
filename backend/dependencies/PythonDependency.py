@@ -100,9 +100,6 @@ class PythonDependency(Dependency):
 
         package_with_version = f"{package_name}{required_version}"
 
-        loop = asyncio.get_event_loop()
-        executor = asyncio.get_running_loop().run_in_executor
-
         def run_subprocess():
             try:
                 result = subprocess.run(
@@ -137,7 +134,8 @@ class PythonDependency(Dependency):
             return None
 
         try:
-            result = await executor(None, run_subprocess)
+            loop = asyncio.get_event_loop()
+            result = await loop.run_in_executor(None, run_subprocess)
             if result.returncode == 0:
                 logger.info(f"Successfully installed {package_with_version}")
                 reload_package(package_name)
@@ -152,7 +150,7 @@ class PythonDependency(Dependency):
         except asyncio.CancelledError:
             logger.warning(f"Installation of {package_with_version} was cancelled")
             raise ValueError(f"Installation of {package_with_version} was cancelled")
-        except ContextualVersionConflict as e:
+        except pkg_resources.ContextualVersionConflict as e:
             logger.error(f"Version conflict during installation of {package_with_version}: {e}")
             raise ValueError(f"Version conflict: {str(e)}")
         except Exception as e:

@@ -28,9 +28,16 @@ class AbilitiesManager:
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
             cls._instance = super(AbilitiesManager, cls).__new__(cls, *args, **kwargs)
-            cls._instance._load_abilities()
-            cls._instance._initialize_dependency_managers()
+            cls._instance.__initialized = False
+            cls._instance.__init__(*args, **kwargs)  # Explicitly call __init__
         return cls._instance
+
+    def __init__(self):
+        if self.__initialized:
+            return
+        self.__initialized = True
+        self._load_abilities()
+        self._initialize_dependency_managers()
 
     def _initialize_dependency_managers(self):
         self.dependency_managers = {
@@ -230,25 +237,27 @@ class AbilitiesManager:
             return self.ok()
         else:
             return {"error": "Ability not running"}, 404
-        
+
     async def install_dependency(self, ability_id: str, dependency_id: str):
         ability = self.get_ability(ability_id)
         if not ability:
-            return {"message": "Ability not found"}, 404
+            raise ValueError("Ability not found")
 
         dependency = next((dep for dep in ability.get('dependencies', []) if dep.get('id') == dependency_id), None)
         if not dependency:
-            return {"message": "Dependency not found"}, 404
+            raise ValueError("Dependency not found")
 
         dependency_manager = self.dependency_managers.get(dependency.get('type'))
         if not dependency_manager:
-            return {"message": "Unsupported dependency type"}, 400
+            raise ValueError("Unsupported dependency type")
 
-        try:
-            return await dependency_manager.install(ability, dependency)
-        except asyncio.CancelledError:
-            logger.warning(f"Installation of dependency {dependency_id} for ability {ability_id} was cancelled")
-            return {"message": f"Installation of dependency {dependency_id} was cancelled"}, 400
-        except Exception as e:
-            logger.error(f"Unexpected error during dependency installation: {e}", exc_info=True)
-            return {"message": f"An unexpected error occurred: {str(e)}"}, 500
+        async def callback(result):
+            if isinstance(result, dict) and 'message' in result:
+                logger.info(result['message'])
+            else:
+                logger.error(f"Unexpected result: {result}")
+            # Reload the ability or update versions here if needed
+            self.refresh_abilities()
+
+        await dependency_manager.install_in_background(ability, dependency, callback)
+        return {"message": f"Installation of dependency {dependency_id} started"}

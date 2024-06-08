@@ -13,8 +13,14 @@ class ContainerDependency(Dependency):
         #except docker.errors.NotFound:
         #    self.dependency['status'] = False
 
-    def start(self):
+    def start(self, ability, dependency):
+        # Implementation for starting the dependency
         pass
 
-    def stop(self):
+    def stop(self, ability, dependency):
+        # Implementation for stopping the dependency
         pass
+
+    async def install(self, ability, dependency):
+        # Placeholder implementation for installing the dependency
+        return {"message": "Dependency installation not yet implemented"}
