@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from backend.dependencies.DependencyState import DependencyState
 import threading
 import asyncio
 import logging
@@ -7,8 +8,14 @@ logger = logging.getLogger(__name__)
 
 class Dependency(ABC):
     def __init__(self):
-        pass
+        self.state = DependencyState.AVAILABLE
 
+    def set_state(self, state: DependencyState):
+        self.state = state
+
+    def get_state(self):
+        return self.state
+    
     @abstractmethod
     def refresh_status(self, ability, dependency):
         pass

@@ -2,11 +2,12 @@ import json
 import re
 import os
 import signal
-import asyncio
+from pkg_resources import ContextualVersionConflict
 from backend.paths import abilities_dir
 from backend.utils import remove_null_fields
 from enum import Enum
 from pathlib import Path
+from backend.dependencies.DependencyState import DependencyState
 from backend.dependencies.PythonDependency import PythonDependency
 from backend.dependencies.ResourceDependency import ResourceDependency
 from backend.dependencies.LinuxDependency import LinuxDependency
@@ -251,13 +252,26 @@ class AbilitiesManager:
         if not dependency_manager:
             raise ValueError("Unsupported dependency type")
 
+        dependency_manager.set_state(DependencyState.INSTALLING)
+
         async def callback(result):
             if isinstance(result, dict) and 'message' in result:
                 logger.info(result['message'])
+                dependency_manager.set_state(DependencyState.INSTALLED)
             else:
                 logger.error(f"Unexpected result: {result}")
-            # Reload the ability or update versions here if needed
+                dependency_manager.set_state(DependencyState.FAILED)
             self.refresh_abilities()
 
-        await dependency_manager.install(ability, dependency, background=True)
-        return {"message": f"Installation of dependency {dependency_id} started"}
+        try:
+            await dependency_manager.install(ability, dependency, background=True)
+            return {"message": f"Installation of dependency {dependency_id} started"}
+        except ContextualVersionConflict as e:
+            logger.error(f"Version conflict detected: {e}")
+            dependency_manager.set_state(DependencyState.FAILED)
+            return {"error": "Version conflict detected. Please restart the application to resolve dependencies."}, 500
+        except Exception as e:
+            logger.error(f"Unexpected error during dependency installation: {e}")
+            dependency_manager.set_state(DependencyState.FAILED)
+            return {"error": "An unexpected error occurred during dependency installation."}, 500
+

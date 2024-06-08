@@ -1,4 +1,3 @@
-// PythonDependency.tsx
 import { Button, Datagrid, TextField } from 'react-admin';
 import { useState, useEffect, useRef } from 'react';
 import { CheckedField } from '../components/CheckedField';
@@ -27,21 +26,18 @@ const InstallButton = ({ ability_id }: { ability_id: string }) => {
     const intervalId = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
-        // Clear any existing interval
         if (intervalId.current) {
             clearInterval(intervalId.current);
             intervalId.current = null;
         }
 
-        // Set a new interval if the package is currently installing
         if (isInstalling) {
             intervalId.current = setInterval(() => {
                 refresh();
-            }, 5000); // Refresh every 5 seconds
+            }, 5000);
         }
 
         return () => {
-            // Clear the interval when the component is unmounted or the installing state changes
             if (intervalId.current) {
                 clearInterval(intervalId.current);
             }
@@ -65,13 +61,16 @@ const InstallButton = ({ ability_id }: { ability_id: string }) => {
             });
     };
 
+    const isLatestVersion = record.versions.installed === record.versions.latest;
     const buttonLabel = isInstalling ? "Installing" : (record.versions.installed ? (record.versions.satisfied ? "Install" : "Upgrade") : "Install");
 
+    if (isLatestVersion) {
+        return null; // Hide the button if the installed version is the latest version
+    }
+
     return (
-        !record.versions.satisfied && (
-            <Button label={buttonLabel} onClick={handleInstallClick} disabled={isInstalling}>
-                <GetAppIcon />
-            </Button>
-        )
+        <Button label={buttonLabel} onClick={handleInstallClick} disabled={isInstalling || record.state === 'installing'}>
+            <GetAppIcon />
+        </Button>
     );
 };
