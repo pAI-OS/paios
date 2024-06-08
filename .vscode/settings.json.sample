@@ -1,4 +1,3 @@
 {
     "python.analysis.extraPaths": ["./"],
-    "rest-client.environmentVariables": { "$shared": { "PAIOS_BEARER_TOKEN": "your_token_value_here" } }
 }
