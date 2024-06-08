@@ -80,9 +80,13 @@ class AbilitiesView:
         manager = AbilitiesManager()
         try:
             result = await manager.install_dependency(id, dependency_id)
-            return JSONResponse(status_code=202, content=result)
+            return JSONResponse(status_code=200, content=result)
+        except ContextualVersionConflict as e:
+            logger.error(f"Version conflict during dependency installation: {e}")
+            return JSONResponse(status_code=409, content={"message": str(e)})
         except ValueError as e:
-            return JSONResponse(status_code=404, content={"error": str(e)})
+            logger.error(f"ValueError during dependency installation: {e}")
+            return JSONResponse(status_code=400, content={"message": str(e)})
         except Exception as e:
             logger.error(f"Unexpected error during dependency installation: {e}", exc_info=True)
             return JSONResponse(status_code=500, content={"error": str(e)})

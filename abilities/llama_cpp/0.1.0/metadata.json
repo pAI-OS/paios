@@ -28,7 +28,7 @@
             "name": "fetch_llama_cpp",
             "description": "Fetches the latest and best version of llama.cpp for your system.",
             "versions": {
-                "specifiers": ">=0.1.0"
+                "required": ">=0.1.0"
             }
         }
     ]

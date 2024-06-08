@@ -27,7 +27,7 @@
             "id": "beautifulsoup4",
             "name": "Beautiful Soup",
             "versions": {
-                "specifiers": ">=4"
+                "required": ">=4"
             }
         }
     ]

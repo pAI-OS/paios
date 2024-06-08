@@ -1,18 +1,17 @@
 from abc import ABC, abstractmethod
 
 class Dependency(ABC):
-    def __init__(self, ability, dependency):
-        self.ability = ability
-        self.dependency = dependency
-
-    @abstractmethod
-    def refresh_status(self):
+    def __init__(self):
         pass
 
     @abstractmethod
-    def start(self):
+    def refresh_status(self, ability, dependency):
         pass
 
     @abstractmethod
-    def stop(self):
+    def start(self, ability, dependency):
+        pass
+
+    @abstractmethod
+    def stop(self, ability, dependency):
         pass

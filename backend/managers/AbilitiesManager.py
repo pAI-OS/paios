@@ -12,6 +12,9 @@ from backend.dependencies.ResourceDependency import ResourceDependency
 from backend.dependencies.LinuxDependency import LinuxDependency
 from backend.dependencies.ContainerDependency import ContainerDependency
 
+import logging
+logger = logging.getLogger(__name__)
+
 class AbilityState(Enum):
     AVAILABLE = "available"
     INSTALLING = "installing"
@@ -31,10 +34,10 @@ class AbilitiesManager:
 
     def _initialize_dependency_managers(self):
         self.dependency_managers = {
-            'python': PythonDependency,
-            'resource': ResourceDependency,
-            'linux': LinuxDependency,
-            'container': ContainerDependency
+            'python': PythonDependency(),
+            'resource': ResourceDependency(),
+            'linux': LinuxDependency(),
+            'container': ContainerDependency()
         }
 
     def _load_abilities(self):
@@ -99,8 +102,7 @@ class AbilitiesManager:
         for dependency in dependencies:
             dependency_manager = self.dependency_managers.get(dependency.get('type'))
             if dependency_manager:
-                dependency_instance = dependency_manager(ability, dependency)
-                dependency_instance.refresh_status()
+                dependency_manager.refresh_status(ability, dependency)
 
     def retrieve_abilities(self, offset=0, limit=100, sort_by=None, sort_order='asc', filters=None, query=None):
         filtered_abilities = self._apply_filters(self.abilities, filters)
@@ -228,24 +230,25 @@ class AbilitiesManager:
             return self.ok()
         else:
             return {"error": "Ability not running"}, 404
-
-    def install_dependency(self, ability_id, dependency_id):
+        
+    async def install_dependency(self, ability_id: str, dependency_id: str):
         ability = self.get_ability(ability_id)
         if not ability:
-            raise ValueError("Ability not found")
+            return {"message": "Ability not found"}, 404
 
-        dependency_data = next((dep for dep in ability.get('dependencies', []) if dep['id'] == dependency_id), None)
-        if not dependency_data:
-            raise ValueError("Dependency not found")
+        dependency = next((dep for dep in ability.get('dependencies', []) if dep.get('id') == dependency_id), None)
+        if not dependency:
+            return {"message": "Dependency not found"}, 404
 
-        dependency_type = dependency_data.get('type')
-        dependency_manager_class = self.dependency_managers.get(dependency_type)
-        if not dependency_manager_class:
-            raise ValueError(f"Unsupported dependency type: {dependency_type}")
+        dependency_manager = self.dependency_managers.get(dependency.get('type'))
+        if not dependency_manager:
+            return {"message": "Unsupported dependency type"}, 400
 
-        dependency_manager = dependency_manager_class(ability, dependency_data)
         try:
-            result, status_code = dependency_manager.install()
-            return result, status_code
+            return await dependency_manager.install(ability, dependency)
+        except asyncio.CancelledError:
+            logger.warning(f"Installation of dependency {dependency_id} for ability {ability_id} was cancelled")
+            return {"message": f"Installation of dependency {dependency_id} was cancelled"}, 400
         except Exception as e:
-            raise ValueError(f"Installation failed: {e}")
+            logger.error(f"Unexpected error during dependency installation: {e}", exc_info=True)
+            return {"message": f"An unexpected error occurred: {str(e)}"}, 500
