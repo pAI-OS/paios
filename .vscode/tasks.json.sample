@@ -1,0 +1,46 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Start Frontend Server",
+            "type": "shell",
+            "command": "npm run dev",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "group": "frontend"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/frontend"
+            }
+        },
+        {
+            "label": "Start Backend Server",
+            "type": "shell",
+            "command": "${config:python.pythonPath} -m paios",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+                "group": "backend"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/..",
+                "env": {
+                    "VIRTUAL_ENV": "${workspaceFolder}/.venv",
+                    "PATH": "${workspaceFolder}/.venv/bin:${env:PATH}"
+                }
+            }
+        },
+        {
+            "label": "Run Both Servers",
+            "dependsOn": [
+                "Start Frontend Server",
+                "Start Backend Server"
+            ],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        }
+    ]
+}
