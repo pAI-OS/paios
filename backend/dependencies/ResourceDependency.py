@@ -1,13 +1,18 @@
-import os
-from .Dependency import Dependency
+from backend.dependencies.Dependency import Dependency
 
 class ResourceDependency(Dependency):
-    def refresh_status(self):
-        resource_path = self.dependency.get('path')
-        self.dependency['status'] = os.path.exists(resource_path)
-
-    def start(self):
+    def refresh_status(self, ability, dependency):
+        # Implementation for refreshing status
         pass
 
-    def stop(self):
+    def start(self, ability, dependency):
+        # Implementation for starting the dependency
         pass
+
+    def stop(self, ability, dependency):
+        # Implementation for stopping the dependency
+        pass
+
+    async def install(self, ability, dependency):
+        # Placeholder implementation for installing the dependency
+        return {"message": "Dependency installation not yet implemented"}
