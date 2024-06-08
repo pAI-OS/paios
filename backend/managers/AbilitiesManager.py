@@ -259,5 +259,5 @@ class AbilitiesManager:
             # Reload the ability or update versions here if needed
             self.refresh_abilities()
 
-        await dependency_manager.install_in_background(ability, dependency, callback)
+        await dependency_manager.install(ability, dependency, background=True)
         return {"message": f"Installation of dependency {dependency_id} started"}
