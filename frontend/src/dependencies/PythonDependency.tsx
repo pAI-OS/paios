@@ -51,14 +51,14 @@ const InstallButton = ({ ability_id }: { ability_id: string }) => {
         httpClient(`${apiBase}/abilities/${ability_id}/dependencies/${record.id}/install`, { method: 'POST' })
             .then(() => {
                 notify('Python dependency installation requested');
-                refresh();
+                //refresh();
             })
             .catch((e: any) => {
                 notify('Error: Python dependency not installed', { type: 'warning' });
             })
-            .finally(() => {
-                setIsInstalling(false);
-            });
+            //.finally(() => {
+            //    setIsInstalling(false);
+            //});
     };
 
     const isLatestVersion = record.versions.installed === record.versions.latest;
