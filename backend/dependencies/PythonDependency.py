@@ -35,23 +35,16 @@ class PythonDependency(Dependency):
         if installed_version:
             versions['installed'] = installed_version
 
-        available_versions = self._get_available_versions(package_name)
+        available_versions, latest_version = self._get_available_versions(package_name)
         if available_versions:
-            versions['all'] = available_versions
             satisfactory_versions = self._get_satisfactory_versions(available_versions, required_version)
             if satisfactory_versions:
-                versions['satisfactory'] = satisfactory_versions
+                versions['available'] = satisfactory_versions
 
-            latest_version = self._get_latest_version(available_versions)
             if latest_version:
                 versions['latest'] = latest_version
-
-        # Ensure satisfactory versions are set
-        if 'satisfactory' not in versions:
-            versions['satisfactory'] = self._get_satisfactory_versions(available_versions, required_version)
-
         # Add satisfied flag
-        satisfied = self._is_satisfied(installed_version, versions['satisfactory'])
+        satisfied = self._is_satisfied(installed_version, versions.get('available', []))
         logger.debug(f"Setting satisfied for {package_name}: {satisfied}")
         versions['satisfied'] = satisfied
 
@@ -75,20 +68,22 @@ class PythonDependency(Dependency):
             response = requests.get(f'https://pypi.org/pypi/{package_name}/json')
             response.raise_for_status()
             data = response.json()
-            return sorted(data['releases'].keys(), key=Version, reverse=True)
+            available_versions = sorted(data['releases'].keys(), key=Version, reverse=True)
+            latest_version = data.get('info', {}).get('version')
+            return available_versions, latest_version
         except requests.RequestException as e:
             logger.error(f"Error fetching available versions for {package_name}: {e}")
-            return None
+            return None, None
 
     def _get_satisfactory_versions(self, available_versions, required_version):
         if not available_versions:
-            return None
+            return []
         try:
             specifier = SpecifierSet(required_version)
-            return [version for version in available_versions if specifier.contains(Version(version))]
+            return sorted([version for version in available_versions if specifier.contains(Version(version))], key=Version, reverse=True)
         except Exception as e:
             logger.error(f"Error getting satisfactory versions: {e}")
-            return None
+            return []
 
     def _get_latest_version(self, available_versions):
         if not available_versions:
