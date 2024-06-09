@@ -59,7 +59,7 @@
                 "priority": "recommended"
             }
         ],
-        "resources": [
+        "resource": [
             {
                 "name": "llava.llamafile",
                 "url": "https://example.com/models/llava.llamafile",

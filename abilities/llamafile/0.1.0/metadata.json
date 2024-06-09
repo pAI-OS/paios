@@ -21,7 +21,7 @@
     },
     "dependencies": [
         {
-            "type": "resources",
+            "type": "resource",
             "id": "llava15",
             "name": "LLaVA 1.5",
             "source_url": "https://huggingface.co/Mozilla/llava-v1.5-7b-llamafile/resolve/main/llava-v1.5-7b-q4.llamafile",
@@ -30,7 +30,7 @@
             "file_size": 4286714993
         },
         {
-            "type": "resources",
+            "type": "resource",
             "id": "tinyllama11b",
             "name": "TinyLlama-1.1B",
             "source_url": "https://huggingface.co/mozilla/TinyLlama-1.1B-Chat-v1.0-GGUF/resolve/main/TinyLlama-1.1B-Chat-v1.0.F16.llamafile",
@@ -38,7 +38,7 @@
             "file_size": 2225345005
         },
         {
-            "type": "resources",
+            "type": "resource",
             "id": "mistral7binstruct",
             "name": "Mistral-7B-Instruct",
             "source_url": "https://huggingface.co/mozilla/Mistral-7B-Instruct-v0.2-llamafile/resolve/main/mistral-7b-instruct-v0.2.Q4_0.llamafile",
@@ -46,7 +46,7 @@
             "file_size": 4136047333
         },
         {
-            "type": "resources",
+            "type": "resource",
             "id": "phi3mini4kinstruct",
             "name": "Phi-3-mini-4k-instruct",
             "source_url": "https://huggingface.co/mozilla/Phi-3-mini-4k-instruct-llamafile/resolve/main/Phi-3-mini-4k-instruct.F16.llamafile",
@@ -54,7 +54,7 @@
             "file_size": 7671518172
         },
         {
-            "type": "resources",
+            "type": "resource",
             "id": "mixtral8x7binstruct",
             "name": "Mixtral-8x7B-Instruct",
             "source_url": "https://huggingface.co/mozilla/Mixtral-8x7B-Instruct-v0.1-llamafile/resolve/main/mixtral-8x7b-instruct-v0.1.Q5_K_M.llamafile",
@@ -62,7 +62,7 @@
             "file_size": 33256706797
         },
         {
-            "type": "resources",
+            "type": "resource",
             "id": "wizardcoderpython34b",
             "name": "WizardCoder-Python-34B",
             "source_url": "https://huggingface.co/mozilla/WizardCoder-Python-34B-V1.0-llamafile/resolve/main/wizardcoder-python-34b-v1.0.Q5_K_M.llamafile",
@@ -70,7 +70,7 @@
             "file_size": 23863169529
         },
         {
-            "type": "resources",
+            "type": "resource",
             "id": "wizardcoderpython13b",
             "name": "WizardCoder-Python-13B",
             "source_url": "https://huggingface.co/mozilla/wizardcoder-13b-python/resolve/main/wizardcoder-python-13b.llamafile",
@@ -78,7 +78,7 @@
             "file_size": 9257030383
         },
         {
-            "type": "resources",
+            "type": "resource",
             "id": "llama3instruct70b",
             "name": "LLaMA-3-Instruct-70B",
             "source_url": "https://huggingface.co/mozilla/Meta-Llama-3-70B-Instruct-llamafile/resolve/main/Meta-Llama-3-70B-Instruct.Q4_0.llamafile",
@@ -86,7 +86,7 @@
             "file_size": 39994659426
         },
         {
-            "type": "resources",
+            "type": "resource",
             "id": "llama3instruct8b",
             "name": "LLaMA-3-Instruct-8B",
             "source_url": "https://huggingface.co/mozilla/Meta-Llama-3-8B-Instruct-llamafile/resolve/main/Meta-Llama-3-8B-Instruct.Q5_K_M.llamafile",
@@ -94,7 +94,7 @@
             "file_size": 5760815951
         },
         {
-            "type": "resources",
+            "type": "resource",
             "id": "rocket3b",
             "name": "Rocket-3B",
             "source_url": "https://huggingface.co/mozilla/rocket-3B-llamafile/resolve/main/rocket-3b.Q5_K_M.llamafile",

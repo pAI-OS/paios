@@ -22,7 +22,7 @@ const DownloadButton = ({ ability_id }: { ability_id: string }) => {
                 source_url: record.source_url,
                 file_name: record.file_name,
                 file_hash: record.file_hash,
-                target_directory: `abilities/${ability_id}/resources`
+                target_directory: `abilities/${ability_id}/resource`
             }
         ];
 
