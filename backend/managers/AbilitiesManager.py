@@ -2,12 +2,10 @@ import json
 import re
 import os
 import signal
-from pkg_resources import ContextualVersionConflict
 from backend.paths import abilities_dir
 from backend.utils import remove_null_fields
 from enum import Enum
 from pathlib import Path
-from backend.dependencies.DependencyState import DependencyState
 from backend.dependencies.PythonDependency import PythonDependency
 from backend.dependencies.ResourceDependency import ResourceDependency
 from backend.dependencies.LinuxDependency import LinuxDependency
@@ -30,18 +28,16 @@ class AbilitiesManager:
         if not cls._instance:
             cls._instance = super(AbilitiesManager, cls).__new__(cls, *args, **kwargs)
             cls._instance.__initialized = False
-            cls._instance.__init__(*args, **kwargs)  # Explicitly call __init__
         return cls._instance
 
     def __init__(self):
-        if self.__initialized:
-            return
-        self.__initialized = True
-        self._load_abilities()
-        self._initialize_dependency_managers()
+        if not hasattr(self, '_initialized'):  # Ensure initialization happens only once
+            self._load_abilities()
+            self._load_dependency_managers()
+            self._initialized = True
 
-    def _initialize_dependency_managers(self):
-        self.dependency_managers = {
+    def _load_dependency_managers(self):
+        self._dependency_managers = {
             'python': PythonDependency(),
             'resource': ResourceDependency(),
             'linux': LinuxDependency(),
@@ -102,15 +98,22 @@ class AbilitiesManager:
             if ability.get('id') == id and (version is None or ability.get('version') == version):
                 if refresh:
                     self._refresh_dependencies(ability)
-                return ability
-        return None
+                return remove_null_fields(ability)
+        raise ValueError(f"Ability with id {id} not found")
 
-    def _refresh_dependencies(self, ability):
-        dependencies = ability.get('dependencies', [])
-        for dependency in dependencies:
-            dependency_manager = self.dependency_managers.get(dependency.get('type'))
-            if dependency_manager:
-                dependency_manager.refresh_status(ability, dependency)
+    # get/set/del for dependencies to set state (as we were not able to do so by reference)
+    def del_value(self, ability_id, key):
+        ability = self.get_ability(ability_id)
+        if ability[key]:
+            del(ability[key])
+
+    def get_value(self, ability_id, key):
+        ability = self.get_ability(ability_id)
+        return ability.get(key)
+
+    def set_value(self, ability_id, key, value):
+        ability = self.get_ability(ability_id)
+        ability[key] = value
 
     def retrieve_abilities(self, offset=0, limit=100, sort_by=None, sort_order='asc', filters=None, query=None):
         filtered_abilities = self._apply_filters(self.abilities, filters)
@@ -124,6 +127,24 @@ class AbilitiesManager:
         paginated_abilities = [remove_null_fields(ability) for ability in paginated_abilities]
 
         return paginated_abilities, total_count
+
+    def get_dependency(self, ability_id: str, dependency_id: str):
+        ability = self.get_ability(ability_id)
+        dependency= next((dep for dep in ability.get('dependencies', []) if dep.get('id') == dependency_id), None)
+        if not dependency:
+            raise ValueError("Dependency not found")
+        return dependency
+
+    def _refresh_dependencies(self, ability, dependency_ids=[]):
+        dependencies = ability.get('dependencies', [])
+        for dep in dependencies:
+            if dep.get('id') in dependency_ids or not dependency_ids:
+                dep_type = dep.get('type')
+                dm = self._dependency_managers.get(dep_type)
+                if dm:
+                    dm.refresh_status(ability, dep)
+                else:
+                    logger.error(f"Dependency manager for type '{dep_type}' not found")
 
     def _apply_filters(self, abilities, filters):
         if not filters:
@@ -152,73 +173,72 @@ class AbilitiesManager:
         )
         return sorted_abilities
 
-    def refresh_abilities(self):
+    def reload_abilities(self):
+        print("RELOAD ABILITIES")
         self._load_abilities()
 
     def install_ability(self, id, version=None):
         print(f"Installing ability {id} version {version}")
-        for ability in self.abilities:
-            if ability['id'] == id:
-                if version is None:
-                    version = ability['versions']['latest']
-                ability['versions']['installed'] = version
-                self._set_ability_state(id, AbilityState.AVAILABLE, AbilityState.INSTALLING, version)
-                try:
-                    # TODO: Perform the installation process here
+        ability = self.get_ability(id)
 
-                    # If successful, set state to installed
-                    self._set_ability_state(id, AbilityState.INSTALLING, AbilityState.INSTALLED)
-                    return True
-                except Exception as e:
-                    # Rollback state to available
-                    self._set_ability_state(id, AbilityState.INSTALLING, AbilityState.AVAILABLE)
-                    raise ValueError(f"Installation failed: {e}")
-        raise ValueError("Installation failed: Ability not found")
+        if version is None:
+            version = ability['versions']['latest']
+
+        self._state_transition(id, AbilityState.AVAILABLE, AbilityState.INSTALLING, version)
+        try:
+            # TODO: Perform the installation process here
+
+            # If successful, set state to installed
+            self._state_transition(id, AbilityState.INSTALLING, AbilityState.INSTALLED, version)
+            return True
+        except Exception as e:
+            # Rollback state to available
+            self._state_transition(id, AbilityState.INSTALLING, AbilityState.AVAILABLE)
+            raise ValueError(f"Installation failed: {e}")
 
     def upgrade_ability(self, id, version=None):
         print(f"Upgrading ability {id} to version {version}")
-        for ability in self.abilities:
-            if ability['id'] == id:
-                old_version = ability['versions']['installed']
-                if old_version == version:
-                    raise ValueError(f"Upgrade failed: Ability {id} is already at version {version}")
-                if version is None:
-                    version = ability['versions']['latest']
-                try:
-                    self._set_ability_state(id, AbilityState.INSTALLED, AbilityState.UPGRADING, version)
-                    # TODO: Perform the upgrade process here
+        ability = self.get_ability(id)
 
-                    # If successful, set state to installed
-                    ability['versions']['installed'] = version
-                    self._set_ability_state(id, AbilityState.UPGRADING, AbilityState.INSTALLED)
-                    return True
-                except Exception as e:
-                    # Rollback state to previous version
-                    ability['versions']['installed'] = old_version
-                    self._set_ability_state(id, AbilityState.UPGRADING, AbilityState.INSTALLED, rollback=True)
-                    raise ValueError(f"Upgrade failed: {e}")
-        raise ValueError("Upgrade failed: Ability not found")
+        old_version = ability['versions']['installed']
+        if old_version == version:
+            raise ValueError(f"Upgrade failed: Ability {id} is already at version {version}")
+        if version is None:
+            version = ability['versions']['latest']
+        try:
+            self._state_transition(id, AbilityState.INSTALLED, AbilityState.UPGRADING, version)
+            # TODO: Perform the upgrade process here
+
+            # If successful, set state to installed
+            self._state_transition(id, AbilityState.UPGRADING, AbilityState.INSTALLED, version)
+            return True
+        except Exception as e:
+            # Rollback state to previous version
+            ability['versions']['installed'] = old_version
+            self._state_transition(id, AbilityState.UPGRADING, AbilityState.INSTALLED, rollback=True)
+            raise ValueError(f"Upgrade failed: {e}")
 
     def uninstall_ability(self, id):
         print(f"Uninstalling ability {id}")
-        for ability in self.abilities:
-            if ability['id'] == id:
-                self._set_ability_state(id, AbilityState.INSTALLED, AbilityState.UNINSTALLING)
-                try:
-                    # TODO: Perform the uninstallation process here
+        ability = self.get_ability(id)
 
-                    # If successful, set state to available
-                    self._set_ability_state(id, AbilityState.UNINSTALLING, AbilityState.AVAILABLE)
-                    ability['versions']['installed'] = None
-                    return True
-                except Exception as e:
-                    # Rollback state to installed
-                    self._set_ability_state(id, AbilityState.UNINSTALLING, AbilityState.INSTALLED)
-                    raise ValueError(f"Uninstallation failed: {e}")
-        raise ValueError("Uninstallation failed: Ability not found")
+        self._state_transition(id, AbilityState.INSTALLED, AbilityState.UNINSTALLING)
+        try:
+            # TODO: Perform the uninstallation process here
+
+            # If successful, set state to available
+            self._state_transition(id, AbilityState.UNINSTALLING, AbilityState.AVAILABLE)
+            del(ability['versions']['installed'])
+            return True
+        except Exception as e:
+            # Rollback state to installed
+            self._state_transition(id, AbilityState.UNINSTALLING, AbilityState.INSTALLED)
+            raise ValueError(f"Uninstallation failed: {e}")
 
     # Simple state machine using lock files to keep track of state for durability    
-    def _set_ability_state(self, id, old_state, new_state, version=None, rollback=False):
+    def _state_transition(self, id, old_state, new_state, version=None, rollback=False):
+        ability = self.get_ability(id)
+
         def _invalid_state_transition():
             raise ValueError(f"Invalid state transition: {old_state}->{new_state}")
 
@@ -226,27 +246,35 @@ class AbilitiesManager:
             if new_state == AbilityState.INSTALLING: # Install in progress
                 with open(abilities_dir / id / AbilityState.INSTALLING.value, 'w') as f:
                     f.write(version)
+                ability['state'] = AbilityState.INSTALLING.value
             else:
                 _invalid_state_transition()
         elif old_state == AbilityState.INSTALLING:
             if new_state == AbilityState.INSTALLED: # Successful install
                 (abilities_dir / id / AbilityState.INSTALLING.value).replace(abilities_dir / id / AbilityState.INSTALLED.value)
+                ability['versions']['installed'] = version
+                ability['state'] = AbilityState.INSTALLED.value
             elif new_state == AbilityState.AVAILABLE: # Failed install (no need for rollback to disambiguate)
                 (abilities_dir / id / AbilityState.INSTALLING.value).unlink()
+                del(ability['state'])
             else:
                 _invalid_state_transition()
         elif old_state == AbilityState.INSTALLED:
             if new_state == AbilityState.UPGRADING: # Upgrade in progress
                 with open(abilities_dir / id / AbilityState.UPGRADING.value, 'w') as f:
                     f.write(version)
+                ability['state'] = AbilityState.UPGRADING.value
             elif new_state == AbilityState.UNINSTALLING: # Uninstall in progress
                 (abilities_dir / id / AbilityState.INSTALLED.value).replace(abilities_dir / id / AbilityState.UNINSTALLING.value)
+                ability['state'] = AbilityState.UNINSTALLING.value
             else:
                 _invalid_state_transition()
         elif old_state == AbilityState.UPGRADING:
             if new_state == AbilityState.INSTALLED:
+                ability['state'] = AbilityState.INSTALLED.value
                 if not rollback: # Successful upgrade
                     (abilities_dir / id / AbilityState.UPGRADING.value).replace(abilities_dir / id / AbilityState.INSTALLED.value)
+                    ability['versions']['installed'] = version
                 else: # Failed upgrade
                     (abilities_dir / id / AbilityState.UPGRADING.value).unlink()
             else:
@@ -254,8 +282,11 @@ class AbilitiesManager:
         elif old_state == AbilityState.UNINSTALLING:
             if new_state == AbilityState.AVAILABLE: # Successful uninstall
                 (abilities_dir / id / AbilityState.UNINSTALLING.value).unlink()
+                ability['versions']['installed'] = None
+                del(ability['state'])
             elif new_state == AbilityState.INSTALLED: # Unsuccessful uninstall
                 (abilities_dir / id / AbilityState.UNINSTALLING.value).replace(abilities_dir / id / AbilityState.INSTALLED.value)
+                ability['state'] = AbilityState.INSTALLED.value
             else:
                 _invalid_state_transition()
 
@@ -313,55 +344,21 @@ class AbilitiesManager:
 
         process = subprocess.Popen(start_script_parts, cwd=start_script_cwd, shell=False, stdout=stdout_file, stderr=stderr_file, text=True)
         ability['pid'] = process.pid
-        return self.ok()
 
-    def stop_ability(self, ability_id):
-        ability = self.get_ability(ability_id)
-        if not ability:
-            return {"error": "Ability not found"}, 404
+    def stop_ability(self, id):
+        ability = self.get_ability(id)
+
         if 'pid' in ability:
-            try:
-                os.kill(ability['pid'], signal.SIGTERM)
-            except ProcessLookupError:
-                return {"error": "Ability not running"}, 404
+            os.kill(ability['pid'], signal.SIGTERM)
             del ability['pid']
-            return self.ok()
-        else:
-            return {"error": "Ability not running"}, 404
 
     async def install_dependency(self, ability_id: str, dependency_id: str):
         ability = self.get_ability(ability_id)
-        if not ability:
-            raise ValueError("Ability not found")
+        dependency = self.get_dependency(ability_id, dependency_id)
 
-        dependency = next((dep for dep in ability.get('dependencies', []) if dep.get('id') == dependency_id), None)
-        if not dependency:
-            raise ValueError("Dependency not found")
-
-        dependency_manager = self.dependency_managers.get(dependency.get('type'))
-        if not dependency_manager:
+        dm = self._dependency_managers.get(dependency.get('type'))
+        if not dm:
             raise ValueError("Unsupported dependency type")
 
-        dependency_manager.set_state(DependencyState.INSTALLING)
-
-        async def callback(result):
-            if isinstance(result, dict) and 'message' in result:
-                logger.info(result['message'])
-                dependency_manager.set_state(DependencyState.INSTALLED)
-            else:
-                logger.error(f"Unexpected result: {result}")
-                dependency_manager.set_state(DependencyState.FAILED)
-            self.refresh_abilities()
-
-        try:
-            await dependency_manager.install(ability, dependency, background=True)
-            return {"message": f"Installation of dependency {dependency_id} started"}
-        except ContextualVersionConflict as e:
-            logger.error(f"Version conflict detected: {e}")
-            dependency_manager.set_state(DependencyState.FAILED)
-            return {"error": "Version conflict detected. Please restart the application to resolve dependencies."}, 500
-        except Exception as e:
-            logger.error(f"Unexpected error during dependency installation: {e}")
-            dependency_manager.set_state(DependencyState.FAILED)
-            return {"error": "An unexpected error occurred during dependency installation."}, 500
-
+        await dm.install(ability, dependency, background=True)
+        #self.reload_abilities()

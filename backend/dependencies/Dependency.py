@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from backend.managers import AbilitiesManager
 from backend.dependencies.DependencyState import DependencyState
 import threading
 import asyncio
@@ -9,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 class Dependency(ABC):
     def __init__(self):
-        self.am = AbilitiesManager()
+        pass
 
     @abstractmethod
     def handle_exception(self, exception):
@@ -37,13 +36,13 @@ class Dependency(ABC):
         async def install_task(ability, dependency, background):
             try:
                 logger.info(f"Started installation of dependency {dependency['id']}")
-                self.am.set_value(ability['id'], dependency['id'] + '.state', DependencyState.INSTALLING.value)
+                #self.am.set_value(ability['id'], dependency['id'] + '.state', DependencyState.INSTALLING.value)
                 await self._install(ability, dependency, background)
-                self.am.set_value(ability['id'], dependency['id'] + '.state', DependencyState.INSTALLED.value)
+                #self.am.set_value(ability['id'], dependency['id'] + '.state', DependencyState.INSTALLED.value)
                 logger.info(f"Completed installation of dependency {dependency['id']}")
             except Exception as e:
                 logger.error(f"Unexpected error in install_task during dependency installation: {e}")
-                self.am.del_value(ability['id'], dependency['id'] + '.state')
+                #self.am.del_value(ability['id'], dependency['id'] + '.state')
 
         if background:
             logger.info(f"Installation of dependency {dependency['id']} started in background")

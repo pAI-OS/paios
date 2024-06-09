@@ -6,6 +6,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 class AbilitiesView:
+    def __init__(self):
+        self.am = AbilitiesManager()
+
     def error_immutable(self):
         return JSONResponse(status_code=400, content={"message": "Invalid Request: Abilities must be installed and are immutable; their metadata.json files cannot be edited via the API."})
 
@@ -19,7 +22,7 @@ class AbilitiesView:
         return self.error_immutable()
 
     def get(self, id=None):
-        ability = AbilitiesManager().get_ability(id)
+        ability = self.am.get_ability(id)
         if ability:
             return JSONResponse(status_code=200, content=ability)
         return JSONResponse(status_code=404, content={"message": "Ability not found"})
@@ -32,7 +35,7 @@ class AbilitiesView:
         offset, limit, sort_by, sort_order, filters = result
         query = filters.pop('q', None)
 
-        abilities, total_count = AbilitiesManager().retrieve_abilities(
+        abilities, total_count = self.am.retrieve_abilities(
             limit=limit, 
             offset=offset, 
             sort_by=sort_by, 
@@ -47,9 +50,8 @@ class AbilitiesView:
         return JSONResponse(abilities, status_code=200, headers=headers)
 
     async def install(self, id: str, version: str = None):
-        manager = AbilitiesManager()
         try:
-            if manager.install_ability(id, version):
+            if self.am.install_ability(id, version):
                 return JSONResponse(status_code=200, content={"message": "Ability installed"})
             else:
                 return JSONResponse(status_code=400, content={"message": "Installation failed"})
@@ -57,9 +59,8 @@ class AbilitiesView:
             return JSONResponse(status_code=400, content={"message": str(e)})
 
     async def upgrade(self, id: str, version: str = None):
-        manager = AbilitiesManager()
         try:
-            if manager.upgrade_ability(id, version):
+            if self.am.upgrade_ability(id, version):
                 return JSONResponse(status_code=200, content={"message": "Ability upgraded"})
             else:
                 return JSONResponse(status_code=400, content={"message": "Upgrade failed"})
@@ -67,9 +68,8 @@ class AbilitiesView:
             return JSONResponse(status_code=400, content={"message": str(e)})
 
     async def uninstall(self, id: str):
-        manager = AbilitiesManager()
         try:
-            if manager.uninstall_ability(id):
+            if self.am.uninstall_ability(id):
                 return JSONResponse(status_code=200, content={"message": "Ability uninstalled"})
             else:
                 return JSONResponse(status_code=400, content={"message": "Uninstallation failed"})
@@ -77,20 +77,18 @@ class AbilitiesView:
             return JSONResponse(status_code=400, content={"message": str(e)})
 
     async def install_dependency(self, id: str, dependency_id: str):
-        manager = AbilitiesManager()
         try:
-            result = await manager.install_dependency(id, dependency_id)
-            return JSONResponse(status_code=202, content=result)
+            await self.am.install_dependency(id, dependency_id)
+            return JSONResponse(status_code=202, content={"message": "Dependency install started"})
         except ValueError as e:
-            return JSONResponse(status_code=404, content={"error": str(e)})
+            return JSONResponse(status_code=400, content={"error": str(e)})
         except Exception as e:
             logger.error(f"Unexpected error during dependency installation: {e}", exc_info=True)
             return JSONResponse(status_code=500, content={"error": str(e)})
 
     async def start(self, id: str):
-        manager = AbilitiesManager()
         try:
-            result = manager.start_ability(id)
+            result = self.am.start_ability(id)
             if "error" in result:
                 return JSONResponse(status_code=404, content=result)
             else:
@@ -99,9 +97,8 @@ class AbilitiesView:
             return JSONResponse(status_code=500, content={"error": str(e)})
 
     async def stop(self, id: str):
-        manager = AbilitiesManager()
         try:
-            result = manager.stop_ability(id)
+            result = self.am.stop_ability(id)
             if "error" in result:
                 return JSONResponse(status_code=404, content=result)
             else:

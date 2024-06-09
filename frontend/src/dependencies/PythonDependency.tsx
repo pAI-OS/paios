@@ -10,9 +10,10 @@ export const PythonDependency = (props: { dependencies: any, ability_id: string 
         <Datagrid data={props.dependencies} sort={{ field: 'name', order: 'ASC' }}>
             <TextField source="id" />
             <TextField source="name" />
-            <TextField source="versions.installed" label="Installed" />
-            <TextField source="versions.required" label="Required" />
             <CheckedField source="versions.satisfied" label="Satisfied" />
+            <TextField source="versions.required" label="Required" />
+            <TextField source="versions.installed" label="Installed" />
+            <TextField source="versions.latest" label="Latest" />
             <InstallButton ability_id={props.ability_id} />
         </Datagrid>
     );
