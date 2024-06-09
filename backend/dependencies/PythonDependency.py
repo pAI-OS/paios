@@ -21,15 +21,18 @@ class PythonDependency(Dependency):
             return super().handle_exception(exception)
 
     def refresh_status(self, ability, dependency):
-        package_name = dependency.get('id')
-        required_version = dependency.get('required', '')
+        try:
+            package_name = dependency.get('id')
+            required_version = dependency.get('required', '')
 
-        versions = dependency.get('versions', {})
+            versions = dependency.get('versions', {})
 
-        self._refresh_versions(package_name, required_version, versions)
+            self._refresh_versions(package_name, required_version, versions)
 
-        if versions:
-            dependency['versions'] = versions
+            if versions:
+                dependency['versions'] = versions
+        except Exception as e:
+            self.handle_exception(e)
 
     def _refresh_versions(self, package_name, required_version, versions):
         installed_version = self._get_installed_version(package_name)
@@ -107,7 +110,7 @@ class PythonDependency(Dependency):
         def run_subprocess():
             try:
                 result = subprocess.run(
-                    [sys.executable, '-m', 'pip', 'install', package_with_version],
+                    [sys.executable, '-m', 'pip', 'install', '--force-reinstall', package_with_version],
                     capture_output=True,
                     text=True
                 )
