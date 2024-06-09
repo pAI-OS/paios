@@ -488,7 +488,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/uuid4'
+                type: object
+                properties:
+                  id:
+                    $ref: '#/components/schemas/uuid4'
         '400':
           description: Missing Required Information
         '409':
