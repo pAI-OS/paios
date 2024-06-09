@@ -89,6 +89,8 @@ class AbilitiesManager:
         if installed_version:
             versions_info['installed'] = installed_version
 
+        return versions_info
+
     def get_ability(self, id, version=None, refresh=True):
         for ability in self.abilities:
             if ability.get('id') == id and (version is None or ability.get('version') == version):
