@@ -1,8 +1,13 @@
 from .Dependency import Dependency
 
 class ContainerDependency(Dependency):
+    # TODO: Container dependencies need to be implemented when required
+
+    def handle_exception(self, exception):
+        super().handle_exception(exception)
+        # Implementation for handling exception
+
     def refresh_status(self):
-        # TODO: Linux dependencies need to be implemented when required
         raise NotImplementedError
         #container_name = self.dependency.get('name')
         #import docker
@@ -21,6 +26,6 @@ class ContainerDependency(Dependency):
         # Implementation for stopping the dependency
         pass
 
-    async def install(self, ability, dependency):
+    async def _install(self, ability, dependency):
         # Placeholder implementation for installing the dependency
         return {"message": "Dependency installation not yet implemented"}

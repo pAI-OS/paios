@@ -2,6 +2,10 @@ from .Dependency import Dependency
 
 class LinuxDependency(Dependency):
     # TODO: Linux dependencies need to be implemented when required
+    def handle_exception(self, exception):
+        super().handle_exception(exception)
+        # Implementation for handling exception
+
     def refresh_status(self):
         raise NotImplementedError
         #package_name = self.dependency.get('name')
@@ -17,6 +21,6 @@ class LinuxDependency(Dependency):
         # Implementation for stopping the dependency
         pass
 
-    async def install(self, ability, dependency):
+    async def _install(self, ability, dependency):
         # Placeholder implementation for installing the dependency
         return {"message": "Dependency installation not yet implemented"}

@@ -7,11 +7,18 @@ import sys
 import importlib
 from packaging.specifiers import SpecifierSet
 from packaging.version import Version
+from pkg_resources import ContextualVersionConflict
 
 import logging
 logger = logging.getLogger(__name__)
 
 class PythonDependency(Dependency):
+    def handle_exception(self, exception):
+        super().handle_exception(exception)
+
+        if isinstance(exception, ContextualVersionConflict):
+            logger.error(f"Version conflict detected: {exception}")
+
     def refresh_status(self, ability, dependency):
         package_name = dependency.get('id')
         required_version = dependency.get('required', '')
@@ -88,9 +95,9 @@ class PythonDependency(Dependency):
             return None
         return available_versions[0]
 
-    async def install(self, ability, dependency, background=False):
+    async def _install(self, ability, dependency, background=False):
         if background:
-            await self._run_in_background(self._install_task, ability, dependency)
+            self._run_in_background(self._install_task, ability, dependency)
         else:
             return await self._install_task(ability, dependency)
 
