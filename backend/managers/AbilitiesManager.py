@@ -23,6 +23,7 @@ class AbilityState(Enum):
 
 class AbilitiesManager:
     _instance = None
+    abilities = []
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
@@ -45,10 +46,6 @@ class AbilitiesManager:
         }
 
     def _load_abilities(self):
-        self.abilities = self._fetch_abilities_from_directory()
-
-    def _fetch_abilities_from_directory(self):
-        abilities = []
         for ability_path in abilities_dir.iterdir():
             if ability_path.is_dir():
                 versions_info = self._get_versions_info(ability_path)
@@ -60,8 +57,7 @@ class AbilitiesManager:
                             ability_data['versions'].update(versions_info)
                         else:
                             ability_data['versions'] = versions_info
-                        abilities.append(ability_data)
-        return abilities
+                        self.abilities.append(ability_data)
 
     def _fetch_ability_from_directory(self, ability_path, version):
         version_dir = ability_path / version
@@ -98,7 +94,8 @@ class AbilitiesManager:
             if ability.get('id') == id and (version is None or ability.get('version') == version):
                 if refresh:
                     self._refresh_dependencies(ability)
-                return remove_null_fields(ability)
+                # remove_null_fields creates a copy so let's return the original reference
+                return ability
         raise ValueError(f"Ability with id {id} not found")
 
     # get/set/del for dependencies to set state (as we were not able to do so by reference)
@@ -173,10 +170,6 @@ class AbilitiesManager:
         )
         return sorted_abilities
 
-    def reload_abilities(self):
-        print("RELOAD ABILITIES")
-        self._load_abilities()
-
     def install_ability(self, id, version=None):
         print(f"Installing ability {id} version {version}")
         ability = self.get_ability(id)
@@ -228,7 +221,6 @@ class AbilitiesManager:
 
             # If successful, set state to available
             self._state_transition(id, AbilityState.UNINSTALLING, AbilityState.AVAILABLE)
-            del(ability['versions']['installed'])
             return True
         except Exception as e:
             # Rollback state to installed
@@ -242,29 +234,29 @@ class AbilitiesManager:
         def _invalid_state_transition():
             raise ValueError(f"Invalid state transition: {old_state}->{new_state}")
 
-        if old_state == AbilityState.AVAILABLE: # Not installed
-            if new_state == AbilityState.INSTALLING: # Install in progress
+        if old_state == AbilityState.AVAILABLE:  # Not installed
+            if new_state == AbilityState.INSTALLING:  # Install in progress
                 with open(abilities_dir / id / AbilityState.INSTALLING.value, 'w') as f:
                     f.write(version)
                 ability['state'] = AbilityState.INSTALLING.value
             else:
                 _invalid_state_transition()
         elif old_state == AbilityState.INSTALLING:
-            if new_state == AbilityState.INSTALLED: # Successful install
+            if new_state == AbilityState.INSTALLED:  # Successful install
                 (abilities_dir / id / AbilityState.INSTALLING.value).replace(abilities_dir / id / AbilityState.INSTALLED.value)
-                ability['versions']['installed'] = version
+                ability['versions']['installed'] = version  # Set the installed version here
                 ability['state'] = AbilityState.INSTALLED.value
-            elif new_state == AbilityState.AVAILABLE: # Failed install (no need for rollback to disambiguate)
+            elif new_state == AbilityState.AVAILABLE:  # Failed install (no need for rollback to disambiguate)
                 (abilities_dir / id / AbilityState.INSTALLING.value).unlink()
-                del(ability['state'])
+                del ability['state']
             else:
                 _invalid_state_transition()
         elif old_state == AbilityState.INSTALLED:
-            if new_state == AbilityState.UPGRADING: # Upgrade in progress
+            if new_state == AbilityState.UPGRADING:  # Upgrade in progress
                 with open(abilities_dir / id / AbilityState.UPGRADING.value, 'w') as f:
                     f.write(version)
                 ability['state'] = AbilityState.UPGRADING.value
-            elif new_state == AbilityState.UNINSTALLING: # Uninstall in progress
+            elif new_state == AbilityState.UNINSTALLING:  # Uninstall in progress
                 (abilities_dir / id / AbilityState.INSTALLED.value).replace(abilities_dir / id / AbilityState.UNINSTALLING.value)
                 ability['state'] = AbilityState.UNINSTALLING.value
             else:
@@ -272,19 +264,21 @@ class AbilitiesManager:
         elif old_state == AbilityState.UPGRADING:
             if new_state == AbilityState.INSTALLED:
                 ability['state'] = AbilityState.INSTALLED.value
-                if not rollback: # Successful upgrade
+                if not rollback:  # Successful upgrade
                     (abilities_dir / id / AbilityState.UPGRADING.value).replace(abilities_dir / id / AbilityState.INSTALLED.value)
-                    ability['versions']['installed'] = version
-                else: # Failed upgrade
+                    ability['versions']['installed'] = version  # Set the installed version here
+                else:  # Failed upgrade
                     (abilities_dir / id / AbilityState.UPGRADING.value).unlink()
             else:
                 _invalid_state_transition()
         elif old_state == AbilityState.UNINSTALLING:
-            if new_state == AbilityState.AVAILABLE: # Successful uninstall
+            if new_state == AbilityState.AVAILABLE:  # Successful uninstall
                 (abilities_dir / id / AbilityState.UNINSTALLING.value).unlink()
-                ability['versions']['installed'] = None
-                del(ability['state'])
-            elif new_state == AbilityState.INSTALLED: # Unsuccessful uninstall
+                if ability.get('versions').get('installed'):
+                    del ability['versions']['installed']
+                if ability.get('state'):
+                    del ability['state']
+            elif new_state == AbilityState.INSTALLED:  # Unsuccessful uninstall
                 (abilities_dir / id / AbilityState.UNINSTALLING.value).replace(abilities_dir / id / AbilityState.INSTALLED.value)
                 ability['state'] = AbilityState.INSTALLED.value
             else:
@@ -361,4 +355,4 @@ class AbilitiesManager:
             raise ValueError("Unsupported dependency type")
 
         await dm.install(ability, dependency, background=True)
-        #self.reload_abilities()
+        #self._load_abilities()
