@@ -36,13 +36,10 @@ class Dependency(ABC):
         async def install_task(ability, dependency, background):
             try:
                 logger.info(f"Started installation of dependency {dependency['id']}")
-                #self.am.set_value(ability['id'], dependency['id'] + '.state', DependencyState.INSTALLING.value)
                 await self._install(ability, dependency, background)
-                #self.am.set_value(ability['id'], dependency['id'] + '.state', DependencyState.INSTALLED.value)
                 logger.info(f"Completed installation of dependency {dependency['id']}")
             except Exception as e:
-                logger.error(f"Unexpected error in install_task during dependency installation: {e}")
-                #self.am.del_value(ability['id'], dependency['id'] + '.state')
+                self.handle_exception(e)
 
         if background:
             logger.info(f"Installation of dependency {dependency['id']} started in background")
