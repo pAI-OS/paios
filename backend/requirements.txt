@@ -13,3 +13,4 @@ asyncio
 aiohttp
 aioftp
 aiofiles
+structlog

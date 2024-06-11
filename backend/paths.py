@@ -15,6 +15,8 @@ venv_bin_dir = venv_dir / 'bin'
 
 # data
 data_dir = base_dir / 'data'
+log_path = data_dir / 'log'
+log_db_path = 'file:log?mode=memory&cache=shared'
 
 # abilities
 abilities_subdir = 'abilities'
