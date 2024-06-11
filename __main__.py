@@ -1,4 +1,6 @@
+import asyncio
 import sys
+import signal
 from pathlib import Path
 
 # Ensure the parent directory is in sys.path so relative imports work.
@@ -9,12 +11,22 @@ from backend.env import check_env
 from backend.paths import backend_dir, venv_dir, log_db_path
 from backend.log import logger
 
-logger.info("Starting server...")
+def handle_keyboard_interrupt(signum, frame):
+    print(f"KeyboardInterrupt (ID: {signum}) has been caught. Cleaning up...")
+    cleanup()
+    asyncio.get_event_loop().stop()
+
+def cleanup():
+    # Perform any necessary cleanup here
+    print("Performing cleanup tasks...")
 
 if __name__ == "__main__":
-    # Check if the environment is set up and activated before importing dependencies
+    # Set up signal handlers
+    signal.signal(signal.SIGINT, handle_keyboard_interrupt)
+    signal.signal(signal.SIGTERM, handle_keyboard_interrupt)
+
+    logger.info("Checking if the environment is set up and activated before importing dependencies.")
     check_env()
-    from starlette.staticfiles import StaticFiles
 
     # Create the app
     from app import create_app
@@ -22,4 +34,9 @@ if __name__ == "__main__":
 
     # Run the app
     import uvicorn
-    uvicorn.run("app:create_app", host="localhost", port=3080, factory=True, workers=1, reload=True, reload_dirs=[backend_dir], reload_excludes=[venv_dir])
+    try:
+        uvicorn.run("app:create_app", host="localhost", port=3080, factory=True, workers=1, reload=True, reload_dirs=[backend_dir], reload_excludes=[venv_dir])
+    except KeyboardInterrupt:
+        pass
+    finally:
+        cleanup()
