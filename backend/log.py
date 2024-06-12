@@ -9,6 +9,16 @@ from structlog.stdlib import LoggerFactory
 from structlog.dev import ConsoleRenderer
 from backend.paths import log_path, log_db_path
 
+# Set up basic configuration for logging
+logging.basicConfig(
+    level=logging.INFO,  # Minimum level of logs to capture
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',  # Format of log messages
+    handlers=[
+        logging.StreamHandler(),  # Output logs to the console
+        logging.FileHandler(filename=log_path / 'system.log', mode='a')  # Output logs to a file
+    ]
+)
+
 # Configure structlog
 structlog.configure(
     processors=[
