@@ -7,12 +7,12 @@ import logging
 from structlog.processors import JSONRenderer, TimeStamper, CallsiteParameterAdder
 from structlog.stdlib import LoggerFactory
 from structlog.dev import ConsoleRenderer
-from backend.paths import log_path, log_db_path
+from common.paths import log_path, log_db_path
 
 # Set up basic configuration for logging
 logging.basicConfig(
     level=logging.INFO,  # Minimum level of logs to capture
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',  # Format of log messages
+    format='%(message)s',  # Format of log messages
     handlers=[
         logging.StreamHandler(),  # Output logs to the console
         logging.FileHandler(filename=log_path / 'system.log', mode='a')  # Output logs to a file
@@ -49,7 +49,7 @@ structlog.configure(
                 structlog.processors.CallsiteParameter.LINENO,
             }
         ),
-        ConsoleRenderer(colors=True),  # Use colored console renderer
+        ConsoleRenderer(colors=False),  # Use colored console renderer?
         JSONRenderer(),
         #StructlogAsyncSQLiteHandler(db_path=log_db_path),
         # Transform event dict into `logging.Logger` method arguments.
@@ -57,7 +57,8 @@ structlog.configure(
         # "extra". IMPORTANT: This means that the standard library MUST
         # render "extra" for the context to appear in log entries! See
         # warning below.
-        structlog.stdlib.render_to_log_kwargs,
+        # TODO: Here be dragons: AttributeError: 'str' object has no attribute 'pop'
+        #structlog.stdlib.render_to_log_kwargs,
     ],
     # TODO: DeprecationWarning: `structlog.threadlocal` is deprecated, please use `structlog.contextvars` instead.
     #context_class=dict, # wrap_dict() deprecated, but contextvars are not safe for hybrid applications like our host, Starlette!

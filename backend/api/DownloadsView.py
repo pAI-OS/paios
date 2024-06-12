@@ -1,7 +1,6 @@
 from starlette.requests import Request
 from starlette.responses import Response, JSONResponse
 from backend.managers.DownloadsManager import DownloadsManager
-from backend.paths import api_base_url
 from backend.pagination import parse_pagination_params
 
 class DownloadsView:

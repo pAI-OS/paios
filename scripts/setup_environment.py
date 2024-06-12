@@ -10,7 +10,7 @@ base_dir = Path(__file__).parent.parent
 if base_dir not in sys.path:
     sys.path.append(str(base_dir))
 
-from backend.paths import base_dir, venv_dir, backend_dir, frontend_dir, env_file
+from common.paths import base_dir, venv_dir, backend_dir, frontend_dir, env_file
 
 # Determine the correct path for the Python executable based on the OS
 if os.name == 'nt':  # Windows

@@ -8,7 +8,7 @@ base_dir = Path(__file__).parent
 if base_dir not in sys.path:
     sys.path.append(str(base_dir))
 from backend.env import check_env
-from backend.paths import backend_dir, venv_dir
+from common.paths import backend_dir, venv_dir
 
 def handle_keyboard_interrupt(signum, frame):
     print(f"KeyboardInterrupt (ID: {signum}) has been caught. Cleaning up...")

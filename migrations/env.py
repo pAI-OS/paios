@@ -13,7 +13,7 @@ repo_root = Path(__file__).resolve().parent.parent
 sys.path.append(str(repo_root))
 
 # get the db path from the backend
-from backend.paths import db_path
+from common.paths import db_path
 
 # import the models so SQLModel.metadata is populated
 from backend.models import Config

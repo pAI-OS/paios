@@ -1,10 +1,12 @@
 # database helper functions
 import os
 import aiosqlite
+import logging
 from alembic import command
 from alembic.config import Config as AlembicConfig
-from backend.paths import base_dir, db_path
-from backend.log import logger
+from common.paths import base_dir, db_path
+
+logger = logging.getLogger(__name__)
 
 # use alembic to create the database or migrate to the latest schema
 def init_db():
@@ -16,7 +18,8 @@ def init_db():
     command.upgrade(alembic_cfg, "head")
 
 async def execute_query(query, params=None):
-    logger.adebug(f"Executing query: {query} with params: {params}")
+    # TODO: logger.adebug from structlog
+    logger.debug(f"Executing query: {query} with params: {params}")
     async with aiosqlite.connect(db_path) as conn:
         async with conn.cursor() as cursor:
             try:

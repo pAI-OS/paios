@@ -1,6 +1,6 @@
 from starlette.responses import JSONResponse, Response
+from common.paths import api_base_url
 from backend.managers.ChannelsManager import ChannelsManager
-from backend.paths import api_base_url
 from backend.pagination import parse_pagination_params
 
 class ChannelsView:

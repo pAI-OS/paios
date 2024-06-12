@@ -2,7 +2,7 @@ import json
 import re
 import os
 import signal
-from backend.paths import abilities_dir
+from common.paths import abilities_dir, abilities_data_dir, venv_bin_dir
 from backend.utils import remove_null_fields
 from enum import Enum
 from pathlib import Path
@@ -292,7 +292,6 @@ class AbilitiesManager:
         import sys
         import subprocess
         import shlex
-        from backend.paths import abilities_dir, abilities_data_dir, venv_bin_dir
 
         print(f"Starting ability {ability_id}")
         ability = self.get_ability(ability_id)
