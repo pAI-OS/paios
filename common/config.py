@@ -12,7 +12,7 @@ logging_config: dict[str, Any] = {
         },
         "access": {
             "()": "uvicorn.logging.AccessFormatter",
-            "fmt": '%(client_addr)s - - [%(asctime)s] "%(request_line)s" %(status_code)s',
+            "fmt": '%(client_addr)s - - [%(asctime)s] "%(request_line)s" %(status_code).3s -',
             "datefmt": "%d/%b/%Y:%H:%M:%S %z",
             "use_colors": False
         },
