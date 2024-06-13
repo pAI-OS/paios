@@ -7,9 +7,12 @@ from pathlib import Path
 base_dir = Path(__file__).parent
 if base_dir not in sys.path:
     sys.path.append(str(base_dir))
-from backend.env import check_env
 from common.paths import backend_dir, venv_dir
 from common.config import logging_config
+
+# check environment
+from backend.env import check_env
+check_env()
 
 # set up logging
 from common.log import get_logger
@@ -26,11 +29,8 @@ def cleanup():
 
 if __name__ == "__main__":
     # Set up signal handlers
-    signal.signal(signal.SIGINT, handle_keyboard_interrupt)
-    signal.signal(signal.SIGTERM, handle_keyboard_interrupt)
-
-    logger.info(f"Checking if the environment in {venv_dir} is set up and activated before importing dependencies.", extra={'x': 'y'})
-    check_env()
+    #signal.signal(signal.SIGINT, handle_keyboard_interrupt)
+    #signal.signal(signal.SIGTERM, handle_keyboard_interrupt)
 
     # Create the app
     logger.info("Creating the app...")
@@ -45,6 +45,7 @@ if __name__ == "__main__":
         logger.info(f"Logging config: {logging_config}")
         uvicorn.run("app:create_app", host="localhost", port=3080, factory=True, workers=1, reload=True, reload_dirs=[backend_dir], reload_excludes=[venv_dir], log_config=logging_config)
     except KeyboardInterrupt:
-        handle_keyboard_interrupt(None, None)
+        #handle_keyboard_interrupt(None, None)
+        pass
     finally:
         cleanup()
