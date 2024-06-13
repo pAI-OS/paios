@@ -1,17 +1,19 @@
 from typing import Any
+from common.paths import log_dir
 
-LOGGING_CONFIG: dict[str, Any] = {
+logging_config: dict[str, Any] = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
         "default": {
             "()": "uvicorn.logging.DefaultFormatter",
             "fmt": "%(levelprefix)s %(message)s",
-            "use_colors": None,
+            "use_colors": True,
         },
         "access": {
             "()": "uvicorn.logging.AccessFormatter",
-            "fmt": '%(levelprefix)s %(client_addr)s - "%(request_line)s" %(status_code)s',  # noqa: E501
+            "fmt": '%(levelprefix)s %(client_addr)s - "%(request_line)s" %(status_code)s',
+            "use_colors": True # noqa: E501
         },
     },
     "handlers": {
@@ -23,7 +25,7 @@ LOGGING_CONFIG: dict[str, Any] = {
         "access": {
             "formatter": "access",
             "class": "logging.StreamHandler",
-            "stream": "ext://sys.stdout",
+            "stream": "ext://sys.stdout"
         },
     },
     "loggers": {

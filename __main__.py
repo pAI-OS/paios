@@ -8,7 +8,8 @@ base_dir = Path(__file__).parent
 if base_dir not in sys.path:
     sys.path.append(str(base_dir))
 from backend.env import check_env
-from common.paths import backend_dir, venv_dir, logging_config_path
+from common.paths import backend_dir, venv_dir
+from common.config import logging_config
 
 # set up logging
 from common.log import get_logger
@@ -41,7 +42,8 @@ if __name__ == "__main__":
     
     logger.info("Running the app...")
     try:
-        uvicorn.run("app:create_app", host="localhost", port=3080, factory=True, workers=1, reload=True, reload_dirs=[backend_dir], reload_excludes=[venv_dir], log_config=str(logging_config_path))
+        logger.info(f"Logging config: {logging_config}")
+        uvicorn.run("app:create_app", host="localhost", port=3080, factory=True, workers=1, reload=True, reload_dirs=[backend_dir], reload_excludes=[venv_dir], log_config=logging_config)
     except KeyboardInterrupt:
         handle_keyboard_interrupt(None, None)
     finally:

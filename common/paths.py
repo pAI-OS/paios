@@ -20,7 +20,6 @@ log_dir = data_dir / 'log'
 
 # logs
 log_db_path = 'file:log?mode=memory&cache=shared'
-logging_config_path = common_dir / 'logging_config.json'
 
 # abilities
 abilities_subdir = 'abilities'
