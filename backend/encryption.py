@@ -2,7 +2,7 @@ import os
 import json
 from dotenv import load_dotenv, set_key
 from cryptography.fernet import Fernet
-
+from common.paths import base_dir
 class Encryption:
     _instance = None
 
@@ -17,7 +17,7 @@ class Encryption:
         if self._initialized:
             return
         self._initialized = True
-        load_dotenv()
+        load_dotenv(base_dir / '.env')
         self.encryption_key = encryption_key if encryption_key else self.get_encryption_key()
 
     # Helper function to get the encryption key from environment variables or generate a new one and save it to .env
@@ -25,7 +25,7 @@ class Encryption:
         encryption_key = os.environ.get('PAIOS_DB_ENCRYPTION_KEY')
         if not encryption_key:
             encryption_key = Fernet.generate_key().decode()
-            set_key('.env', 'PAIOS_DB_ENCRYPTION_KEY', encryption_key)
+            set_key(base_dir / '.env', 'PAIOS_DB_ENCRYPTION_KEY', encryption_key)
         return encryption_key
 
     # Encrypt a value using Fernet encryption
