@@ -28,7 +28,7 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, handle_keyboard_interrupt)
     signal.signal(signal.SIGTERM, handle_keyboard_interrupt)
 
-    logger.info(f"Checking if the environment in {venv_dir} is set up and activated before importing dependencies.")
+    logger.info(f"Checking if the environment in {venv_dir} is set up and activated before importing dependencies.", extra={'x': 'y'})
     check_env()
 
     # Create the app

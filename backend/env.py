@@ -4,9 +4,7 @@ def check_env():
     import sys
     from pathlib import Path
 
-    if hasattr(sys, 'real_prefix') or (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix):
-        print("Running in a virtual environment ({})".format(sys.prefix))
-    else:
+    if not (hasattr(sys, 'real_prefix') or (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix)):
         print("Error: Running under the system python ({})\n".format(sys.prefix))
         venv_path = Path(__file__).resolve().parent.parent / '.venv'
         if not venv_path.exists():

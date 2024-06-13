@@ -7,7 +7,7 @@ import logging
 from structlog.processors import JSONRenderer, TimeStamper, CallsiteParameterAdder
 from structlog.stdlib import LoggerFactory
 from structlog.dev import ConsoleRenderer
-from common.paths import log_path, log_db_path
+from common.paths import log_path
 
 # Set up basic configuration for logging
 logging.basicConfig(

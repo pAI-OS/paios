@@ -16,8 +16,11 @@ venv_bin_dir = venv_dir / 'bin'
 
 # data
 data_dir = base_dir / 'data'
-log_path = data_dir / 'log'
+log_dir = data_dir / 'log'
+
+# logs
 log_db_path = 'file:log?mode=memory&cache=shared'
+logging_config_path = common_dir / 'logging_config.json'
 
 # abilities
 abilities_subdir = 'abilities'
@@ -27,4 +30,3 @@ abilities_data_dir = data_dir / abilities_subdir
 # paths
 db_path = data_dir / 'paios.db'
 downloads_dir = data_dir / 'downloads'
-logging_config_path = common_dir / 'logging_config.json'
