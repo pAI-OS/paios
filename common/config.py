@@ -12,8 +12,9 @@ logging_config: dict[str, Any] = {
         },
         "access": {
             "()": "uvicorn.logging.AccessFormatter",
-            "fmt": '%(levelprefix)s %(client_addr)s - "%(request_line)s" %(status_code)s',
-            "use_colors": True # noqa: E501
+            "fmt": '%(client_addr)s - - [%(asctime)s] "%(request_line)s" %(status_code)s',
+            "datefmt": "%d/%b/%Y:%H:%M:%S %z",
+            "use_colors": False
         },
     },
     "handlers": {
@@ -24,8 +25,11 @@ logging_config: dict[str, Any] = {
         },
         "access": {
             "formatter": "access",
-            "class": "logging.StreamHandler",
-            "stream": "ext://sys.stdout"
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": log_dir / "access.log",
+            "maxBytes": 52428800,
+            "backupCount": 9,
+            "encoding": "utf8"
         },
     },
     "loggers": {
