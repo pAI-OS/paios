@@ -42,7 +42,6 @@ if __name__ == "__main__":
     
     logger.info("Running the app...")
     try:
-        logger.info(f"Logging config: {logging_config}")
         uvicorn.run("app:create_app", host="localhost", port=3080, factory=True, workers=1, reload=True, reload_dirs=[backend_dir], reload_excludes=[venv_dir], log_config=logging_config)
     except KeyboardInterrupt:
         #handle_keyboard_interrupt(None, None)

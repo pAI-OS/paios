@@ -5,7 +5,10 @@ logging_config: dict[str, Any] = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "default": {
+        'standard': {
+            'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+        },
+        "uvicorn_default": {
             "()": "uvicorn.logging.DefaultFormatter",
             "fmt": "%(levelprefix)s %(message)s",
             "use_colors": True,
@@ -16,10 +19,16 @@ logging_config: dict[str, Any] = {
             "datefmt": "%d/%b/%Y:%H:%M:%S %z",
             "use_colors": False
         },
+
     },
     "handlers": {
-        "default": {
-            "formatter": "default",
+        "standard": {
+            "formatter": "standard",
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stderr",
+        },
+        "uvicorn_default": {
+            "formatter": "uvicorn_default",
             "class": "logging.StreamHandler",
             "stream": "ext://sys.stderr",
         },
@@ -31,9 +40,19 @@ logging_config: dict[str, Any] = {
             "backupCount": 9,
             "encoding": "utf8"
         },
+        "connexion": {
+            "formatter": "standard",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": log_dir / "connexion.log",
+            "maxBytes": 52428800,
+            "backupCount": 9,
+            "encoding": "utf8"
+        },
     },
     "loggers": {
-        "uvicorn": {"handlers": ["default"], "level": "INFO", "propagate": False},
+        "": {"handlers": ["standard"], "level": "INFO"}, # root logger
+        "connexion": {"handlers": ["connexion"], "level": "DEBUG", "propagate": False},
+        "uvicorn": {"handlers": ["uvicorn_default"], "level": "INFO", "propagate": False},
         "uvicorn.error": {"level": "INFO"},
         "uvicorn.access": {"handlers": ["access"], "level": "INFO", "propagate": False},
     },
