@@ -28,7 +28,6 @@ class AbilitiesManager:
     abilities = []
 
     def __new__(cls, *args, **kwargs):
-        # The managers are singletons so expensive startup operations are not performed on each instantiation
         if not cls._instance:
             with cls._lock:
                 if not cls._instance:
