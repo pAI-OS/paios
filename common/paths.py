@@ -11,8 +11,11 @@ frontend_dir = base_dir / 'frontend'
 env_file = backend_dir / '.env'
 
 # python venv
-venv_dir = base_dir / '.venv'
-venv_bin_dir = venv_dir / 'bin'
+venv_subdir = base_dir / '.venv'
+venv_bin_subdir = venv_subdir / 'bin'
+
+# apps
+apps_dir = base_dir / 'apps'
 
 # data
 data_dir = base_dir / 'data'
