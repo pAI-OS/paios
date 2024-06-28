@@ -1,4 +1,5 @@
 from uuid import uuid4
+import time
 import hashlib
 import os
 import aiohttp
@@ -10,7 +11,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 from common.paths import data_dir, downloads_dir
 from backend.utils import filter_dict, remove_null_fields
-import time
+from threading import Lock
 
 class DownloadStatus(Enum):
     DOWNLOADING = "downloading"
@@ -24,11 +25,25 @@ class DownloadStatus(Enum):
     INVALID = "invalid"
 
 class DownloadsManager:
+    _instance = None
+    _lock = Lock()
+
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            with cls._lock:
+                if not cls._instance:
+                    cls._instance = super(DownloadsManager, cls).__new__(cls, *args, **kwargs)
+        return cls._instance
+
     def __init__(self, max_concurrent_downloads=5):
-        self.max_concurrent_downloads = max_concurrent_downloads
-        self.semaphore = asyncio.Semaphore(max_concurrent_downloads)
-        self.downloads = {}
-        downloads_dir.mkdir(parents=True, exist_ok=True)
+        if not hasattr(self, '_initialized'):
+            with self._lock:
+                if not hasattr(self, '_initialized'):
+                    self.max_concurrent_downloads = max_concurrent_downloads
+                    self.semaphore = asyncio.Semaphore(max_concurrent_downloads)
+                    self.downloads = {}
+                    downloads_dir.mkdir(parents=True, exist_ok=True)
+                    self._initialized = True
 
     def _is_valid_url(self, url):
         parsed_url = urlparse(url)

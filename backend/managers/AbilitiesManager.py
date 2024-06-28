@@ -6,6 +6,7 @@ from common.paths import abilities_dir, abilities_data_dir, venv_bin_dir
 from backend.utils import remove_null_fields
 from enum import Enum
 from pathlib import Path
+from threading import Lock
 from backend.dependencies.PythonDependency import PythonDependency
 from backend.dependencies.ResourceDependency import ResourceDependency
 from backend.dependencies.LinuxDependency import LinuxDependency
@@ -23,19 +24,24 @@ class AbilityState(Enum):
 
 class AbilitiesManager:
     _instance = None
+    _lock = Lock()
     abilities = []
 
     def __new__(cls, *args, **kwargs):
+        # The managers are singletons so expensive startup operations are not performed on each instantiation
         if not cls._instance:
-            cls._instance = super(AbilitiesManager, cls).__new__(cls, *args, **kwargs)
-            cls._instance.__initialized = False
+            with cls._lock:
+                if not cls._instance:
+                    cls._instance = super(AbilitiesManager, cls).__new__(cls, *args, **kwargs)
         return cls._instance
 
     def __init__(self):
         if not hasattr(self, '_initialized'):  # Ensure initialization happens only once
-            self._load_abilities()
-            self._load_dependency_managers()
-            self._initialized = True
+            with self._lock:
+                if not hasattr(self, '_initialized'):
+                    self._load_abilities()
+                    self._load_dependency_managers()
+                    self._initialized = True
 
     def _load_dependency_managers(self):
         self._dependency_managers = {

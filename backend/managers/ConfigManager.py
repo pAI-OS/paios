@@ -1,12 +1,27 @@
 from uuid import uuid4
 import backend.db as db
 from backend.encryption import Encryption
+from threading import Lock
 
 class ConfigManager:
+    _instance = None
+    _lock = Lock()
+
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            with cls._lock:
+                if not cls._instance:
+                    cls._instance = super(ConfigManager, cls).__new__(cls, *args, **kwargs)
+        return cls._instance
+
     def __init__(self, tenant=None):
-        self.encryption = Encryption()
-        self.tenant = tenant
-        db.init_db()
+        if not hasattr(self, '_initialized'):
+            with self._lock:
+                if not hasattr(self, '_initialized'):
+                    self.encryption = Encryption()
+                    self.tenant = tenant
+                    db.init_db()
+                    self._initialized = True
 
     # CRUD operations
     # Note: Creating a new config item without specifying a key is unusual; use update_config_item instead.
