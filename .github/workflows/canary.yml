@@ -37,17 +37,6 @@ jobs:
       env:
         GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
 
-    - name: Configure GPG agent
-      run: |
-        echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
-        echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
-        gpg-connect-agent reloadagent /bye
-
-    - name: Load GPG key into agent
-      run: |
-        echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --batch --yes --passphrase-fd 0 --pinentry-mode loopback --import
-        gpg --list-keys
-
     - name: Commit and push to canary branch
       run: |
         export GPG_TTY=$(tty)
@@ -62,7 +51,6 @@ jobs:
         git push origin canary --force
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
         GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
         GPG_USER_NAME: ${{ secrets.GPG_USER_NAME }}
         GPG_USER_EMAIL: ${{ secrets.GPG_USER_EMAIL }}
