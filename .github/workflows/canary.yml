@@ -9,6 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    # Run in canary environment to access its secrets
     environment: canary
 
     permissions:
