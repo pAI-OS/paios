@@ -21,3 +21,10 @@ class Asset(SQLModel, table=True):
     creator: str = Field(nullable=True)
     subject: str = Field(nullable=True)
     description: str = Field(nullable=True)
+    
+class Persona(SQLModel, table=True):
+    id: str = Field(default=None, primary_key=True)
+    name: str = Field(nullable=False)
+    description: str = Field(nullable=True)
+    voiceId: str = Field(nullable=True)
+    faceId: str = Field(nullable=True)
