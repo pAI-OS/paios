@@ -25,4 +25,11 @@ class Asset(Base):
     title = Column(String, nullable=False)
     creator = Column(String, nullable=True)
     subject = Column(String, nullable=True)
-    description = Column(String, nullable=True)
+    description = Column(String, nullable=True)    
+
+class Persona(SQLModel, table=True):
+    id: str = Field(default=None, primary_key=True)
+    name: str = Field(nullable=False)
+    description: str = Field(nullable=True)
+    voiceId: str = Field(nullable=True)
+    faceId: str = Field(nullable=True)
