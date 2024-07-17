@@ -9,8 +9,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    environment: canary
+
     permissions:
-      contents: write  # Grant write permission to the contents scope
+      contents: write
 
     steps:
     - name: Checkout code
