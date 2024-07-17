@@ -29,13 +29,26 @@ jobs:
       working-directory: frontend
       run: npm run build
 
+    - name: Import GPG key
+      run: |
+        echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
+      env:
+        GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+
     - name: Commit and push to canary branch
       run: |
-        git config --global user.name 'github-actions[bot]'
-        git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-        git checkout -b canary
+        git config --global user.name '${{ secrets.GPG_USER_NAME }}'
+        git config --global user.email '${{ secrets.GPG_USER_EMAIL }}'
+        git config --global commit.gpgSign true
+        git config --global user.signingkey ${{ secrets.GPG_KEY_ID }}
+        git checkout main
+        git checkout -B canary
         git add -f frontend/dist
-        git commit -m "Update canary with latest build from main"
+        git commit -S -m "Update canary with latest build from main"
         git push origin canary --force
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+        GPG_USER_NAME: ${{ secrets.GPG_USER_NAME }}
+        GPG_USER_EMAIL: ${{ secrets.GPG_USER_EMAIL }}
