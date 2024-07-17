@@ -9,11 +9,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    # Run in canary environment to access its secrets
-    environment: canary
+    environment: canary  # Specify the environment
 
     permissions:
-      contents: write
+      contents: write  # Grant write permission to the contents scope
 
     steps:
     - name: Checkout code
@@ -40,10 +39,12 @@ jobs:
 
     - name: Commit and push to canary branch
       run: |
+        export GPG_TTY=$(tty)
         git config --global user.name '${{ secrets.GPG_USER_NAME }}'
         git config --global user.email '${{ secrets.GPG_USER_EMAIL }}'
         git config --global commit.gpgSign true
         git config --global user.signingkey ${{ secrets.GPG_KEY_ID }}
+        echo "${{ secrets.GPG_PASSPHRASE }}" | gpg --batch --yes --passphrase-fd 0 --pinentry-mode loopback --import
         git checkout main
         git checkout -B canary
         git add -f frontend/dist
