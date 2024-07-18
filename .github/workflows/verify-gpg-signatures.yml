@@ -1,4 +1,4 @@
-name: Verify GPG Signatures
+name: Verify GPG Signatures on Commits
 
 on:
   pull_request:
