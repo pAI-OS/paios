@@ -120,3 +120,4 @@ if [ "$failure" = true ]; then
 else
   echo "::notice file=.github/scripts/verify-signatures.sh::All commits have valid GPG signatures from trusted keys."
 fi
+
