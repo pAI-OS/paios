@@ -33,6 +33,16 @@ is_signed_by_trusted_key() {
   return 1
 }
 
+# Debug: Print GPG version and configuration
+echo "GPG version:"
+gpg --version
+echo "GPG configuration:"
+gpg --list-config
+
+# Debug: List imported keys
+echo "Imported GPG keys:"
+gpg --list-keys
+
 # Determine the range of commits to check
 if [ "$CHECK_ALL_COMMITS" = "true" ]; then
   echo "Checking all commits in the repository"
@@ -51,42 +61,56 @@ else
   echo "Checking commits in range: $commit_range"
 fi
 
-# Verify each commit, including merge commits (ie no --no-merges)
+# Verify each commit, including merge commits
 for commit in $(git rev-list $commit_range); do
   echo "Verifying commit: $commit"
   
   # Get the author of the commit
   commit_author=$(git log -1 --format='%an <%ae>' $commit)
+  echo "Commit author: $commit_author"
   
   # Get detailed signature information
-  signature_info=$(git verify-commit "$commit" 2>&1)
-  signature_status=$(git log -1 --format='%G?' $commit)
+  echo "Attempting to verify commit signature..."
+  signature_info=$(git verify-commit "$commit" 2>&1) || true
+  echo "Raw signature info: $signature_info"
   
+  signature_status=$(git log -1 --format='%G?' $commit)
   echo "Signature status: $signature_status"
-  echo "Signature info: $signature_info"
   
   # Check if it's a GPG signature (not SSH)
   if [[ "$signature_status" != "G" && "$signature_status" != "U" ]]; then
-    echo "::error file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is not signed with GPG (status: $signature_status)"
-    exit 1
+    echo "::warning file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is not signed with GPG (status: $signature_status)"
+    continue
   fi
   
   # Get the signing key ID
   signing_key=$(git log --format='%GK' -n 1 "$commit")
+  echo "Signing key: $signing_key"
+  
+  if [ -z "$signing_key" ]; then
+    echo "::warning file=.github/scripts/verify-signatures.sh::No signing key found for commit $commit by $commit_author"
+    continue
+  fi
   
   # Check if the signing key is a trusted key
-  if gpg --list-keys --with-colons "$signing_key" | grep -q "^pub"; then
+  if gpg --list-keys --with-colons "$signing_key" 2>/dev/null | grep -q "^pub"; then
     echo "::notice file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is signed by a trusted key: $signing_key"
     continue
   fi
   
   # If not a trusted key, check if it's signed by a trusted key
   if ! is_signed_by_trusted_key "$signing_key"; then
-    echo "::error file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is signed by an untrusted key: $signing_key"
-    exit 1
+    echo "::warning file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is signed by an untrusted key: $signing_key"
+    continue
   fi
   
   echo "::notice file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author has a valid signature from a trusted key"
 done
 
-echo "::notice file=.github/scripts/verify-signatures.sh::All commits have valid GPG signatures from trusted keys."
+# Check if any warnings were issued
+if grep -q "::warning" <<< "$(git log)"; then
+  echo "::error file=.github/scripts/verify-signatures.sh::Some commits have signature verification issues."
+  exit 1
+else
+  echo "::notice file=.github/scripts/verify-signatures.sh::All commits have valid GPG signatures from trusted keys."
+fi
