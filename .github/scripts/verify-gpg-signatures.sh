@@ -11,7 +11,7 @@ GPG_KEYSERVER="${GPG_KEYSERVER:-keyserver.ubuntu.com}"
 for key in "$TRUSTED_KEYS_DIR"/*; do
   gpg --import "$key"
   key_id=$(gpg --with-colons --show-keys "$key" | awk -F: '/^pub:/ {print $5}')
-  echo "${key_id}:6:" | gpg --import-ownertrust
+  echo -e "5\ny\n" | gpg --command-fd 0 --expert --edit-key "$key_id" trust
 done
 
 # Function to check if a key is signed by a trusted key
