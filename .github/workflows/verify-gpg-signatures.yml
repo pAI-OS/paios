@@ -30,7 +30,9 @@ jobs:
         chmod 700 ~/.gnupg
 
     - name: Run GPG signature verification
-      run: .github/scripts/verify-gpg-signatures.sh
+      run: |
+        chmod +x .github/scripts/verify-gpg-signatures.sh
+        .github/scripts/verify-gpg-signatures.sh
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_EVENT_NAME: ${{ github.event_name }}
