@@ -1,0 +1,16 @@
+# These owners will be the default owners for everything in
+# the repo. Unless a later match takes precedence,
+# @samj and @quaid will be requested for
+# review when someone opens a pull request.
+*       @samj @quaid
+
+# Specific ownership for GPG verification scripts
+/.github/scripts/verify-gpg-signature.sh   @samj @quaid
+
+# Ownership for workflow files
+/.github/workflows/   @samj @quaid
+
+# Ownership for GPG keys directory
+/.gpg-keys/   @samj @quaid
+
+# Add more specific rules as needed
