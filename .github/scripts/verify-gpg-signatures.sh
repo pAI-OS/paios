@@ -74,13 +74,13 @@ for commit in $(git rev-list $commit_range); do
   # Get the signing key ID
   signing_key=$(git log --format='%GK' -n 1 "$commit")
   
-  # Check if the signing key is a maintainer key
+  # Check if the signing key is a trusted key
   if gpg --list-keys --with-colons "$signing_key" | grep -q "^pub"; then
     echo "::notice file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is signed by a trusted key: $signing_key"
     continue
   fi
   
-  # If not a maintainer key, check if it's signed by a maintainer
+  # If not a trusted key, check if it's signed by a trusted key
   if ! is_signed_by_trusted_key "$signing_key"; then
     echo "::error file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is signed by an untrusted key: $signing_key"
     exit 1
