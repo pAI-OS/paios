@@ -35,7 +35,7 @@ jobs:
       run: |
         echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
       env:
-        GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }} # F1E9CF7FAEE383E9
 
     - name: Commit and push to canary branch
       run: |
