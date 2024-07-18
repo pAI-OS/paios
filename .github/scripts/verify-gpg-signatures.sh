@@ -68,7 +68,17 @@ failure=false
 for commit in $(git rev-list $commit_range); do
   echo "Verifying commit: $commit"
   
-  # ... existing code ...
+  # Get the author of the commit
+  commit_author=$(git log -1 --format='%an <%ae>' $commit)
+  echo "Commit author: $commit_author"
+  
+  # Get detailed signature information
+  echo "Attempting to verify commit signature..."
+  signature_info=$(git verify-commit "$commit" 2>&1) || true
+  echo "Raw signature info: $signature_info"
+  
+  signature_status=$(git log -1 --format='%G?' $commit)
+  echo "Signature status: $signature_status"
   
   # Check if it's a GPG signature (not SSH)
   if [[ "$signature_status" != "G" && "$signature_status" != "U" && "$signature_status" != "E" ]]; then
