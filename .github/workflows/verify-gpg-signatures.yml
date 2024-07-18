@@ -21,7 +21,6 @@ jobs:
       uses: actions/checkout@v4
       with:
         fetch-depth: 0
-
     - name: Set up GPG
       run: |
         mkdir -p ~/.gnupg
@@ -29,16 +28,13 @@ jobs:
         echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
         chmod 700 ~/.gnupg
 
-        - name: Run GPG signature verification
-        run: |
-          echo "Current directory: $(pwd)"
-          ls -la .github/scripts/
-          cat .github/scripts/verify-gpg-signatures.sh
-          chmod +x .github/scripts/verify-gpg-signatures.sh
-          if ! .github/scripts/verify-gpg-signatures.sh; then
-            echo "GPG signature verification failed or encountered an error."
-            exit 1
-          fi
+    - name: Run GPG signature verification
+      run: |
+        chmod +x .github/scripts/verify-gpg-signatures.sh
+        if ! .github/scripts/verify-gpg-signatures.sh; then
+          echo "GPG signature verification failed or encountered an error."
+          exit 1
+        fi
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_EVENT_NAME: ${{ github.event_name }}
