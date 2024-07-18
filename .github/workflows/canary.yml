@@ -51,4 +51,3 @@ jobs:
         git push origin canary --force
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
