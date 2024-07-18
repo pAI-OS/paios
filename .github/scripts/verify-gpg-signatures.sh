@@ -1,20 +1,20 @@
 #!/bin/bash
 set -euo pipefail
 
-# Directory containing trusted maintainer public keys
-MAINTAINER_KEYS_DIR=".github/trusted-keys"
+# Directory containing trusted trusted public keys
+TRUSTED_KEYS_DIR=".github/gpg-keys"
 
 # Use the GPG_KEYSERVER environment variable, defaulting to keyserver.ubuntu.com if not set
 GPG_KEYSERVER="${GPG_KEYSERVER:-keyserver.ubuntu.com}"
 
 # Import all maintainer public keys and set ultimate trust
-for key in "$MAINTAINER_KEYS_DIR"/*; do
+for key in "$TRUSTED_KEYS_DIR"/*; do
   gpg --import "$key"
   key_id=$(gpg --with-colons --show-keys "$key" | awk -F: '/^pub:/ {print $5}')
   echo "${key_id}:6:" | gpg --import-ownertrust
 done
 
-# Function to check if a key is signed by a maintainer
+# Function to check if a key is signed by a trusted key
 is_signed_by_trusted_key() {
   local key_id="$1"
   local trusted_fingerprints=$(gpg --with-colons --fingerprint | awk -F: '/^fpr:/ {print $10}')
@@ -55,7 +55,7 @@ for commit in $(git rev-list --no-merges HEAD); do
   
   # Check if the signing key is a maintainer key
   if gpg --list-keys --with-colons "$signing_key" | grep -q "^pub"; then
-    echo "::notice file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is signed by a maintainer key: $signing_key"
+    echo "::notice file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is signed by a trusted key: $signing_key"
     continue
   fi
   
