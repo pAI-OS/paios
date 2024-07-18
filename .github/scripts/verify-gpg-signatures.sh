@@ -40,7 +40,7 @@ if [ "$CHECK_ALL_COMMITS" = "true" ]; then
 else
   if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
     # For pull requests, check commits between base and head
-    commit_range="${GITHUB_BASE_REF}..${GITHUB_HEAD_REF}"
+    commit_range="origin/${GITHUB_BASE_REF}..HEAD"
   elif [ "$GITHUB_EVENT_NAME" == "push" ]; then
     # For pushes, check commits between before and after the push
     commit_range="${GITHUB_EVENT_BEFORE}..${GITHUB_SHA}"
@@ -51,8 +51,8 @@ else
   echo "Checking commits in range: $commit_range"
 fi
 
-# Verify each commit
-for commit in $(git rev-list --no-merges $commit_range); do
+# Verify each commit, including merge commits (ie no --no-merges)
+for commit in $(git rev-list $commit_range); do
   echo "Verifying commit: $commit"
   
   # Get the author of the commit
