@@ -1,11 +1,14 @@
 #!/bin/bash
 set -euo pipefail
 
-# Directory containing trusted trusted public keys
+# Directory containing trusted public keys
 TRUSTED_KEYS_DIR=".github/gpg-keys"
 
 # Use the GPG_KEYSERVER environment variable, defaulting to keyserver.ubuntu.com if not set
 GPG_KEYSERVER="${GPG_KEYSERVER:-keyserver.ubuntu.com}"
+
+# Check if we should verify all commits or just incoming ones
+CHECK_ALL_COMMITS="${CHECK_ALL_COMMITS:-false}"
 
 # Import all maintainer public keys and set ultimate trust
 for key in "$TRUSTED_KEYS_DIR"/*; do
@@ -30,8 +33,26 @@ is_signed_by_trusted_key() {
   return 1
 }
 
+# Determine the range of commits to check
+if [ "$CHECK_ALL_COMMITS" = "true" ]; then
+  echo "Checking all commits in the repository"
+  commit_range="--all"
+else
+  if [ "$GITHUB_EVENT_NAME" == "pull_request" ]; then
+    # For pull requests, check commits between base and head
+    commit_range="${GITHUB_BASE_REF}..${GITHUB_HEAD_REF}"
+  elif [ "$GITHUB_EVENT_NAME" == "push" ]; then
+    # For pushes, check commits between before and after the push
+    commit_range="${GITHUB_EVENT_BEFORE}..${GITHUB_SHA}"
+  else
+    echo "Unsupported event type: $GITHUB_EVENT_NAME"
+    exit 1
+  fi
+  echo "Checking commits in range: $commit_range"
+fi
+
 # Verify each commit
-for commit in $(git rev-list --no-merges HEAD); do
+for commit in $(git rev-list --no-merges $commit_range); do
   echo "Verifying commit: $commit"
   
   # Get the author of the commit

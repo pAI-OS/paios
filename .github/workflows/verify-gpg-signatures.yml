@@ -2,8 +2,16 @@ name: Verify GPG Signatures
 
 on:
   pull_request:
-    branches:
-      - main
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      check_all_commits:
+        description: 'Check all commits in the repository'
+        required: true
+        default: false
+        type: boolean
 
 jobs:
   verify-signatures:
@@ -21,10 +29,16 @@ jobs:
         echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
         chmod 700 ~/.gnupg
 
-    - name: Run signature verification
-      run: |
-        chmod +x .github/scripts/verify-gpg-signatures.sh
-        .github/scripts/verify-gpg-signatures.sh
+    - name: Run GPG signature verification
+      run: .github/scripts/verify-gpg-signatures.sh
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_EVENT_NAME: ${{ github.event_name }}
+        GITHUB_BASE_REF: ${{ github.base_ref }}
+        GITHUB_HEAD_REF: ${{ github.head_ref }}
+        GITHUB_EVENT_BEFORE: ${{ github.event.before }}
+        GITHUB_SHA: ${{ github.sha }}
+        CHECK_ALL_COMMITS: ${{ github.event.inputs.check_all_commits || 'false' }}
 
     - name: Check for errors
       if: failure()
