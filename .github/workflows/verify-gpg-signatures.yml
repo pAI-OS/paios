@@ -1,0 +1,45 @@
+name: Verify GPG Signatures
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      check_all_commits:
+        description: 'Check all commits in the repository'
+        required: true
+        default: false
+        type: boolean
+
+jobs:
+  verify-signatures:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - name: Set up GPG
+      run: |
+        mkdir -p ~/.gnupg
+        echo "use-agent" >> ~/.gnupg/gpg.conf
+        echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+        chmod 700 ~/.gnupg
+
+    - name: Run GPG signature verification
+      run: |
+        chmod +x .github/scripts/verify-gpg-signatures.sh
+        if ! .github/scripts/verify-gpg-signatures.sh; then
+          echo "GPG signature verification failed or encountered an error."
+          exit 1
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_EVENT_NAME: ${{ github.event_name }}
+        GITHUB_BASE_REF: ${{ github.base_ref }}
+        GITHUB_HEAD_REF: ${{ github.head_ref }}
+        GITHUB_EVENT_BEFORE: ${{ github.event.before }}
+        GITHUB_SHA: ${{ github.sha }}
+        CHECK_ALL_COMMITS: ${{ github.event.inputs.check_all_commits || 'false' }}
