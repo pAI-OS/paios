@@ -2,17 +2,19 @@
 set -euo pipefail
 
 # Directory containing trusted maintainer public keys
-GPG_KEYS_DIR=".github/gpg-keys"
+MAINTAINER_KEYS_DIR=".github/trusted-keys"
 
 # Use the GPG_KEYSERVER environment variable, defaulting to keyserver.ubuntu.com if not set
 GPG_KEYSERVER="${GPG_KEYSERVER:-keyserver.ubuntu.com}"
 
-# Import all maintainer public keys
-for key in "$GPG_KEYS_DIR"/*; do
+# Import all maintainer public keys and set ultimate trust
+for key in "$MAINTAINER_KEYS_DIR"/*; do
   gpg --import "$key"
+  key_id=$(gpg --with-colons --show-keys "$key" | awk -F: '/^pub:/ {print $5}')
+  echo "${key_id}:6:" | gpg --import-ownertrust
 done
 
-# Function to check if a key is signed by a key in GPG_KEYS_DIR
+# Function to check if a key is signed by a maintainer
 is_signed_by_trusted_key() {
   local key_id="$1"
   local trusted_fingerprints=$(gpg --with-colons --fingerprint | awk -F: '/^fpr:/ {print $10}')
@@ -43,12 +45,8 @@ for commit in $(git rev-list --no-merges HEAD); do
   echo "Signature info: $signature_info"
   
   # Check if it's a GPG signature (not SSH)
-  if [[ "$signature_status" != "G" ]]; then
-    if [[ "$signature_status" == "U" ]]; then
-      echo "::error file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author has an untrusted GPG signature"
-    else
-      echo "::error file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is not signed with GPG (status: $signature_status)"
-    fi
+  if [[ "$signature_status" != "G" && "$signature_status" != "U" ]]; then
+    echo "::error file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is not signed with GPG (status: $signature_status)"
     exit 1
   fi
   
@@ -62,7 +60,7 @@ for commit in $(git rev-list --no-merges HEAD); do
   fi
   
   # If not a maintainer key, check if it's signed by a maintainer
-  if ! is_signed_by_maintainer "$signing_key"; then
+  if ! is_signed_by_trusted_key "$signing_key"; then
     echo "::error file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is signed by an untrusted key: $signing_key"
     exit 1
   fi
