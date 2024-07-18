@@ -29,10 +29,16 @@ jobs:
         echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
         chmod 700 ~/.gnupg
 
-    - name: Run GPG signature verification
-      run: |
-        chmod +x .github/scripts/verify-gpg-signatures.sh
-        .github/scripts/verify-gpg-signatures.sh
+        - name: Run GPG signature verification
+        run: |
+          echo "Current directory: $(pwd)"
+          ls -la .github/scripts/
+          cat .github/scripts/verify-gpg-signatures.sh
+          chmod +x .github/scripts/verify-gpg-signatures.sh
+          if ! .github/scripts/verify-gpg-signatures.sh; then
+            echo "GPG signature verification failed or encountered an error."
+            exit 1
+          fi
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_EVENT_NAME: ${{ github.event_name }}
@@ -41,9 +47,3 @@ jobs:
         GITHUB_EVENT_BEFORE: ${{ github.event.before }}
         GITHUB_SHA: ${{ github.sha }}
         CHECK_ALL_COMMITS: ${{ github.event.inputs.check_all_commits || 'false' }}
-
-    - name: Check for errors
-      if: failure()
-      run: |
-        echo "GPG signature verification failed. Please ensure all commits are properly signed with GPG by a trusted key."
-        exit 1
