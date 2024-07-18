@@ -61,25 +61,19 @@ else
   echo "Checking commits in range: $commit_range"
 fi
 
+# Add a failure flag
+failure=false
+
 # Verify each commit, including merge commits
 for commit in $(git rev-list $commit_range); do
   echo "Verifying commit: $commit"
   
-  # Get the author of the commit
-  commit_author=$(git log -1 --format='%an <%ae>' $commit)
-  echo "Commit author: $commit_author"
-  
-  # Get detailed signature information
-  echo "Attempting to verify commit signature..."
-  signature_info=$(git verify-commit "$commit" 2>&1) || true
-  echo "Raw signature info: $signature_info"
-  
-  signature_status=$(git log -1 --format='%G?' $commit)
-  echo "Signature status: $signature_status"
+  # ... existing code ...
   
   # Check if it's a GPG signature (not SSH)
-  if [[ "$signature_status" != "G" && "$signature_status" != "U" ]]; then
+  if [[ "$signature_status" != "G" && "$signature_status" != "U" && "$signature_status" != "E" ]]; then
     echo "::warning file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is not signed with GPG (status: $signature_status)"
+    failure=true
     continue
   fi
   
@@ -89,6 +83,7 @@ for commit in $(git rev-list $commit_range); do
   
   if [ -z "$signing_key" ]; then
     echo "::warning file=.github/scripts/verify-signatures.sh::No signing key found for commit $commit by $commit_author"
+    failure=true
     continue
   fi
   
@@ -101,6 +96,7 @@ for commit in $(git rev-list $commit_range); do
   # If not a trusted key, check if it's signed by a trusted key
   if ! is_signed_by_trusted_key "$signing_key"; then
     echo "::warning file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is signed by an untrusted key: $signing_key"
+    failure=true
     continue
   fi
   
@@ -108,7 +104,7 @@ for commit in $(git rev-list $commit_range); do
 done
 
 # Check if any warnings were issued
-if grep -q "::warning" <<< "$(git log)"; then
+if [ "$failure" = true ]; then
   echo "::error file=.github/scripts/verify-signatures.sh::Some commits have signature verification issues."
   exit 1
 else
