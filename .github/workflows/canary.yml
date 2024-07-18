@@ -44,7 +44,7 @@ jobs:
         git config --global user.email '${{ vars.GPG_USER_EMAIL }}'
         git config --global commit.gpgSign true
         git config --global user.signingkey ${{ vars.GPG_KEY_ID }}
-        # git checkout main # Already on 'main'
+        git checkout main
         git checkout -B canary
         git add -f frontend/dist
         git commit -S -m "Update canary with latest build from main"
