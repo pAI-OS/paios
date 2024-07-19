@@ -77,6 +77,13 @@ for commit in $(git rev-list $commit_range); do
   signature_info=$(git verify-commit "$commit" 2>&1) || true
   echo "Raw signature info: $signature_info"
   
+  # Check if it's an SSH signature
+  if [[ "$signature_info" == "Good \"git\" signature"* ]]; then
+    echo "::warning file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is signed with SSH, but only GPG is accepted"
+    failure=true
+    continue
+  fi
+
   signature_status=$(git log -1 --format='%G?' $commit)
   echo "Signature status: $signature_status"
   
