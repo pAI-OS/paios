@@ -6,7 +6,7 @@ logging_config: dict[str, Any] = {
     "disable_existing_loggers": False,
     "formatters": {
         'standard': {
-            'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
+            'format': '%(asctime)s [%(levelname)s] %(name)s: %(message)s',
         },
         "uvicorn_default": {
             "()": "uvicorn.logging.DefaultFormatter",
@@ -22,13 +22,22 @@ logging_config: dict[str, Any] = {
 
     },
     "handlers": {
+        # TODO: standardise formatting; for now use uvicorn_default
+        "default": {
+            #"formatter": "standard",
+            "formatter": "uvicorn_default",
+            "class": "logging.StreamHandler",
+            "stream": "ext://sys.stderr",
+        },
         "standard": {
-            "formatter": "standard",
+            #"formatter": "standard",
+            "formatter": "uvicorn_default",
             "class": "logging.StreamHandler",
             "stream": "ext://sys.stderr",
         },
         "uvicorn_default": {
             "formatter": "uvicorn_default",
+            #"formatter": "standard",
             "class": "logging.StreamHandler",
             "stream": "ext://sys.stderr",
         },
@@ -50,10 +59,11 @@ logging_config: dict[str, Any] = {
         },
     },
     "loggers": {
-        "": {"handlers": ["standard"], "level": "INFO"}, # root logger
+        "": {"handlers": ["default"], "level": "INFO"}, # root logger
         "connexion": {"handlers": ["connexion"], "level": "DEBUG", "propagate": False},
         "uvicorn": {"handlers": ["uvicorn_default"], "level": "INFO", "propagate": False},
         "uvicorn.error": {"level": "INFO"},
         "uvicorn.access": {"handlers": ["access"], "level": "INFO", "propagate": False},
+        "watchfiles.main": {"level": "ERROR"}, # filter watchfiles noise
     },
 }
