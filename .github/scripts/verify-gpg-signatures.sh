@@ -96,10 +96,7 @@ for commit in $(git rev-list $commit_range); do
   
   # Get the signing key ID and trim whitespace
   signing_key=$(git log --format='%GK' -n 1 "$commit" | tr -d '[:space:]')
-  echo "Debug: Signing key is '$signing_key'"
-  echo "Debug: Length of signing key: ${#signing_key}"
-  echo "Debug: Hex dump of signing key:"
-  echo -n "$signing_key" | xxd -p
+  echo "Signing key: $signing_key"
   
   if [ -z "$signing_key" ]; then
     echo "::warning file=.github/scripts/verify-signatures.sh::No signing key found for commit $commit by $commit_author"
@@ -109,12 +106,8 @@ for commit in $(git rev-list $commit_range); do
   
   # Check if it's GitHub's key
   if [[ "$signing_key" == "B5690EEEBB952194" ]]; then
-    echo "Debug: GitHub key match successful"
     echo "::notice file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is signed by GitHub (likely made through web interface or API)"
     continue
-  else
-    echo "Debug: GitHub key match failed"
-    echo "Debug: Comparison result: $([ "$signing_key" == "B5690EEEBB952194" ] && echo "true" || echo "false")"
   fi
   
   # Check if the signing key is a trusted key
