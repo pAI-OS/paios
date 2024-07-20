@@ -17,6 +17,9 @@ def init_db():
     alembic_cfg.set_main_option("sqlalchemy.url", f"sqlite:///{db_path}")
     command.upgrade(alembic_cfg, "head")
 
+# Call init_db() when the module is first imported
+init_db()
+
 async def execute_query(query, params=None):
     # TODO: logger.adebug from structlog
     logger.debug(f"Executing query: {query} with params: {params}")

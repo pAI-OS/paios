@@ -17,7 +17,7 @@ class ChannelsManager:
         if not hasattr(self, '_initialized'):
             with self._lock:
                 if not hasattr(self, '_initialized'):
-                    db.init_db()
+                    # db.init_db()
                     self._initialized = True
 
     async def create_channel(self, name, uri):

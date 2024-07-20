@@ -20,7 +20,7 @@ class ConfigManager:
                 if not hasattr(self, '_initialized'):
                     self.encryption = Encryption()
                     self.tenant = tenant
-                    db.init_db()
+                    # db.init_db()
                     self._initialized = True
 
     # CRUD operations

@@ -18,7 +18,7 @@ class AssetsManager:
         if not hasattr(self, '_initialized'):
             with self._lock:
                 if not hasattr(self, '_initialized'):
-                    db.init_db()
+                    # db.init_db()
                     self._initialized = True
 
     async def create_asset(self, user_id, title, creator, subject, description):
