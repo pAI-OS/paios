@@ -3,6 +3,7 @@ from threading import Lock
 from sqlalchemy import select, insert, update, delete, func
 from backend.models import User
 from backend.db import db_session_context
+from backend.schemas import UserSchema
 
 class UsersManager:
     _instance = None
@@ -44,7 +45,7 @@ class UsersManager:
         async with db_session_context() as session:
             result = await session.execute(select(User).filter(User.id == id))
             user = result.scalar_one_or_none()
-            return user.to_dict() if user else None
+            return UserSchema(id=user.id, name=user.name, email=user.email) if user else None
 
     async def retrieve_users(self, offset=0, limit=100, sort_by=None, sort_order='asc', filters=None):
         async with db_session_context() as session:
@@ -64,7 +65,11 @@ class UsersManager:
             query = query.offset(offset).limit(limit)
 
             result = await session.execute(query)
-            users = [user.to_dict() for user in result.scalars().all()]
+            users = [UserSchema(
+                id=user.id,
+                name=user.name,
+                email=user.email
+            ) for user in result.scalars().all()]
 
             # Get total count
             count_query = select(func.count()).select_from(User)

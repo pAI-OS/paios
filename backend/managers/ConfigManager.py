@@ -4,6 +4,7 @@ from sqlalchemy import select, insert, update, delete
 from backend.models import Config
 from backend.db import db_session_context, init_db
 from backend.encryption import Encryption
+from backend.schemas import ConfigSchema
 
 class ConfigManager:
     _instance = None
@@ -32,14 +33,15 @@ class ConfigManager:
             new_config = Config(key=key, value=encrypted_value)
             session.add(new_config)
             await session.commit()
-        return key
+        return ConfigSchema(key=key, value=value)
 
     async def retrieve_config_item(self, key):
         async with db_session_context() as session:
             result = await session.execute(select(Config).filter(Config.key == key))
             config = result.scalar_one_or_none()
             if config:
-                return self.encryption.decrypt_value(config.value)
+                decrypted_value = self.encryption.decrypt_value(config.value)
+                return ConfigSchema(key=config.key, value=decrypted_value)
         return None
 
     async def update_config_item(self, key, value):
@@ -51,9 +53,18 @@ class ConfigManager:
                 new_config = Config(key=key, value=encrypted_value)
                 session.add(new_config)
             await session.commit()
+        return ConfigSchema(key=key, value=value)
 
     async def delete_config_item(self, key):
         async with db_session_context() as session:
             stmt = delete(Config).where(Config.key == key)
-            await session.execute(stmt)
+            result = await session.execute(stmt)
             await session.commit()
+        return result.rowcount > 0
+
+    async def retrieve_all_config_items(self):
+        async with db_session_context() as session:
+            result = await session.execute(select(Config))
+            configs = result.scalars().all()
+            return [ConfigSchema(key=config.key, value=self.encryption.decrypt_value(config.value)) 
+                    for config in configs]

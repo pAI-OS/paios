@@ -3,6 +3,8 @@ from threading import Lock
 from sqlalchemy import select, insert, update, delete, func
 from backend.models import Channel
 from backend.db import db_session_context
+from backend.schemas import ChannelCreateSchema, ChannelSchema
+from typing import List, Tuple, Optional, Dict, Any
 
 class ChannelsManager:
     _instance = None
@@ -21,32 +23,41 @@ class ChannelsManager:
                 if not hasattr(self, '_initialized'):
                     self._initialized = True
 
-    async def create_channel(self, name, uri):
+    async def create_channel(self, channel_data: ChannelCreateSchema) -> ChannelSchema:
         async with db_session_context() as session:
-            new_channel = Channel(id=str(uuid4()), name=name, uri=uri)
+            new_channel = Channel(id=str(uuid4()), **channel_data.model_dump())
             session.add(new_channel)
             await session.commit()
-            return new_channel.id
+            await session.refresh(new_channel)
+            return ChannelSchema(id=new_channel.id, **channel_data.model_dump())
 
-    async def update_channel(self, id, name, uri):
+    async def update_channel(self, id: str, channel_data: ChannelCreateSchema) -> Optional[ChannelSchema]:
         async with db_session_context() as session:
-            stmt = update(Channel).where(Channel.id == id).values(name=name, uri=uri)
-            await session.execute(stmt)
-            await session.commit()
+            stmt = update(Channel).where(Channel.id == id).values(**channel_data.dict())
+            result = await session.execute(stmt)
+            if result.rowcount > 0:
+                await session.commit()
+                updated_channel = await session.get(Channel, id)
+                return ChannelSchema(id=updated_channel.id, **channel_data.model_dump())
+            return None
 
-    async def delete_channel(self, id):
+    async def delete_channel(self, id: str) -> bool:
         async with db_session_context() as session:
             stmt = delete(Channel).where(Channel.id == id)
-            await session.execute(stmt)
+            result = await session.execute(stmt)
             await session.commit()
+            return result.rowcount > 0
 
-    async def retrieve_channel(self, id):
+    async def retrieve_channel(self, id: str) -> Optional[ChannelSchema]:
         async with db_session_context() as session:
             result = await session.execute(select(Channel).filter(Channel.id == id))
             channel = result.scalar_one_or_none()
-            return channel.to_dict() if channel else None
+            if channel:
+                return ChannelSchema(id=channel.id, name=channel.name, uri=channel.uri)
+            return None
 
-    async def retrieve_channels(self, offset=0, limit=100, sort_by=None, sort_order='asc', filters=None):
+    async def retrieve_channels(self, offset: int = 0, limit: int = 100, sort_by: Optional[str] = None, 
+                                sort_order: str = 'asc', filters: Optional[Dict[str, Any]] = None) -> Tuple[List[ChannelSchema], int]:
         async with db_session_context() as session:
             query = select(Channel)
 
@@ -64,7 +75,8 @@ class ChannelsManager:
             query = query.offset(offset).limit(limit)
 
             result = await session.execute(query)
-            channels = [channel.to_dict() for channel in result.scalars().all()]
+            channels = [ChannelSchema(id=channel.id, name=channel.name, uri=channel.uri) 
+                        for channel in result.scalars().all()]
 
             # Get total count
             count_query = select(func.count()).select_from(Channel)
