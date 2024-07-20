@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 Base = declarative_base()
 
 # Create async engine
-engine = create_async_engine(db_url, echo=True)
+engine = create_async_engine(db_url, echo=False)
 
 # Create async session factory
 AsyncSessionLocal = sessionmaker(

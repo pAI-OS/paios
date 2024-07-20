@@ -65,5 +65,6 @@ logging_config: dict[str, Any] = {
         "uvicorn.error": {"level": "INFO"},
         "uvicorn.access": {"handlers": ["access"], "level": "INFO", "propagate": False},
         "watchfiles.main": {"level": "ERROR"}, # filter watchfiles noise
+        "sqlalchemy.engine": {"level": "WARNING", "propagate": False}, # filter sqlalchemy noise
     },
 }
