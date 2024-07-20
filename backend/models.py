@@ -1,23 +1,28 @@
-from sqlmodel import Field, SQLModel
+from sqlalchemy import Column, String
+from backend.db import Base
 
-class Config(SQLModel, table=True):
-    key: str = Field(default=None, primary_key=True)
-    value: str = Field(nullable=True)
+class Config(Base):
+    __tablename__ = "config"
+    key = Column(String, primary_key=True)
+    value = Column(String, nullable=True)
 
-class Channel(SQLModel, table=True):
-    id: str = Field(default=None, primary_key=True)
-    name: str = Field(nullable=False)
-    uri: str = Field(nullable=False)
+class Channel(Base):
+    __tablename__ = "channel"
+    id = Column(String, primary_key=True)
+    name = Column(String, nullable=False)
+    uri = Column(String, nullable=False)
 
-class User(SQLModel, table=True):
-    id: str = Field(default=None, primary_key=True)
-    name: str = Field(nullable=False)
-    email: str = Field(nullable=False)
+class User(Base):
+    __tablename__ = "user"
+    id = Column(String, primary_key=True)
+    name = Column(String, nullable=False)
+    email = Column(String, nullable=False)
 
-class Asset(SQLModel, table=True):
-    id: str = Field(default=None, primary_key=True)
-    user_id: str = Field(nullable=True)
-    title: str = Field(nullable=False)
-    creator: str = Field(nullable=True)
-    subject: str = Field(nullable=True)
-    description: str = Field(nullable=True)
+class Asset(Base):
+    __tablename__ = "asset"
+    id = Column(String, primary_key=True)
+    user_id = Column(String, nullable=True)
+    title = Column(String, nullable=False)
+    creator = Column(String, nullable=True)
+    subject = Column(String, nullable=True)
+    description = Column(String, nullable=True)

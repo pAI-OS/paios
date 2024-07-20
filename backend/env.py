@@ -29,7 +29,7 @@ def check_env():
             print(f"\nOnce you have activated the virtual environment, run this again.")
             sys.exit(1)
 
-    required_modules = ['connexion', 'uvicorn']
+    required_modules = ['connexion', 'uvicorn', 'sqlalchemy', 'alembic', 'aiosqlite']
     for module in required_modules:
         try:
             __import__(module)

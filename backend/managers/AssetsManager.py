@@ -1,7 +1,9 @@
 from uuid import uuid4
-import backend.db as db
-from backend.utils import remove_null_fields, zip_fields
 from threading import Lock
+from sqlalchemy import select, insert, update, delete, func, or_
+from backend.models import Asset
+from backend.db import db_session_context
+from backend.utils import remove_null_fields
 
 class AssetsManager:
     _instance = None
@@ -18,80 +20,69 @@ class AssetsManager:
         if not hasattr(self, '_initialized'):
             with self._lock:
                 if not hasattr(self, '_initialized'):
-                    db.init_db()
                     self._initialized = True
 
     async def create_asset(self, user_id, title, creator, subject, description):
-        id = str(uuid4())
-        query = 'INSERT INTO asset (id, user_id, title, creator, subject, description) VALUES (?, ?, ?, ?, ?, ?)'
-        await db.execute_query(query, (id, user_id, title, creator, subject, description))
-        return id
+        async with db_session_context() as session:
+            new_asset = Asset(id=str(uuid4()), user_id=user_id, title=title, creator=creator, subject=subject, description=description)
+            session.add(new_asset)
+            await session.commit()
+            return new_asset.id
 
     async def update_asset(self, id, user_id, title, creator, subject, description):
-        query = 'INSERT OR REPLACE INTO asset (id, user_id, title, creator, subject, description) VALUES (?, ?, ?, ?, ?, ?)'
-        return await db.execute_query(query, (id, user_id, title, creator, subject, description))
+        async with db_session_context() as session:
+            stmt = update(Asset).where(Asset.id == id).values(user_id=user_id, title=title, creator=creator, subject=subject, description=description)
+            result = await session.execute(stmt)
+            await session.commit()
+            return result.rowcount > 0
 
     async def delete_asset(self, id):
-        query = 'DELETE FROM asset WHERE id = ?'
-        return await db.execute_query(query, (id,))
+        async with db_session_context() as session:
+            stmt = delete(Asset).where(Asset.id == id)
+            result = await session.execute(stmt)
+            await session.commit()
+            return result.rowcount > 0
 
     async def retrieve_asset(self, id):
-        query = 'SELECT user_id, title, creator, subject, description FROM asset WHERE id = ?'
-        result = await db.execute_query(query, (id,))
-        if result:
-            fields = ['user_id', 'title', 'creator', 'subject', 'description']
-            asset = remove_null_fields(zip_fields(fields, result[0]))
-            asset['id'] = id
-            return asset
-        return None
+        async with db_session_context() as session:
+            result = await session.execute(select(Asset).filter(Asset.id == id))
+            asset = result.scalar_one_or_none()
+            return remove_null_fields(asset.to_dict()) if asset else None
 
     async def retrieve_assets(self, offset=0, limit=100, sort_by=None, sort_order='asc', filters=None, query=None):
-        base_query = 'SELECT id, user_id, title, creator, subject, description FROM asset'
-        query_params = []
+        async with db_session_context() as session:
+            stmt = select(Asset)
 
-        # Apply filters
-        filter_clauses = []
-        if filters:
-            for key, value in filters.items():
-                if isinstance(value, list):
-                    placeholders = ', '.join(['?'] * len(value))
-                    filter_clauses.append(f"{key} IN ({placeholders})")
-                    query_params.extend(value)
-                else:
-                    filter_clauses.append(f"{key} = ?")
-                    query_params.append(value)
+            if filters:
+                for key, value in filters.items():
+                    if isinstance(value, list):
+                        stmt = stmt.filter(getattr(Asset, key).in_(value))
+                    else:
+                        stmt = stmt.filter(getattr(Asset, key) == value)
 
-        # Apply free text search
-        if query:
-            query_clause = "(title LIKE ? OR description LIKE ? OR creator LIKE ? OR subject LIKE ?)"
-            query_params.extend([f"%{query}%"] * 4)
-            filter_clauses.append(query_clause)
+            if query:
+                search_condition = or_(
+                    Asset.title.ilike(f"%{query}%"),
+                    Asset.description.ilike(f"%{query}%"),
+                    Asset.creator.ilike(f"%{query}%"),
+                    Asset.subject.ilike(f"%{query}%")
+                )
+                stmt = stmt.filter(search_condition)
 
-        if filter_clauses:
-            base_query += ' WHERE ' + ' AND '.join(filter_clauses)
+            if sort_by and hasattr(Asset, sort_by):
+                order_column = getattr(Asset, sort_by)
+                stmt = stmt.order_by(order_column.desc() if sort_order.lower() == 'desc' else order_column)
 
-        # Validate and apply sorting
-        valid_sort_columns = ['id', 'user_id', 'title', 'creator', 'subject', 'description']
-        if sort_by and sort_by in valid_sort_columns:
-            sort_order = 'DESC' if sort_order.lower() == 'desc' else 'ASC'
-            base_query += f' ORDER BY {sort_by} {sort_order}'
+            stmt = stmt.offset(offset).limit(limit)
 
-        # Apply pagination
-        base_query += ' LIMIT ? OFFSET ?'
-        query_params.extend([limit, offset])
+            result = await session.execute(stmt)
+            assets = [remove_null_fields(asset.to_dict()) for asset in result.scalars().all()]
 
-        # Execute the main query
-        results = await db.execute_query(base_query, tuple(query_params))
-        
-        fields = ['id', 'user_id', 'title', 'creator', 'subject', 'description']
-        assets = [remove_null_fields(zip_fields(fields, result)) for result in results]
+            # Get total count
+            count_stmt = select(func.count()).select_from(Asset)
+            if filters or query:
+                count_stmt = count_stmt.filter(stmt.whereclause)
+            total_count = await session.execute(count_stmt)
+            total_count = total_count.scalar()
 
-        # Get the total count of assets
-        total_count_query = 'SELECT COUNT(*) FROM asset'
-        total_count_params = query_params[:-2]  # Exclude limit and offset for the count query
-        if filter_clauses:
-            total_count_query += ' WHERE ' + ' AND '.join(filter_clauses)
-        total_count_result = await db.execute_query(total_count_query, tuple(total_count_params))
-        total_count = total_count_result[0][0] if total_count_result else 0
-
-        return assets, total_count
+            return assets, total_count
