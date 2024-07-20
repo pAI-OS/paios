@@ -94,8 +94,8 @@ for commit in $(git rev-list $commit_range); do
     continue
   fi
   
-  # Get the signing key ID
-  signing_key=$(git log --format='%GK' -n 1 "$commit")
+  # Get the signing key ID and trim whitespace
+  signing_key=$(git log --format='%GK' -n 1 "$commit" | tr -d '[:space:]')
   echo "Signing key: $signing_key"
   
   if [ -z "$signing_key" ]; then
@@ -105,7 +105,7 @@ for commit in $(git rev-list $commit_range); do
   fi
   
   # Check if it's GitHub's key
-  if [ "$signing_key" = "B5690EEEBB952194" ]; then
+  if [[ "$signing_key" == "B5690EEEBB952194" ]]; then
     echo "::notice file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is signed by GitHub (likely made through web interface or API)"
     continue
   fi
@@ -116,7 +116,7 @@ for commit in $(git rev-list $commit_range); do
     continue
   fi
   
-  # If not a trusted key, check if it's signed by a trusted key
+  # If not a trusted key or GitHub key, check if it's signed by a trusted key
   if ! is_signed_by_trusted_key "$signing_key"; then
     echo "::warning file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is signed by an untrusted key: $signing_key"
     failure=true
