@@ -71,7 +71,13 @@ for commit in $(git rev-list $commit_range); do
   # Get the author of the commit
   commit_author=$(git log -1 --format='%an <%ae>' $commit)
   echo "Commit author: $commit_author"
-  
+
+  # Check if it's a GitHub commit
+  if [[ "$commit_author" == "GitHub <noreply@github.com>" ]]; then
+    echo "::notice file=.github/scripts/verify-signatures.sh::Commit $commit is from GitHub (likely made through web interface or API)"
+    continue
+  fi
+
   # Get detailed signature information
   echo "Attempting to verify commit signature..."
   signature_info=$(git verify-commit "$commit" 2>&1) || true
