@@ -30,5 +30,8 @@ abilities_dir = base_dir / abilities_subdir
 abilities_data_dir = data_dir / abilities_subdir
 
 # paths
-db_path = data_dir / 'paios.db'
+db_name = 'paios.db'
+db_path = data_dir / db_name
+db_url = f"sqlite+aiosqlite:///{db_path}"
 downloads_dir = data_dir / 'downloads'
+

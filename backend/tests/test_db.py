@@ -1,60 +1,48 @@
 import unittest
-from db import create_config_item, read_config_item, update_config_item, delete_config_item, set_config_item
+from backend.managers.ConfigManager import ConfigManager
+import asyncio
 
-class TestDbFunctions(unittest.TestCase):
+class TestConfigManager(unittest.TestCase):
     def setUp(self):
-        pass
+        self.config_manager = ConfigManager()
 
-    def test_create_config_item(self):
-        # Test that create_config_item correctly encrypts the value and inserts it into the database
-        tenant = 'test'
-        key = 'test_key'
+    def asyncTest(func):
+        def wrapper(*args, **kwargs):
+            return asyncio.run(func(*args, **kwargs))
+        return wrapper
+
+    @asyncTest
+    async def test_create_config_item(self):
         value = 'test_value'
-        create_config_item(key, value, tenant=tenant)
-        result = read_config_item(key, tenant=tenant)
-        delete_config_item(key, tenant=tenant)
+        key = await self.config_manager.create_config_item(value)
+        result = await self.config_manager.retrieve_config_item(key)
+        await self.config_manager.delete_config_item(key)
         self.assertEqual(result, value)
 
-    def test_read_config_item(self):
-        # Test that read_config_item correctly retrieves and decrypts a value from the database
-        tenant = 'test'
-        key = 'test_key'
+    @asyncTest
+    async def test_read_config_item(self):
         value = 'test_value'
-        create_config_item(key, value, tenant=tenant)
-        result = read_config_item(key, tenant=tenant)
-        delete_config_item(key, tenant=tenant)
+        key = await self.config_manager.create_config_item(value)
+        result = await self.config_manager.retrieve_config_item(key)
+        await self.config_manager.delete_config_item(key)
         self.assertEqual(result, value)
 
-    def test_update_config_item(self):
-        # Test that update_config_item correctly updates a value in the database
-        tenant = 'test'
-        key = 'test_key'
-        old_value = 'old_test_value'
+    @asyncTest
+    async def test_update_config_item(self):
+        value = 'test_value'
+        key = await self.config_manager.create_config_item(value)
         new_value = 'new_test_value'
-        create_config_item(key, old_value, tenant=tenant)
-        update_config_item(key, new_value, tenant=tenant)
-        result = read_config_item(key, tenant=tenant)
-        delete_config_item(key, tenant=tenant)
+        await self.config_manager.update_config_item(key, new_value)
+        result = await self.config_manager.retrieve_config_item(key)
+        await self.config_manager.delete_config_item(key)
         self.assertEqual(result, new_value)
 
-    def test_set_config_item(self):
-        # Test that set_config_item correctly updates a value in the database
-        tenant = 'test'
-        key = 'test_key'
-        old_value = 'old_test_value'
-        new_value = 'new_test_value'
-        set_config_item(key, old_value, tenant=tenant)
-        set_config_item(key, new_value, tenant=tenant)
-        result = read_config_item(key, tenant=tenant)
-        delete_config_item(key, tenant=tenant)
-        self.assertEqual(result, new_value)
-
-    def test_delete_config_item(self):
-        # Test that delete_config_item correctly removes a value from the database
-        tenant = 'test'
-        key = 'test_key'
-        delete_config_item(key, tenant=tenant)
-        result = read_config_item(key, tenant=tenant)
+    @asyncTest
+    async def test_delete_config_item(self):
+        value = 'test_value'
+        key = await self.config_manager.create_config_item(value)
+        await self.config_manager.delete_config_item(key)
+        result = await self.config_manager.retrieve_config_item(key)
         self.assertIsNone(result)
 
     def tearDown(self):
