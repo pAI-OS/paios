@@ -1,7 +1,6 @@
 from starlette.responses import JSONResponse
 from backend.managers.AbilitiesManager import AbilitiesManager
 from backend.pagination import parse_pagination_params
-from pkg_resources import ContextualVersionConflict
 import logging
 logger = logging.getLogger(__name__)
 
