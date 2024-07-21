@@ -22,6 +22,19 @@ class ChannelCreateSchema(ChannelBaseSchema):
 class ChannelSchema(ChannelBaseSchema):
     id: str
 
+# Persona schemas
+class PersonaBaseSchema(BaseModel):
+    name: str
+    description: Optional[str] = None
+    voiceId: Optional[str] = None
+    faceId: Optional[str] = None
+
+class PersonaCreateSchema(PersonaBaseSchema):
+    pass
+
+class PersonaSchema(PersonaBaseSchema):
+    id: str
+
 # User schemas
 class UserBaseSchema(BaseModel):
     name: str

@@ -27,9 +27,11 @@ class Asset(Base):
     subject = Column(String, nullable=True)
     description = Column(String, nullable=True)    
 
-class Persona(SQLModel, table=True):
-    id: str = Field(default=None, primary_key=True)
-    name: str = Field(nullable=False)
-    description: str = Field(nullable=True)
-    voiceId: str = Field(nullable=True)
-    faceId: str = Field(nullable=True)
+class Persona(Base):
+    __tablename__ = "persona"
+    id = Column(String, primary_key=True)
+    name = Column(String, nullable=False)
+    description = Column(String, nullable=True)
+    voiceId = Column(String, nullable=True)
+    faceId = Column(String, nullable=True)
+
