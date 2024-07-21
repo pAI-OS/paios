@@ -7,7 +7,7 @@ cryptography
 setuptools
 packaging
 alembic
-sqlmodel
+sqlalchemy
 aiosqlite
 asyncio
 aiohttp

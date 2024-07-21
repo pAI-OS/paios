@@ -3,6 +3,7 @@ from common.paths import api_base_url
 from backend.managers.UsersManager import UsersManager
 from backend.pagination import parse_pagination_params
 from aiosqlite import IntegrityError
+from backend.schemas import UserSchema
 
 class UsersView:
     def __init__(self):
@@ -12,7 +13,7 @@ class UsersView:
         user = await self.um.retrieve_user(id)
         if user is None:
             return JSONResponse(status_code=404, headers={"error": "User not found"})
-        return JSONResponse(user, status_code=200)
+        return JSONResponse(user.model_dump(), status_code=200)
 
     async def post(self, body: dict):
         try:
@@ -37,8 +38,13 @@ class UsersView:
         offset, limit, sort_by, sort_order, filters = result
 
         users, total_count = await self.um.retrieve_users(limit=limit, offset=offset, sort_by=sort_by, sort_order=sort_order, filters=filters)
+        
+        # Convert Pydantic models to dictionaries
+        users_dict = [user.model_dump() for user in users]
+        
         headers = {
             'X-Total-Count': str(total_count),
-            'Content-Range': f'users {offset}-{offset + len(users) - 1}/{total_count}'
+            'Content-Range': f'users {offset}-{offset+len(users)}/{total_count}',
+            'Access-Control-Expose-Headers': 'Content-Range'
         }
-        return JSONResponse(users, status_code=200, headers=headers)
+        return JSONResponse(users_dict, status_code=200, headers=headers)

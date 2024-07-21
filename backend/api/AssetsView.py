@@ -2,6 +2,8 @@ from starlette.responses import JSONResponse, Response
 from backend.managers.AssetsManager import AssetsManager
 from common.paths import api_base_url
 from backend.pagination import parse_pagination_params
+from backend.schemas import AssetCreateSchema, AssetSchema
+from typing import List
 
 class AssetsView:
     def __init__(self):
@@ -11,34 +13,22 @@ class AssetsView:
         asset = await self.am.retrieve_asset(id)
         if asset is None:
             return JSONResponse({"error": "Asset not found"}, status_code=404)
-        return JSONResponse(asset, status_code=200)
+        return JSONResponse(asset.model_dump(), status_code=200)
 
-    async def post(self, body: dict):
-        asset_data = {
-            'user_id': body.get('user_id'),
-            'title': body.get('title'),
-            'creator': body.get('creator'),
-            'subject': body.get('subject'),
-            'description': body.get('description')
-        }
-        id = await self.am.create_asset(**asset_data)
-        asset = await self.am.retrieve_asset(id)
-        return JSONResponse(asset, status_code=201, headers={'Location': f'{api_base_url}/assets/{id}'})
+    async def post(self, body: AssetCreateSchema):
+        new_asset = await self.am.create_asset(body)
+        return JSONResponse(new_asset.model_dump(), status_code=201, headers={'Location': f'{api_base_url}/assets/{new_asset.id}'})
     
-    async def put(self, id: str, body: dict):
-        asset_data = {
-            'user_id': body.get('user_id'),
-            'title': body.get('title'),
-            'creator': body.get('creator'),
-            'subject': body.get('subject'),
-            'description': body.get('description')
-        }
-        await self.am.update_asset(id, **asset_data)
-        asset = await self.am.retrieve_asset(id)
-        return JSONResponse(asset, status_code=200)
+    async def put(self, id: str, body: AssetCreateSchema):
+        updated_asset = await self.am.update_asset(id, body)
+        if updated_asset is None:
+            return JSONResponse({"error": "Asset not found"}, status_code=404)
+        return JSONResponse(updated_asset.model_dump(), status_code=200)
 
     async def delete(self, id: str):
-        await self.am.delete_asset(id)
+        success = await self.am.delete_asset(id)
+        if not success:
+            return JSONResponse({"error": "Asset not found"}, status_code=404)
         return Response(status_code=204)
     
     async def search(self, filter: str = None, range: str = None, sort: str = None):
@@ -63,4 +53,4 @@ class AssetsView:
             'X-Total-Count': str(total_count),
             'Content-Range': f'assets {offset}-{offset + len(assets) - 1}/{total_count}'
         }
-        return JSONResponse(assets, status_code=200, headers=headers)
+        return JSONResponse([asset.model_dump() for asset in assets], status_code=200, headers=headers)

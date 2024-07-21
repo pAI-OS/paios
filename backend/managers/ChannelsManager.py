@@ -1,6 +1,10 @@
 from uuid import uuid4
-import backend.db as db
 from threading import Lock
+from sqlalchemy import select, insert, update, delete, func
+from backend.models import Channel
+from backend.db import db_session_context
+from backend.schemas import ChannelCreateSchema, ChannelSchema
+from typing import List, Tuple, Optional, Dict, Any
 
 class ChannelsManager:
     _instance = None
@@ -20,65 +24,71 @@ class ChannelsManager:
                     # db.init_db()
                     self._initialized = True
 
-    async def create_channel(self, name, uri):
-        id = str(uuid4())
-        query = 'INSERT INTO channel (id, name, uri) VALUES (?, ?, ?)'
-        await db.execute_query(query, (id, name, uri))
-        return id
+    async def create_channel(self, channel_data: ChannelCreateSchema) -> ChannelSchema:
+        async with db_session_context() as session:
+            new_channel = Channel(id=str(uuid4()), **channel_data.model_dump())
+            session.add(new_channel)
+            await session.commit()
+            await session.refresh(new_channel)
+            return ChannelSchema(id=new_channel.id, **channel_data.model_dump())
 
-    async def update_channel(self, id, name, uri):
-        query = 'INSERT OR REPLACE INTO channel (id, name, uri) VALUES (?, ?, ?)'
-        await db.execute_query(query, (id, name, uri))
+    async def update_channel(self, id: str, channel_data: ChannelCreateSchema) -> Optional[ChannelSchema]:
+        async with db_session_context() as session:
+            stmt = update(Channel).where(Channel.id == id).values(**channel_data.dict())
+            result = await session.execute(stmt)
+            if result.rowcount > 0:
+                await session.commit()
+                updated_channel = await session.get(Channel, id)
+                return ChannelSchema(id=updated_channel.id, **channel_data.model_dump())
+            return None
 
-    async def delete_channel(self, id):
-        query = 'DELETE FROM channel WHERE id = ?'
-        await db.execute_query(query, (id,))
+    async def delete_channel(self, id: str) -> bool:
+        async with db_session_context() as session:
+            stmt = delete(Channel).where(Channel.id == id)
+            result = await session.execute(stmt)
+            await session.commit()
+            return result.rowcount > 0
 
-    async def retrieve_channel(self, id):
-        query = 'SELECT name, uri FROM channel WHERE id = ?'
-        result = await db.execute_query(query, (id,))
-        if result:
-            return {'id': id, 'name': result[0][0], 'uri': result[0][1]}
-        return None
-    
-    async def retrieve_channels(self, offset=0, limit=100, sort_by=None, sort_order='asc', filters=None):
-        base_query = 'SELECT id, name, uri FROM channel'
-        query_params = []
+    async def retrieve_channel(self, id: str) -> Optional[ChannelSchema]:
+        async with db_session_context() as session:
+            result = await session.execute(select(Channel).filter(Channel.id == id))
+            channel = result.scalar_one_or_none()
+            if channel:
+                return ChannelSchema(id=channel.id, name=channel.name, uri=channel.uri)
+            return None
 
-        # Apply filters
-        if filters:
-            filter_clauses = []
-            for key, value in filters.items():
-                if isinstance(value, list):
-                    placeholders = ', '.join(['?'] * len(value))
-                    filter_clauses.append(f"{key} IN ({placeholders})")
-                    query_params.extend(value)
-                else:
-                    filter_clauses.append(f"{key} = ?")
-                    query_params.append(value)
-            base_query += ' WHERE ' + ' AND '.join(filter_clauses)
+    async def retrieve_channels(self, offset: int = 0, limit: int = 100, sort_by: Optional[str] = None, 
+                                sort_order: str = 'asc', filters: Optional[Dict[str, Any]] = None) -> Tuple[List[ChannelSchema], int]:
+        async with db_session_context() as session:
+            query = select(Channel)
 
-        # Validate and apply sorting
-        valid_sort_columns = ['id', 'name', 'uri']
-        if sort_by and sort_by in valid_sort_columns:
-            sort_order = 'DESC' if sort_order.lower() == 'desc' else 'ASC'
-            base_query += f' ORDER BY {sort_by} {sort_order}'
+            if filters:
+                for key, value in filters.items():
+                    if isinstance(value, list):
+                        query = query.filter(getattr(Channel, key).in_(value))
+                    else:
+                        query = query.filter(getattr(Channel, key) == value)
 
-        # Apply pagination
-        base_query += ' LIMIT ? OFFSET ?'
-        query_params.extend([limit, offset])
+            if sort_by and sort_by in ['id', 'name', 'uri']:
+                order_column = getattr(Channel, sort_by)
+                query = query.order_by(order_column.desc() if sort_order.lower() == 'desc' else order_column)
 
-        results = await db.execute_query(base_query, tuple(query_params))
-        
-        channels = []
-        for result in results:
-            channels.append({'id': result[0], 'name': result[1], 'uri': result[2]})
-        
-        # Assuming you have a way to get the total count of channels
-        total_count_query = 'SELECT COUNT(*) FROM channel'
-        if filters:
-            total_count_query += ' WHERE ' + ' AND '.join(filter_clauses)
-        total_count_result = await db.execute_query(total_count_query, tuple(query_params[:len(query_params) - 2] if filters else ()))
-        total_count = total_count_result[0][0] if total_count_result else 0
+            query = query.offset(offset).limit(limit)
 
-        return channels, total_count
+            result = await session.execute(query)
+            channels = [ChannelSchema(id=channel.id, name=channel.name, uri=channel.uri) 
+                        for channel in result.scalars().all()]
+
+            # Get total count
+            count_query = select(func.count()).select_from(Channel)
+            if filters:
+                for key, value in filters.items():
+                    if isinstance(value, list):
+                        count_query = count_query.filter(getattr(Channel, key).in_(value))
+                    else:
+                        count_query = count_query.filter(getattr(Channel, key) == value)
+
+            total_count = await session.execute(count_query)
+            total_count = total_count.scalar()
+
+            return channels, total_count

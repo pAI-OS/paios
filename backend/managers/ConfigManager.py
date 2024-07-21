@@ -1,7 +1,10 @@
 from uuid import uuid4
-import backend.db as db
-from backend.encryption import Encryption
 from threading import Lock
+from sqlalchemy import select, insert, update, delete
+from backend.models import Config
+from backend.db import db_session_context, init_db
+from backend.encryption import Encryption
+from backend.schemas import ConfigSchema
 
 class ConfigManager:
     _instance = None
@@ -23,29 +26,45 @@ class ConfigManager:
                     # db.init_db()
                     self._initialized = True
 
-    # CRUD operations
-    # Note: Creating a new config item without specifying a key is unusual; use update_config_item instead.
     async def create_config_item(self, value):
         key = str(uuid4())
         encrypted_value = self.encryption.encrypt_value(value)
-        print(f"ConfigManager: create_config_item {encrypted_value}")
-        query = 'INSERT INTO config (key, value) VALUES (?, ?)'
-        await db.execute_query(query, (key, encrypted_value))
-        return key
-    
+        async with db_session_context() as session:
+            new_config = Config(key=key, value=encrypted_value)
+            session.add(new_config)
+            await session.commit()
+        return ConfigSchema(key=key, value=value)
+
     async def retrieve_config_item(self, key):
-        query = 'SELECT value FROM config WHERE key = ?'
-        result = await db.execute_query(query, (key,))
-        if result:
-            encrypted_value = result[0][0]
-            return self.encryption.decrypt_value(encrypted_value)
+        async with db_session_context() as session:
+            result = await session.execute(select(Config).filter(Config.key == key))
+            config = result.scalar_one_or_none()
+            if config:
+                decrypted_value = self.encryption.decrypt_value(config.value)
+                return ConfigSchema(key=config.key, value=decrypted_value)
         return None
 
     async def update_config_item(self, key, value):
         encrypted_value = self.encryption.encrypt_value(value)
-        query = 'INSERT OR REPLACE INTO config (key, value) VALUES (?, ?)'
-        await db.execute_query(query, (key, encrypted_value))
+        async with db_session_context() as session:
+            stmt = update(Config).where(Config.key == key).values(value=encrypted_value)
+            result = await session.execute(stmt)
+            if result.rowcount == 0:
+                new_config = Config(key=key, value=encrypted_value)
+                session.add(new_config)
+            await session.commit()
+        return ConfigSchema(key=key, value=value)
 
     async def delete_config_item(self, key):
-        query = 'DELETE FROM config WHERE key = ?'
-        await db.execute_query(query, (key,))
+        async with db_session_context() as session:
+            stmt = delete(Config).where(Config.key == key)
+            result = await session.execute(stmt)
+            await session.commit()
+        return result.rowcount > 0
+
+    async def retrieve_all_config_items(self):
+        async with db_session_context() as session:
+            result = await session.execute(select(Config))
+            configs = result.scalars().all()
+            return [ConfigSchema(key=config.key, value=self.encryption.decrypt_value(config.value)) 
+                    for config in configs]
