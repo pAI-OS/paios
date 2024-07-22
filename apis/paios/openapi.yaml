@@ -633,7 +633,7 @@ paths:
         '404':
           description: Not Found
     parameters:
-      - $ref: '#/components/parameters/id'
+      - $ref: '#/components/parameters/id'  
 tags:
   - name: Abilities Management
     description: Installation and configuration of abilities
@@ -1056,10 +1056,10 @@ components:
           $ref: '#/components/schemas/textShort'
         description:
           $ref: '#/components/schemas/textLong'
-        voiceId:
-          $ref: '#/components/schemas/uuid4ReadOnly'
-        faceId:
-          $ref: '#/components/schemas/uuid4ReadOnly'
+        voice:
+          $ref: '#/components/schemas/Voice'
+        face:
+          $ref: '#/components/schemas/Face'
       required:
         - name
     PersonaCreate:
@@ -1073,9 +1073,27 @@ components:
           $ref: '#/components/schemas/textShort'
         description:
           $ref: '#/components/schemas/textLong'
-        voiceId:
-          $ref: '#/components/schemas/uuid4'
-        faceId:
-          $ref: '#/components/schemas/uuid4'
+        voice:
+          $ref: '#/components/schemas/Voice'
+        face:
+          $ref: '#/components/schemas/Face'
       required:
         - name
+    Voice:
+      type: object
+      title: Voice
+      properties:
+        id:
+          $ref: '#/components/schemas/textShort'
+        name:
+          $ref: '#/components/schemas/textShort'
+    Face:
+      type: object
+      title: Face
+      properties:
+        id:
+          $ref: '#/components/schemas/uuid4ReadOnly'
+        name:
+          $ref: '#/components/schemas/textShort'            
+      
+      
