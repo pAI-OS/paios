@@ -4,7 +4,9 @@ from sqlalchemy import select, insert, update, delete, func
 from backend.models import Persona
 from backend.db import db_session_context
 from backend.schemas import PersonaSchema, PersonaCreateSchema
+import logging
 
+logger = logging.getLogger(__name__)
 class PersonasManager:
     _instance = None
     _lock = Lock()
@@ -22,16 +24,17 @@ class PersonasManager:
                 if not hasattr(self, '_initialized'):
                     self._initialized = True
 
-    async def create_persona(self, persona_data: PersonaCreateSchema):
+    async def create_persona(self, persona_data: PersonaCreateSchema) -> str:
         async with db_session_context() as session:
-            new_persona = Persona(id=str(uuid4()), **persona_data.model_dump())
+            new_persona = Persona(id=str(uuid4()), **persona_data)
             session.add(new_persona)
-            await session.commit()
-            return new_persona.id
+            await session.commit() 
+            await session.refresh(new_persona)
+            return new_persona.id    
 
     async def update_persona(self, id: str, persona_data: PersonaCreateSchema):
         async with db_session_context() as session:
-            stmt = update(Persona).where(Persona.id == id).values(**persona_data.model_dump())
+            stmt = update(Persona).where(Persona.id == id).values(**persona_data)
             await session.execute(stmt)
             await session.commit()
 
@@ -41,11 +44,21 @@ class PersonasManager:
             await session.execute(stmt)
             await session.commit()
 
-    async def retrieve_persona(self, id):
+    async def retrieve_persona(self, id:str) -> PersonaSchema:
         async with db_session_context() as session:
+            query = select(Persona).filter(Persona.id == id)
+            logger.info("query :: %s", query)
             result = await session.execute(select(Persona).filter(Persona.id == id))
             persona = result.scalar_one_or_none()
-            return PersonaSchema.model_validate(persona) if persona else None
+            if persona:
+                return PersonaSchema(
+                    id=persona.id,
+                    name=persona.name,
+                    description=persona.description,
+                    voiceId=persona.voiceId,
+                    faceId=persona.faceId                    
+                )
+            return None
 
     async def retrieve_personas(self, offset=0, limit=100, sort_by=None, sort_order='asc', filters=None):
         async with db_session_context() as session:
@@ -67,7 +80,7 @@ class PersonasManager:
             query = query.offset(offset).limit(limit)
 
             result = await session.execute(query)
-            personas = [PersonaSchema.model_validate(persona) for persona in result.scalars().all()]
+            personas = [PersonaSchema.from_orm(persona) for persona in result.scalars().all()]
 
             # Get total count
             count_query = select(func.count()).select_from(Persona)

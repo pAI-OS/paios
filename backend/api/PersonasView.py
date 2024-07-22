@@ -15,17 +15,18 @@ class PersonasView:
         persona = await self.pm.retrieve_persona(id)
         if persona is None:
             return JSONResponse({"error": "Persona not found"}, status_code=404)
-        return JSONResponse(persona.model_dump(), status_code=200)
+        return JSONResponse(persona.dict(), status_code=200)
 
     async def post(self, body: PersonaCreateSchema):
-        id = await self.pm.create_persona(**body.dict())
+        logger.info("Creating persona :::::: %s", body)
+        id = await self.pm.create_persona(body)
         persona = await self.pm.retrieve_persona(id)
-        return JSONResponse(persona.model_dump(), status_code=201, headers={'Location': f'{api_base_url}/personas/{id}'})
+        return JSONResponse(persona.dict(), status_code=201, headers={'Location': f'{api_base_url}/personas/{id}'})
 
     async def put(self, id: str, body: PersonaCreateSchema):
-        await self.pm.update_persona(id, **body.dict())
+        await self.pm.update_persona(id, body)
         persona = await self.pm.retrieve_persona(id)
-        return JSONResponse(persona.model_dump(), status_code=200)
+        return JSONResponse(persona.dict(), status_code=200)
 
     async def delete(self, id: str):
         await self.pm.delete_persona(id)
@@ -33,6 +34,7 @@ class PersonasView:
 
     async def search(self, filter: str = None, range: str = None, sort: str = None):
         result = parse_pagination_params(filter, range, sort)
+        logger.info("result :: %s", result)
         if isinstance(result, JSONResponse):
             return result
 
@@ -49,4 +51,4 @@ class PersonasView:
             'X-Total-Count': str(total_count),
             'Content-Range': f'personas {offset}-{offset + len(personas) - 1}/{total_count}'
         }
-        return JSONResponse([persona.model_dump() for persona in personas], status_code=200, headers=headers)
+        return JSONResponse([persona.dict() for persona in personas], status_code=200, headers=headers)

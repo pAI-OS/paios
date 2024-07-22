@@ -24,11 +24,11 @@ def upgrade() -> None:
         # Create the persona table if it doesn't exist
         op.create_table(
             'persona',
-            sa.Column('id', sa.String(), nullable=False),
-            sa.Column('name', sa.String(), nullable=False),
-            sa.Column('description', sa.String(), nullable=True),
-            sa.Column('voiceId', sa.String(), nullable=True),
-            sa.Column('faceId', sa.String(), nullable=True),
+            sa.Column('id',  sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+            sa.Column('name',  sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+            sa.Column('description', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+            sa.Column('voiceId',  sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+            sa.Column('faceId',  sqlmodel.sql.sqltypes.AutoString(), nullable=False),
             sa.PrimaryKeyConstraint('id')
         )
 

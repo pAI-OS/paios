@@ -1056,10 +1056,10 @@ components:
           $ref: '#/components/schemas/textShort'
         description:
           $ref: '#/components/schemas/textLong'
-        voice:
-          $ref: '#/components/schemas/Voice'
-        face:
-          $ref: '#/components/schemas/Face'
+        voiceId:
+          $ref: '#/components/schemas/textShort'
+        faceId:
+          $ref: '#/components/schemas/textShort'
       required:
         - name
     PersonaCreate:
@@ -1073,11 +1073,11 @@ components:
           $ref: '#/components/schemas/textShort'
         description:
           $ref: '#/components/schemas/textLong'
-        voice:
-          $ref: '#/components/schemas/Voice'
-        face:
-          $ref: '#/components/schemas/Face'
-      required:
+        voiceId:
+          $ref: '#/components/schemas/textShort'
+        faceId:
+          $ref: '#/components/schemas/textShort'
+      required:        
         - name
     Voice:
       type: object
@@ -1087,6 +1087,9 @@ components:
           $ref: '#/components/schemas/textShort'
         name:
           $ref: '#/components/schemas/textShort'
+      required:
+        - id
+        - name
     Face:
       type: object
       title: Face
@@ -1094,6 +1097,9 @@ components:
         id:
           $ref: '#/components/schemas/uuid4ReadOnly'
         name:
-          $ref: '#/components/schemas/textShort'            
+          $ref: '#/components/schemas/textShort'
+      required:
+        - id
+        - name            
       
       
