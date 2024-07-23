@@ -17,6 +17,10 @@ for key in "$TRUSTED_KEYS_DIR"/*; do
   echo -e "5\ny\n" | gpg --command-fd 0 --expert --batch --edit-key "$key_id" trust
 done
 
+# Print trusted keys
+echo "Trusted keys:"
+gpg --list-keys --with-fingerprint
+
 # Function to check if a key is signed by a trusted key
 is_signed_by_trusted_key() {
   local key_id="$1"
@@ -25,11 +29,17 @@ is_signed_by_trusted_key() {
   # Fetch the key from keyserver
   gpg --keyserver "$GPG_KEYSERVER" --recv-keys "$key_id"
   
+  # Print the imported key with signatures
+  echo "Imported key details:"
+  gpg --list-keys --list-signatures "$key_id"
+  
   for trusted_fpr in $trusted_fingerprints; do
-    if gpg --list-sigs --with-colons "$key_id" | grep -q "sig:::::::::$trusted_fpr:"; then
+    if gpg --check-sigs --with-colons "$key_id" | grep -q "sig:!:::::::::$trusted_fpr:"; then
+      echo "Key $key_id is signed by trusted key $trusted_fpr"
       return 0
     fi
   done
+  echo "Key $key_id is not signed by any trusted key"
   return 1
 }
 
@@ -110,20 +120,14 @@ for commit in $(git rev-list $commit_range); do
     continue
   fi
   
-  # Check if the signing key is a trusted key
-  if gpg --list-keys --with-colons "$signing_key" 2>/dev/null | grep -q "^pub"; then
-    echo "::notice file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is signed by a trusted key: $signing_key"
-    continue
-  fi
-  
-  # If not a trusted key or GitHub key, check if it's signed by a trusted key
+  # Check if the signing key is signed by a trusted key
   if ! is_signed_by_trusted_key "$signing_key"; then
-    echo "::warning file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is signed by an untrusted key: $signing_key"
+    echo "::warning file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is signed by a key not signed by any trusted key: $signing_key"
     failure=true
     continue
   fi
   
-  echo "::notice file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author has a valid signature from a trusted key"
+  echo "::notice file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author has a valid signature from a key signed by a trusted key"
 done
 
 # Check if any warnings were issued
