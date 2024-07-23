@@ -17,6 +17,10 @@ for key in "$TRUSTED_KEYS_DIR"/*; do
   echo -e "5\ny\n" | gpg --command-fd 0 --expert --batch --edit-key "$key_id" trust
 done
 
+# Print trusted keys
+echo "Trusted keys:"
+gpg --list-keys --with-fingerprint
+
 # Function to check if a key is signed by a trusted key
 is_signed_by_trusted_key() {
   local key_id="$1"
@@ -24,6 +28,10 @@ is_signed_by_trusted_key() {
   
   # Fetch the key from keyserver
   gpg --keyserver "$GPG_KEYSERVER" --recv-keys "$key_id"
+  
+  # Print the imported key with signatures
+  echo "Imported key details:"
+  gpg --list-keys --list-signatures "$key_id"
   
   for trusted_fpr in $trusted_fingerprints; do
     if gpg --check-sigs --with-colons "$key_id" | grep -q "sig:!:::::::::$trusted_fpr:"; then
