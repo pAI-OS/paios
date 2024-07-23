@@ -38,7 +38,7 @@ is_key_trusted_or_signed_by_trusted() {
   # Fetch the key from keyserver
   echo "Attempting to fetch key from keyserver..."
   if ! gpg --keyserver "$GPG_KEYSERVER" --recv-keys "$key_id"; then
-    echo "Failed to fetch key $key_id from keyserver"
+    echo "Failed to fetch key $key_id from keyserver $GPG_KEYSERVER"
     return 1
   fi
   
