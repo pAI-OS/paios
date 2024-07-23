@@ -34,7 +34,8 @@ is_key_trusted_or_signed_by_trusted() {
   
   # Fetch the key from keyserver
   gpg --keyserver "$GPG_KEYSERVER" --recv-keys "$key_id"
-  
+  gpg --keyserver "$GPG_KEYSERVER" --refresh-keys
+
   # Print the imported key details
   echo "Imported key details:"
   gpg --list-keys "$key_id"
