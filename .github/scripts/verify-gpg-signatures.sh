@@ -141,7 +141,7 @@ for commit in $(git rev-list $commit_range); do
   fi
   
   if [[ "$signing_key" == "B5690EEEBB952194" ]]; then
-    echo "::notice file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is signed by GitHub (likely made through web interface or API)"
+    echo "::warning file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is signed by GitHub (likely made through web interface or API)"
     failure=true
     continue
   elif ! is_key_trusted_or_signed_by_trusted "$signing_key"; then
