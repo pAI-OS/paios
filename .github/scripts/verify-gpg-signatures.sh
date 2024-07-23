@@ -33,11 +33,11 @@ is_key_trusted_or_signed_by_trusted() {
   fi
   
   # Attempt to fetch the key via HTTP
-  echo "Attempting to fetch key $key_id via HTTPS..."
-  if curl -s "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x$key_id" | gpg --import; then
-    echo "Successfully imported key $key_id from HTTPS"
+  echo "Attempting to fetch key $key_id via HTTP..."
+  if curl -s "http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x$key_id" | gpg --import; then
+    echo "Successfully imported key $key_id from HTTP"
   else
-    echo "Failed to import key $key_id from HTTPS, falling back to keyserver"
+    echo "Failed to import key $key_id from HTTP, falling back to keyserver"
     # Fetch the key from keyserver
     gpg --keyserver "$GPG_KEYSERVER" --recv-keys "$key_id" || {
       echo "Failed to fetch key $key_id from keyserver"
@@ -57,6 +57,9 @@ is_key_trusted_or_signed_by_trusted() {
   for trusted_fpr in $trusted_fingerprints; do
     if gpg --check-sigs --with-colons "$key_id" | grep -q "sig:!:::::::::$trusted_fpr:"; then
       echo "Key $key_id is signed by trusted key $trusted_fpr"
+      # Set trust level for the imported key
+      echo -e "4\ny\n" | gpg --command-fd 0 --expert --batch --edit-key "$key_id" trust
+      echo "Trust level set for key $key_id"
       return 0
     fi
   done
@@ -126,7 +129,7 @@ for commit in $(git rev-list $commit_range); do
     continue
   fi
   
-  # Get the signing key ID and trim whitespace
+  # Get the full signing key ID
   signing_key=$(git log --format='%GK' -n 1 "$commit" | tr -d '[:space:]')
   echo "Signing key: $signing_key"
   
@@ -140,8 +143,6 @@ for commit in $(git rev-list $commit_range); do
     echo "::notice file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is signed by GitHub (likely made through web interface or API)"
     failure=true
     continue
-  #elif [[ "$commit_author" == "pAI-OS Build Bot <build-bot@paios.org>" ]]; then
-  #  echo "::notice file=.github/scripts/verify-signatures.sh::Commit $commit is from the pAI-OS Build Bot, allowing without trusted signature"
   elif ! is_key_trusted_or_signed_by_trusted "$signing_key"; then
     echo "::warning file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is signed by a key neither trusted nor signed by any trusted key: $signing_key"
     failure=true
