@@ -18,11 +18,10 @@ for key in "$TRUSTED_KEYS_DIR"/*; do
 done
 
 # Calculate trusted fingerprints after importing keys from files
-trusted_fingerprints=$(gpg --with-colons --list-keys --with-fingerprint | awk -F: '/^fpr:/ {print $10}')
+TRUSTED_FINGERPRINTS=$(gpg --with-colons --list-keys --with-fingerprint | awk -F: '/^fpr:/ {print $10}')
 
-# Print trusted keys
-echo "Trusted keys:"
-gpg --list-keys --with-fingerprint
+echo "Trusted fingerprints:"
+echo "$TRUSTED_FINGERPRINTS"
 
 # Function to check if a key is trusted or signed by a trusted key
 is_key_trusted_or_signed_by_trusted() {
@@ -31,20 +30,29 @@ is_key_trusted_or_signed_by_trusted() {
   echo "Checking key: $key_id"
   
   # Check if the key is directly trusted
-  if echo "$trusted_fingerprints" | grep -q "$key_id"; then
+  if echo "$TRUSTED_FINGERPRINTS" | grep -q "$key_id"; then
     echo "Key $key_id is directly trusted"
     return 0
   fi
   
-  # Fetch the key from keyserver
-  echo "Attempting to fetch key from keyserver..."
-  if ! gpg --keyserver "$GPG_KEYSERVER" --recv-keys "$key_id"; then
-    echo "Failed to fetch key $key_id from keyserver $GPG_KEYSERVER"
-    return 1
+  # Check if the key is already in the local keyring
+  if ! gpg --list-keys "$key_id" > /dev/null 2>&1; then
+    # Get the full fingerprint or at least 16 characters
+    local long_key_id=$(gpg --with-colons --list-keys "$key_id" 2>/dev/null | awk -F: '/^pub:/ {print $5}' | tail -c 17)
+    if [ -z "$long_key_id" ]; then
+      long_key_id="$key_id"
+    fi
+    
+    # Attempt to fetch the key from keyserver
+    echo "Attempting to fetch key $long_key_id from keyserver..."
+    if ! gpg --keyserver "$GPG_KEYSERVER" --recv-keys "$long_key_id"; then
+      echo "Failed to fetch key $long_key_id from keyserver"
+      return 1
+    fi
   fi
   
-  # Print the imported key details
-  echo "Imported key details:"
+  # Print the key details
+  echo "Key details:"
   gpg --list-keys "$key_id" || echo "Failed to list key $key_id"
   
   # Print the signatures on the key
@@ -52,7 +60,7 @@ is_key_trusted_or_signed_by_trusted() {
   gpg --list-signatures "$key_id" || echo "Failed to list signatures for key $key_id"
   
   # Check if the key is signed by a trusted key
-  for trusted_fpr in $trusted_fingerprints; do
+  for trusted_fpr in $TRUSTED_FINGERPRINTS; do
     echo "Checking if key is signed by trusted key: $trusted_fpr"
     if gpg --check-sigs --with-colons "$key_id" | grep -q "sig:!:::::::::$trusted_fpr:"; then
       echo "Key $key_id is signed by trusted key $trusted_fpr"
