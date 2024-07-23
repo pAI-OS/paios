@@ -14,12 +14,12 @@ CHECK_ALL_COMMITS="${CHECK_ALL_COMMITS:-false}"
 for key in "$TRUSTED_KEYS_DIR"/*; do
   gpg --import "$key"
   key_id=$(gpg --with-colons --show-keys "$key" | awk -F: '/^pub:/ {print $5}')
-  echo -e "5\ny\n" | gpg --command-fd 0 --expert --batch --edit-key "$key_id" trust
+  gpg --quiet --batch --yes --trusted-key "$key_id"
 done
 
 # Print trusted keys
 echo "Trusted keys:"
-gpg --list-keys --fingerprint
+gpg --list-keys --with-fingerprint | awk '/^pub|^uid|^fpr/ {print}'
 
 # Function to check if a key is trusted or signed by a trusted key
 is_key_trusted_or_signed_by_trusted() {
