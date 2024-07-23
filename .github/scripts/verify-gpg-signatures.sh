@@ -19,7 +19,7 @@ done
 
 # Print trusted keys
 echo "Trusted keys:"
-gpg --list-keys ---fingerprint
+gpg --list-keys --fingerprint
 
 # Function to check if a key is trusted or signed by a trusted key
 is_key_trusted_or_signed_by_trusted() {
