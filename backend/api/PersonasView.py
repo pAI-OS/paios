@@ -2,10 +2,8 @@ from starlette.responses import JSONResponse, Response
 from backend.managers.PersonasManager import PersonasManager
 from common.paths import api_base_url
 from backend.pagination import parse_pagination_params
-from backend.schemas import PersonaCreateSchema, PersonaSchema
-import logging
+from backend.schemas import PersonaCreateSchema
 
-logger = logging.getLogger(__name__)
 
 class PersonasView:
     def __init__(self):
@@ -18,7 +16,6 @@ class PersonasView:
         return JSONResponse(persona.dict(), status_code=200)
 
     async def post(self, body: PersonaCreateSchema):
-        logger.info("Creating persona :::::: %s", body)
         id = await self.pm.create_persona(body)
         persona = await self.pm.retrieve_persona(id)
         return JSONResponse(persona.dict(), status_code=201, headers={'Location': f'{api_base_url}/personas/{id}'})
@@ -34,7 +31,6 @@ class PersonasView:
 
     async def search(self, filter: str = None, range: str = None, sort: str = None):
         result = parse_pagination_params(filter, range, sort)
-        logger.info("result :: %s", result)
         if isinstance(result, JSONResponse):
             return result
 

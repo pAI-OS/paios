@@ -4,9 +4,7 @@ from sqlalchemy import select, insert, update, delete, func
 from backend.models import Persona
 from backend.db import db_session_context
 from backend.schemas import PersonaSchema, PersonaCreateSchema
-import logging
 
-logger = logging.getLogger(__name__)
 class PersonasManager:
     _instance = None
     _lock = Lock()
@@ -45,9 +43,7 @@ class PersonasManager:
             await session.commit()
 
     async def retrieve_persona(self, id:str) -> PersonaSchema:
-        async with db_session_context() as session:
-            query = select(Persona).filter(Persona.id == id)
-            logger.info("query :: %s", query)
+        async with db_session_context() as session:            
             result = await session.execute(select(Persona).filter(Persona.id == id))
             persona = result.scalar_one_or_none()
             if persona:
