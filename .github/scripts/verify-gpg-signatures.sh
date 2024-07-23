@@ -14,7 +14,7 @@ CHECK_ALL_COMMITS="${CHECK_ALL_COMMITS:-false}"
 for key in "$TRUSTED_KEYS_DIR"/*; do
   gpg --import "$key"
   key_id=$(gpg --with-colons --show-keys "$key" | awk -F: '/^pub:/ {print $5}')
-  gpg --quiet --batch --yes --trusted-key "$key_id"
+  echo -e "5\ny\n" | gpg --command-fd 0 --expert --batch --edit-key "$key_id" trust
 done
 
 # Print trusted keys
