@@ -54,3 +54,4 @@ class AssetsView:
             'Content-Range': f'assets {offset}-{offset + len(assets) - 1}/{total_count}'
         }
         return JSONResponse([asset.model_dump() for asset in assets], status_code=200, headers=headers)
+
