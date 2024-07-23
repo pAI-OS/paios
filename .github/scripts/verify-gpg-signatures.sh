@@ -24,10 +24,10 @@ gpg --list-keys --with-fingerprint | awk '/^pub|^uid|^fpr/ {print}'
 # Function to check if a key is trusted or signed by a trusted key
 is_key_trusted_or_signed_by_trusted() {
   local key_id="$1"
-  local trusted_fingerprints=$(gpg --with-colons --list-keys --fingerprint | awk -F: '/^fpr:/ && !/:sub:/ {print $10}')
+  local trusted_key_ids=$(gpg --with-colons --list-keys | awk -F: '/^pub:/ {print $5}')
   
   # Check if the key is directly trusted
-  if echo "$trusted_fingerprints" | grep -q "$key_id"; then
+  if echo "$trusted_key_ids" | grep -q "$key_id"; then
     echo "Key $key_id is directly trusted"
     return 0
   fi
@@ -54,10 +54,10 @@ is_key_trusted_or_signed_by_trusted() {
   gpg --list-signatures "$key_id"
   
   # Check if the key is signed by a trusted key
-  for trusted_fpr in $trusted_fingerprints; do
-    echo "Checking if key $key_id is signed by trusted key $trusted_fpr"
-    if gpg --check-sigs --with-colons "$key_id" | awk -F: '$1=="sig" && $2=="!" && $13=="'"$trusted_fpr"'" {found=1; exit} END {exit !found}'; then
-      echo "Key $key_id is signed by trusted key $trusted_fpr"
+  for trusted_key in $trusted_key_ids; do
+    echo "Checking if key $key_id is signed by trusted key $trusted_key"
+    if gpg --check-sigs --with-colons "$key_id" | awk -F: '$1=="sig" && $2=="!" && $5=="'"$trusted_key"'" {found=1; exit} END {exit !found}'; then
+      echo "Key $key_id is signed by trusted key $trusted_key"
       # Set trust level for the imported key
       echo -e "4\ny\n" | gpg --command-fd 0 --expert --batch --edit-key "$key_id" trust
       echo "Trust level set for key $key_id"
