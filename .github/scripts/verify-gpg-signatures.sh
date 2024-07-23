@@ -138,8 +138,10 @@ for commit in $(git rev-list $commit_range); do
   
   if [[ "$signing_key" == "B5690EEEBB952194" ]]; then
     echo "::notice file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is signed by GitHub (likely made through web interface or API)"
-  elif [[ "$commit_author" == "pAI-OS Build Bot <build-bot@paios.org>" ]]; then
-    echo "::notice file=.github/scripts/verify-signatures.sh::Commit $commit is from the pAI-OS Build Bot, allowing without trusted signature"
+    failure=true
+    continue
+  #elif [[ "$commit_author" == "pAI-OS Build Bot <build-bot@paios.org>" ]]; then
+  #  echo "::notice file=.github/scripts/verify-signatures.sh::Commit $commit is from the pAI-OS Build Bot, allowing without trusted signature"
   elif ! is_key_trusted_or_signed_by_trusted "$signing_key"; then
     echo "::warning file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is signed by a key neither trusted nor signed by any trusted key: $signing_key"
     failure=true
