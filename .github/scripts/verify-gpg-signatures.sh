@@ -35,9 +35,13 @@ is_key_trusted_or_signed_by_trusted() {
   # Fetch the key from keyserver
   gpg --keyserver "$GPG_KEYSERVER" --recv-keys "$key_id"
   
-  # Print the imported key with signatures
+  # Print the imported key details
   echo "Imported key details:"
-  gpg --list-keys --list-signatures "$key_id"
+  gpg --list-keys "$key_id"
+  
+  # Print the signatures on the key
+  echo "Signatures on the key:"
+  gpg --list-signatures "$key_id"
   
   # Check if the key is signed by a trusted key
   for trusted_fpr in $trusted_fingerprints; do
