@@ -26,6 +26,9 @@ is_key_trusted_or_signed_by_trusted() {
   local key_id="$1"
   local trusted_fingerprints=$(gpg --with-colons --fingerprint | awk -F: '/^fpr:/ {print $10}')
   
+  echo "Checking key: $key_id"
+  echo "Trusted fingerprints: $trusted_fingerprints"
+  
   # Check if the key is directly trusted
   if echo "$trusted_fingerprints" | grep -q "$key_id"; then
     echo "Key $key_id is directly trusted"
@@ -33,18 +36,23 @@ is_key_trusted_or_signed_by_trusted() {
   fi
   
   # Fetch the key from keyserver
-  gpg --keyserver "$GPG_KEYSERVER" --recv-keys "$key_id"
+  echo "Attempting to fetch key from keyserver..."
+  if ! gpg --keyserver "$GPG_KEYSERVER" --recv-keys "$key_id"; then
+    echo "Failed to fetch key $key_id from keyserver"
+    return 1
+  fi
   
   # Print the imported key details
   echo "Imported key details:"
-  gpg --list-keys "$key_id"
+  gpg --list-keys "$key_id" || echo "Failed to list key $key_id"
   
   # Print the signatures on the key
   echo "Signatures on the key:"
-  gpg --list-signatures "$key_id"
+  gpg --list-signatures "$key_id" || echo "Failed to list signatures for key $key_id"
   
   # Check if the key is signed by a trusted key
   for trusted_fpr in $trusted_fingerprints; do
+    echo "Checking if key is signed by trusted key: $trusted_fpr"
     if gpg --check-sigs --with-colons "$key_id" | grep -q "sig:!:::::::::$trusted_fpr:"; then
       echo "Key $key_id is signed by trusted key $trusted_fpr"
       return 0
