@@ -55,6 +55,7 @@ is_key_trusted_or_signed_by_trusted() {
   
   # Check if the key is signed by a trusted key
   for trusted_fpr in $trusted_fingerprints; do
+    echo "Checking if key $key_id is signed by trusted key $trusted_fpr"
     if gpg --check-sigs --with-colons "$key_id" | awk -F: '$1=="sig" && $2=="!" && $5=="'"$trusted_fpr"'" {found=1; exit} END {exit !found}'; then
       echo "Key $key_id is signed by trusted key $trusted_fpr"
       # Set trust level for the imported key
