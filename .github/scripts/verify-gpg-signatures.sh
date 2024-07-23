@@ -17,6 +17,9 @@ for key in "$TRUSTED_KEYS_DIR"/*; do
   echo -e "5\ny\n" | gpg --command-fd 0 --expert --batch --edit-key "$key_id" trust
 done
 
+# Calculate trusted fingerprints after importing keys from files
+trusted_fingerprints=$(gpg --with-colons --list-keys --with-fingerprint | awk -F: '/^fpr:/ {print $10}')
+
 # Print trusted keys
 echo "Trusted keys:"
 gpg --list-keys --with-fingerprint
@@ -24,10 +27,8 @@ gpg --list-keys --with-fingerprint
 # Function to check if a key is trusted or signed by a trusted key
 is_key_trusted_or_signed_by_trusted() {
   local key_id="$1"
-  local trusted_fingerprints=$(gpg --with-colons --fingerprint | awk -F: '/^fpr:/ {print $10}')
   
   echo "Checking key: $key_id"
-  echo "Trusted fingerprints: $trusted_fingerprints"
   
   # Check if the key is directly trusted
   if echo "$trusted_fingerprints" | grep -q "$key_id"; then
