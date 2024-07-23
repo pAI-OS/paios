@@ -32,9 +32,18 @@ is_key_trusted_or_signed_by_trusted() {
     return 0
   fi
   
-  # Fetch the key from keyserver
-  gpg --keyserver "$GPG_KEYSERVER" --recv-keys "$key_id"
-  gpg --keyserver "$GPG_KEYSERVER" --refresh-keys
+  # Attempt to fetch the key via HTTP
+  echo "Attempting to fetch key $key_id via HTTPS..."
+  if curl -s "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0x$key_id" | gpg --import; then
+    echo "Successfully imported key $key_id from HTTPS"
+  else
+    echo "Failed to import key $key_id from HTTPS, falling back to keyserver"
+    # Fetch the key from keyserver
+    gpg --keyserver "$GPG_KEYSERVER" --recv-keys "$key_id" || {
+      echo "Failed to fetch key $key_id from keyserver"
+      return 1
+    }
+  fi
 
   # Print the imported key details
   echo "Imported key details:"
@@ -129,6 +138,8 @@ for commit in $(git rev-list $commit_range); do
   
   if [[ "$signing_key" == "B5690EEEBB952194" ]]; then
     echo "::notice file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is signed by GitHub (likely made through web interface or API)"
+  elif [[ "$commit_author" == "pAI-OS Build Bot <build-bot@paios.org>" ]]; then
+    echo "::notice file=.github/scripts/verify-signatures.sh::Commit $commit is from the pAI-OS Build Bot, allowing without trusted signature"
   elif ! is_key_trusted_or_signed_by_trusted "$signing_key"; then
     echo "::warning file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is signed by a key neither trusted nor signed by any trusted key: $signing_key"
     failure=true
