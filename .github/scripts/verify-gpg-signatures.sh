@@ -24,17 +24,27 @@ gpg --list-keys --with-fingerprint | awk '/^pub|^uid|^fpr/ {print}'
 # Function to check if a key is trusted or signed by a trusted key
 is_key_trusted_or_signed_by_trusted() {
   local key_id="$1"
-  local trusted_fingerprints=$(gpg --with-colons --list-keys --fingerprint | awk -F: '/^fpr:/ && !/:sub:/ {print $10}')
+  local trusted_key_ids=$(gpg --with-colons --list-keys | awk -F: '/^pub:/ {print $5}')
   
   # Check if the key is directly trusted
-  if echo "$trusted_fingerprints" | grep -q "$key_id"; then
+  if echo "$trusted_key_ids" | grep -q "$key_id"; then
     echo "Key $key_id is directly trusted"
     return 0
   fi
   
-  # Fetch the key from keyserver
-  gpg --keyserver "$GPG_KEYSERVER" --recv-keys "$key_id"
-  
+  # Attempt to fetch the key via HTTP
+  echo "Attempting to fetch key $key_id via HTTP..."
+  if curl -s "http://keyserver.ubuntu.com/pks/lookup?op=get&search=0x$key_id" | gpg --import; then
+    echo "Successfully imported key $key_id from HTTP"
+  else
+    echo "Failed to import key $key_id from HTTP, falling back to keyserver"
+    # Fetch the key from keyserver
+    gpg --keyserver "$GPG_KEYSERVER" --recv-keys "$key_id" || {
+      echo "Failed to fetch key $key_id from keyserver"
+      return 1
+    }
+  fi
+
   # Print the imported key details
   echo "Imported key details:"
   gpg --list-keys "$key_id"
@@ -44,9 +54,13 @@ is_key_trusted_or_signed_by_trusted() {
   gpg --list-signatures "$key_id"
   
   # Check if the key is signed by a trusted key
-  for trusted_fpr in $trusted_fingerprints; do
-    if gpg --check-sigs --with-colons "$key_id" | grep -q "sig:!:::::::::$trusted_fpr:"; then
-      echo "Key $key_id is signed by trusted key $trusted_fpr"
+  for trusted_key in $trusted_key_ids; do
+    echo "Checking if key $key_id is signed by trusted key $trusted_key"
+    if gpg --check-sigs --with-colons "$key_id" | awk -F: '$1=="sig" && $2=="!" && $5=="'"$trusted_key"'" {found=1; exit} END {exit !found}'; then
+      echo "Key $key_id is signed by trusted key $trusted_key"
+      # Set trust level for the imported key
+      echo -e "4\ny\n" | gpg --command-fd 0 --expert --batch --edit-key "$key_id" trust
+      echo "Trust level set for key $key_id"
       return 0
     fi
   done
@@ -116,7 +130,7 @@ for commit in $(git rev-list $commit_range); do
     continue
   fi
   
-  # Get the signing key ID and trim whitespace
+  # Get the full signing key ID
   signing_key=$(git log --format='%GK' -n 1 "$commit" | tr -d '[:space:]')
   echo "Signing key: $signing_key"
   
@@ -128,6 +142,8 @@ for commit in $(git rev-list $commit_range); do
   
   if [[ "$signing_key" == "B5690EEEBB952194" ]]; then
     echo "::notice file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is signed by GitHub (likely made through web interface or API)"
+    failure=true
+    continue
   elif ! is_key_trusted_or_signed_by_trusted "$signing_key"; then
     echo "::warning file=.github/scripts/verify-signatures.sh::Commit $commit by $commit_author is signed by a key neither trusted nor signed by any trusted key: $signing_key"
     failure=true
