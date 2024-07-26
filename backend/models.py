@@ -57,3 +57,4 @@ class File(Base):
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False)
     assistant_id = Column(String, nullable=False)
+    
