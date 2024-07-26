@@ -11,7 +11,14 @@ class Channel(Base):
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False)
     uri = Column(String, nullable=False)
-
+    description = Column(String, nullable=True)
+    channel_llm_id = Column(String, nullable=True)
+    persona_id = Column(String, nullable=True)
+    status = Column(String, nullable=True)
+    allow_edit = Column(String, nullable=True)
+    channel_type = Column(String, nullable=True)
+    icon = Column(String, nullable=True)
+       
 class User(Base):
     __tablename__ = "user"
     id = Column(String, primary_key=True)
@@ -25,4 +32,29 @@ class Asset(Base):
     title = Column(String, nullable=False)
     creator = Column(String, nullable=True)
     subject = Column(String, nullable=True)
+    description = Column(String, nullable=True)    
+
+class Persona(Base):
+    __tablename__ = "persona"
+    id = Column(String, primary_key=True)
+    name = Column(String, nullable=False)
     description = Column(String, nullable=True)
+    voiceId = Column(String, nullable=True)
+    faceId = Column(String, nullable=True)
+
+class Voice(Base):
+    __tablename__ = "voice"
+    id = Column(String, primary_key=True)
+    voice_id = Column(String, nullable=False)
+    name = Column(String, nullable=False)
+
+class Face(Base):
+    __tablename__ = "face"
+    id = Column(String, primary_key=True)
+    name = Column(String, nullable=False)
+
+class File(Base):
+    __tablename__ = "file"
+    id = Column(String, primary_key=True)
+    name = Column(String, nullable=False)
+    assistant_id = Column(String, nullable=False)
