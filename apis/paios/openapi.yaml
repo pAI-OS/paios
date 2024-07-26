@@ -766,15 +766,15 @@ components:
     name:
       type: string
       example: Kwaai
-      pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}Γ΅Γ©Γ­Γ³ΓΊΓ±Β©β‚¬Β£Β¥]+$
+      pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}αινσϊρ©€£¥]+$
     textShort:
       type: string
       example: Lorem Ipsum
-      pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}Γ΅Γ©Γ­Γ³ΓΊΓ±Β©β‚¬Β£Β¥]+$
+      pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}αινσϊρ©€£¥]+$
     textLong:
       type: string
       example: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-      pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}Γ΅Γ©Γ­Γ³ΓΊΓ±Β©β‚¬Β£Β¥]+$
+      pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}αινσϊρ©€£¥]+$
     bytes:
       type: integer
       description: Bytes
@@ -919,19 +919,47 @@ components:
           $ref: '#/components/schemas/name'
         uri:
           $ref: '#/components/schemas/uri'
-      required:
-        - id
-        - name
-        - uri
+        description:
+          $ref: '#/components/schemas/textLong'
+        channel_llm_id:
+          $ref: '#/components/schemas/uuid4'
+        persona_id:
+          $ref: '#/components/schemas/uuid4'
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/fileName'
+        status:
+          $ref: '#/components/schemas/textShort'
+        allow_edit:
+          $ref: '#/components/schemas/textShort'
+        channel_type:
+          $ref: '#/components/schemas/textShort'
     ChannelCreate:
       type: object
-      title: Channel
+      title: Channel Create
       description: Channels (input/output)
       properties:
         name:
           $ref: '#/components/schemas/name'
         uri:
           $ref: '#/components/schemas/uri'
+        description:
+          $ref: '#/components/schemas/textLong'
+        channel_llm_id:
+          $ref: '#/components/schemas/uuid4'
+        persona_id:
+          $ref: '#/components/schemas/uuid4'
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/fileName'
+        status:
+          $ref: '#/components/schemas/textShort'
+        allow_edit:
+          $ref: '#/components/schemas/textShort'
+        channel_type:
+          $ref: '#/components/schemas/textShort'          
       required:
         - name
         - uri
@@ -1079,3 +1107,27 @@ components:
           $ref: '#/components/schemas/textShort'
       required:        
         - name
+    Voice:
+      type: object
+      title: Voice
+      properties:
+        id:
+          $ref: '#/components/schemas/textShort'
+        name:
+          $ref: '#/components/schemas/textShort'
+      required:
+        - id
+        - name
+    Face:
+      type: object
+      title: Face
+      properties:
+        id:
+          $ref: '#/components/schemas/uuid4ReadOnly'
+        name:
+          $ref: '#/components/schemas/textShort'
+      required:
+        - id
+        - name            
+      
+      
