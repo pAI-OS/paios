@@ -110,3 +110,4 @@ class AssetsManager:
             total_count = total_count.scalar()
 
             return assets, total_count
+
