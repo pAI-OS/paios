@@ -23,10 +23,14 @@ class PersonasView:
     async def put(self, id: str, body: PersonaCreateSchema):
         await self.pm.update_persona(id, body)
         persona = await self.pm.retrieve_persona(id)
+        if persona is None:
+            return JSONResponse({"error": "Persona not found"}, status_code=404)
         return JSONResponse(persona.dict(), status_code=200)
 
     async def delete(self, id: str):
-        await self.pm.delete_persona(id)
+        success = await self.pm.delete_persona(id)
+        if not success:
+            return JSONResponse({"error": "Persona not found"}, status_code=404)
         return Response(status_code=204)
 
     async def search(self, filter: str = None, range: str = None, sort: str = None):

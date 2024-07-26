@@ -34,14 +34,3 @@ class Persona(Base):
     description = Column(String, nullable=True)
     voiceId = Column(String, nullable=True)
     faceId = Column(String, nullable=True)
-
-class Voice(Base):
-    __tablename__ = "voice"
-    id = Column(String, primary_key=True)
-    voice_id = Column(String, nullable=False)
-    name = Column(String, nullable=False)
-
-class Face(Base):
-    __tablename__ = "face"
-    id = Column(String, primary_key=True)
-    name = Column(String, nullable=False)

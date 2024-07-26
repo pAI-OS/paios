@@ -4,6 +4,7 @@ from sqlalchemy import select, insert, update, delete, func
 from backend.models import Persona
 from backend.db import db_session_context
 from backend.schemas import PersonaSchema, PersonaCreateSchema
+from typing import List, Tuple, Optional, Dict, Any
 
 class PersonasManager:
     _instance = None
@@ -30,19 +31,24 @@ class PersonasManager:
             await session.refresh(new_persona)
             return new_persona.id    
 
-    async def update_persona(self, id: str, persona_data: PersonaCreateSchema):
+    async def update_persona(self, id: str, persona_data: PersonaCreateSchema) -> Optional[PersonaSchema]:
         async with db_session_context() as session:
             stmt = update(Persona).where(Persona.id == id).values(**persona_data)
-            await session.execute(stmt)
-            await session.commit()
+            result = await session.execute(stmt)
+            if result.rowcount > 0:
+                await session.commit()
+                updated_persona = await session.get(Persona, id)
+                return PersonaSchema(id=updated_persona.id, **persona_data)
+            return None
 
-    async def delete_persona(self, id):
+    async def delete_persona(self, id) -> bool:
         async with db_session_context() as session:
             stmt = delete(Persona).where(Persona.id == id)
-            await session.execute(stmt)
+            result = await session.execute(stmt)
             await session.commit()
+            return result.rowcount > 0
 
-    async def retrieve_persona(self, id:str) -> PersonaSchema:
+    async def retrieve_persona(self, id:str) -> Optional[PersonaSchema]:
         async with db_session_context() as session:            
             result = await session.execute(select(Persona).filter(Persona.id == id))
             persona = result.scalar_one_or_none()
@@ -56,7 +62,8 @@ class PersonasManager:
                 )
             return None
 
-    async def retrieve_personas(self, offset=0, limit=100, sort_by=None, sort_order='asc', filters=None):
+    async def retrieve_personas(self, offset: int = 0, limit: int = 100, sort_by: Optional[str] = None,
+                                sort_order:str = 'asc',  filters: Optional[Dict[str, Any]] = None) -> Tuple[List[PersonaSchema], int]:
         async with db_session_context() as session:
             query = select(Persona)
 

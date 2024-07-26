@@ -63,25 +63,3 @@ class AssetCreateSchema(AssetBaseSchema):
 
 class AssetSchema(AssetBaseSchema):
     id: str
-
-# Voice schemas
-class VoiceBaseSchema(BaseModel):
-    voice_id: str
-    name: str
-
-class VoiceCreateSchema(VoiceBaseSchema):
-    id: str
-
-class VoiceSchema(VoiceBaseSchema):
-    pass
-
-# Face schemas
-class FaceBaseSchema(BaseModel):
-    name: str
-
-class FaceCreateSchema(FaceBaseSchema):
-    id: str
-
-class FaceSchema(FaceBaseSchema):
-    pass
-

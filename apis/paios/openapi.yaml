@@ -1079,27 +1079,6 @@ components:
           $ref: '#/components/schemas/textShort'
       required:        
         - name
-    Voice:
-      type: object
-      title: Voice
-      properties:
-        id:
-          $ref: '#/components/schemas/textShort'
-        name:
-          $ref: '#/components/schemas/textShort'
-      required:
-        - id
-        - name
-    Face:
-      type: object
-      title: Face
-      properties:
-        id:
-          $ref: '#/components/schemas/uuid4ReadOnly'
-        name:
-          $ref: '#/components/schemas/textShort'
-      required:
-        - id
-        - name            
+            
       
       
