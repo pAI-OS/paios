@@ -23,6 +23,7 @@ class ChannelBaseSchema(BaseModel):
     status : Optional[str] = None
     allow_edit : Optional[str] = None
     channel_type : Optional[str] = None
+    icon : Optional[str] = None
     class Config:
         orm_mode = True
         from_attributes = True

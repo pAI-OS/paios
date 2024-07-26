@@ -33,7 +33,8 @@ class ChannelsManager:
                         "persona_id": channel_data["persona_id"],
                         "status": channel_data["status"],
                         "allow_edit": channel_data["allow_edit"],
-                        "channel_type": channel_data["channel_type"]
+                        "channel_type": channel_data["channel_type"],
+                        "icon": channel_data["icon"]
                     }
         async with db_session_context() as session:
             new_channel = Channel(id=str(uuid4()), **channel_data_table)
@@ -52,7 +53,8 @@ class ChannelsManager:
                         "persona_id": channel_data["persona_id"],
                         "status": channel_data["status"],
                         "allow_edit": channel_data["allow_edit"],
-                        "channel_type": channel_data["channel_type"]
+                        "channel_type": channel_data["channel_type"],
+                        "icon": channel_data["icon"]
                     }
             files = channel_data["files"]
             
@@ -92,7 +94,8 @@ class ChannelsManager:
                     files=files,
                     status=channel.status,
                     allow_edit=channel.allow_edit,
-                    channel_type=channel.channel_type)
+                    channel_type=channel.channel_type,
+                    icon=channel.icon)
             return None
 
     async def retrieve_channels(self, offset: int = 0, limit: int = 100, sort_by: Optional[str] = None, 

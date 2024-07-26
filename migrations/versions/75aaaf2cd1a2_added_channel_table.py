@@ -31,6 +31,7 @@ def upgrade() -> None:
     sa.Column('status', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
     sa.Column('allow_edit', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
     sa.Column('channel_type', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
+    sa.Column('icon', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###
