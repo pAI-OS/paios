@@ -17,6 +17,7 @@ class Channel(Base):
     status = Column(String, nullable=True)
     allow_edit = Column(String, nullable=True)
     channel_type = Column(String, nullable=True)
+    icon = Column(String, nullable=True)
        
 class User(Base):
     __tablename__ = "user"

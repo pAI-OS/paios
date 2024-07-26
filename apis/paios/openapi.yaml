@@ -935,6 +935,8 @@ components:
           $ref: '#/components/schemas/textShort'
         channel_type:
           $ref: '#/components/schemas/textShort'
+        icon:
+          $ref: '#/components/schemas/uri'
     ChannelCreate:
       type: object
       title: Channel Create
@@ -959,7 +961,9 @@ components:
         allow_edit:
           $ref: '#/components/schemas/textShort'
         channel_type:
-          $ref: '#/components/schemas/textShort'          
+          $ref: '#/components/schemas/textShort'
+        icon:
+          $ref: '#/components/schemas/uri'          
       required:
         - name
         - uri
