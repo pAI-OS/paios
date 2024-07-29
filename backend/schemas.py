@@ -95,3 +95,21 @@ class FaceCreateSchema(FaceBaseSchema):
 
 class FaceSchema(FaceBaseSchema):
     pass
+
+# Message schemas
+class MessageBaseSchema(BaseModel):
+    conversation_id: str
+    assistant_id: str
+    timestamp: str
+    prompt: str
+    chat_response: str
+    
+    class Config:
+        orm_mode = True
+        from_attributes = True
+
+class MessageCreateSchema(MessageBaseSchema):
+    pass
+
+class MessageSchema(MessageBaseSchema):
+    id: str

@@ -58,3 +58,12 @@ class File(Base):
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False)
     assistant_id = Column(String, nullable=False)
+
+class Message(Base):
+    __tablename__ = "message"
+    id = Column(String, primary_key=True)
+    assistant_id = Column(String, nullable=False)
+    conversation_id = Column(String, nullable=False)
+    timestamp = Column(String, nullable=False)
+    prompt = Column(String, nullable=False)
+    chat_response = Column(String, nullable=False)
