@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from connexion import AsyncApp
 from connexion.resolver import MethodResolver
@@ -13,20 +14,35 @@ def create_backend_app():
     connexion_app = AsyncApp(__name__, specification_dir=apis_dir)
 
     allow_origins = [
-        'http://localhost',
-        'https://localhost:8443',
-        'http://localhost:5173'
+        'http://localhost:5173',  # Default Vite dev server
+        'https://localhost:8443',  # Secure port for local development
     ]
 
-   # Add CORS middleware
+    # Add PAIOS server URL if environment variables are set
+    paios_scheme = os.environ.get('PAIOS_SCHEME', 'https')
+    paios_host = os.environ.get('PAIOS_HOST', 'localhost')
+    paios_port = os.environ.get('PAIOS_PORT', '8443')
+
+    if paios_host:
+        paios_url = f"{paios_scheme}://{paios_host}"
+        if paios_port:
+            paios_url += f":{paios_port}"
+        allow_origins.append(paios_url)
+
+    # Allow overriding origins from environment variables
+    additional_origins = os.environ.get('PAIOS_ALLOW_ORIGINS')
+    if additional_origins:
+        allow_origins.extend(additional_origins.split(','))
+
+    # Add CORS middleware
     connexion_app.add_middleware(
-       CORSMiddleware,
-       position=MiddlewarePosition.BEFORE_EXCEPTION,
-       allow_origins=allow_origins,
-       allow_credentials=True,
-       allow_methods=["*"],
-       allow_headers=["*"],
-       expose_headers=["Content-Range", "X-Total-Count"],
+        CORSMiddleware,
+        position=MiddlewarePosition.BEFORE_EXCEPTION,
+        allow_origins=allow_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+        expose_headers=["Content-Range", "X-Total-Count"],
     )
 
     # Add API with validation

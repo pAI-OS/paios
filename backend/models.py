@@ -1,6 +1,7 @@
 from datetime import datetime
-from sqlmodel import Field
+from sqlmodel import Field, ForeignKey
 from backend.db import SQLModelBase
+from sqlalchemy.orm import relationship
 
 class Config(SQLModelBase, table=True):
     key: str = Field(primary_key=True)
@@ -12,9 +13,21 @@ class Resource(SQLModelBase, table=True):
     uri: str = Field()
 
 class User(SQLModelBase, table=True):
+    __tablename__ = "user"
     id: str = Field(primary_key=True)
     name: str = Field()
     email: str = Field()
+    passkey_user_id = Field()
+    creds = relationship('PublicKeyCred', backref='owner')
+
+class PublicKeyCred(SQLModelBase, table=True):
+    __tablename__ = "cred"
+    id: str = Field(primary_key=True)
+    public_key: str = Field()
+    passkey_user_id: str = Field(foreign_key="user.id")
+    backed_up: str = Field()
+    name: str | None = Field(default=None)
+    transports: str = Field()
 
 class Asset(SQLModelBase, table=True):
     id: str = Field(primary_key=True)

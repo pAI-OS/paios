@@ -8,3 +8,4 @@ from .DownloadsView import DownloadsView
 from .UsersView import UsersView
 from .PersonasView import PersonasView
 from .SharesView import SharesView
+from .AuthView import AuthView
