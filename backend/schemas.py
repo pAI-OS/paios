@@ -46,3 +46,17 @@ class AssetCreateSchema(AssetBaseSchema):
 
 class AssetSchema(AssetBaseSchema):
     id: str
+
+class RegistrationOptions(BaseModel):
+    email: str
+
+class VerifyRegistration(BaseModel):
+    email: str
+    att_resp: dict
+
+class AuthenticationOptions(BaseModel):
+    email: str
+
+class VerifyAuthentication(BaseModel):
+    email: str
+    auth_resp: dict

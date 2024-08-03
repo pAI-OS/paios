@@ -1,5 +1,6 @@
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String, ForeignKey
 from backend.db import Base
+from sqlalchemy.orm import relationship
 
 class Config(Base):
     __tablename__ = "config"
@@ -15,8 +16,20 @@ class Channel(Base):
 class User(Base):
     __tablename__ = "user"
     id = Column(String, primary_key=True)
-    name = Column(String, nullable=False)
+    name = Column(String, nullable=True)
     email = Column(String, nullable=False)
+    passkey_user_id = Column(String, nullable=False)
+    creds = relationship('PublicKeyCred', backref='owner')
+
+
+class PublicKeyCred(Base):
+    __tablename__ = "public_key_cred"
+    id = Column(String, primary_key=True)
+    public_key = Column(String, nullable=False)
+    passkey_user_id = Column(String, ForeignKey("user.id"), nullable=False)
+    backed_up = Column(String, nullable=False)
+    name = Column(String, nullable=True)
+    transports = Column(String)
 
 class Asset(Base):
     __tablename__ = "asset"

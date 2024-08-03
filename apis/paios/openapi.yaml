@@ -409,7 +409,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/download'
+                  $ref: '#/components/schemas/Download'
         '400':
           description: Invalid request
   '/downloads/{id}':
@@ -549,6 +549,86 @@ paths:
           description: User Not Found
         '409':
           description: Email Already Taken
+  /webauthn/generate-registration-options:
+    post:
+      summary: Generate WebAuthn registration options
+      description: Generate registration options for WebAuthn.
+      operationId: backend.api.AuthView.generate_registration_options
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationOptions'
+      responses:
+        '200':
+          description: Registration options generated
+          content:
+            application/json:
+              schema:        
+                type: object
+        '404':
+          description: User not found
+  /webauthn/verify-registration:
+    post:
+      summary: Verify WebAuthn registration
+      description: Verify the registration response for WebAuthn.
+      operationId: backend.api.AuthView.verify_registration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyRegistration'
+      responses:
+        '200':
+          description: Registration verified
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: User not found
+  /webauthn/generate-authentication-options:
+    post:
+      summary: Generate WebAuthn authentication options
+      description: Generate authentication options for WebAuthn.
+      operationId: backend.api.AuthView.generate_authentication_options
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthenticationOptions'
+      responses:
+        '200':
+          description: Authentication options generated
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: User not found
+  /webauthn/verify-authentication:
+    post:
+      summary: Verify WebAuthn authentication
+      description: Verify the authentication response for WebAuthn.
+      operationId: backend.api.AuthView.verify_authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyAuthentication'
+      responses:
+        '200':
+          description: Authentication verified
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: User not found
 tags:
   - name: Abilities Management
     description: Installation and configuration of abilities
@@ -959,3 +1039,27 @@ components:
       required:
         - name
         - email
+    RegistrationOptions:
+      type: object
+      properties:
+        email:
+          type: string
+    VerifyRegistration:
+      type: object
+      properties:
+        email:
+          type: string
+        att_resp:
+          type: object
+    AuthenticationOptions:
+      type: object
+      properties:
+        email:
+          type: string
+    VerifyAuthentication:
+      type: object
+      properties:
+        email:
+          type: string
+        auth_resp:
+          type: object

@@ -36,6 +36,15 @@ if __name__ == "__main__":
     from app import create_app
     app = create_app()
 
+    
+    # Define the paths to the SSL certificate and key file
+    certfile_path = base_dir / "localhost+2.pem"
+    keyfile_path = base_dir / "localhost+2-key.pem"
+
+    # Ensure the SSL certificate and key file exist
+    if not certfile_path.is_file() or not keyfile_path.is_file():
+        raise FileNotFoundError("SSL certificate or key file not found.")
+
     # Run the app
     import uvicorn
     
