@@ -13,18 +13,16 @@ class Resource(SQLModelBase, table=True):
     uri: str = Field()
 
 class User(SQLModelBase, table=True):
-    __tablename__ = "user"
     id: str = Field(primary_key=True)
     name: str = Field()
     email: str = Field()
     passkey_user_id = Field()
-    creds = relationship('PublicKeyCred', backref='owner')
+    creds = relationship('Cred', backref='owner')
 
-class PublicKeyCred(SQLModelBase, table=True):
-    __tablename__ = "cred"
+class Cred(SQLModelBase, table=True):
     id: str = Field(primary_key=True)
     public_key: str = Field()
-    passkey_user_id: str = Field(foreign_key="user.id")
+    passkey_user_id: str = Field(foreign_key="user.passkey_user_id")
     backed_up: str = Field()
     name: str | None = Field(default=None)
     transports: str = Field()

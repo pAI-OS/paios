@@ -14,10 +14,14 @@ class AuthView:
 
         if not options:
             return JSONResponse({"error": "Something went wrong"}, status_code=500)
-        return JSONResponse({"option": options}, status_code=200)
+        return JSONResponse({"options": options}, status_code=200)
     
 
-    async def verify_registration(self):
+    async def verify_registration(self, body: dict):
+        verify = await self.am.registrationResponse(body["challenge"], body["email"], body["user_id"], body["att_resp"])
+        if not verify:
+            return JSONResponse({"message": "Failed"}, status_code=401)
+        
         return JSONResponse({"message": "Success"}, status_code=200)
     async def generate_authentication_options(self):
         return JSONResponse({"message": "Success"}, status_code=200)
