@@ -13,6 +13,7 @@ import SyncAltIcon from '@mui/icons-material/SyncAlt';
 import { Dashboard } from "./Dashboard";
 import { authProvider } from "./authProvider";
 import { CustomLayout } from './CustomLayout';
+import Login from './Login';
 
 export const App = () => (
   <Admin
@@ -20,6 +21,7 @@ export const App = () => (
     authProvider={authProvider}
     dashboard={Dashboard}
     layout={CustomLayout}
+    loginPage={Login}
   >
     <Resource name="assets" list={AssetList} create={AssetCreate} edit={AssetEdit} show={AssetShow} recordRepresentation='name' icon={DocIcon} />
     <Resource name="users" list={UserList} create={UserCreate} edit={UserEdit} show={UserShow} recordRepresentation='name' icon={UserIcon} />

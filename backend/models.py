@@ -26,7 +26,7 @@ class PublicKeyCred(Base):
     __tablename__ = "public_key_cred"
     id = Column(String, primary_key=True)
     public_key = Column(String, nullable=False)
-    passkey_user_id = Column(String, ForeignKey("user.id"), nullable=False)
+    passkey_user_id = Column(String, ForeignKey("user.passkey_user_id"), nullable=False)
     backed_up = Column(String, nullable=False)
     name = Column(String, nullable=True)
     transports = Column(String)
