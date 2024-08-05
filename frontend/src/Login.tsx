@@ -16,20 +16,20 @@ const Login: React.FC = () => {
         body: JSON.stringify({ email }),
       });
 
-      const data = await response.json();
-      const options = data.publicKey;
+      const res = await response.json();
+      const options = JSON.parse(res?.options)
       const authResp = await startAuthentication(options);
 
-      const verifyResponse = await fetch('https://localhost:3080/api/v1/webauthn/verify-authentication', {
+      const verifyResponse = await fetch('http://localhost:3080/api/v1/webauthn/verify-authentication', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, auth_resp: authResp }),
+        body: JSON.stringify({ email, auth_resp: authResp, challenge: options.challenge }),
       });
 
-      const { verified } = await verifyResponse.json();
-      setMessage(verified ? 'Login successful' : 'Login failed');
+      const { message } = await verifyResponse.json();
+      setMessage(message === "Success" ? 'Login successful' : 'Login failed');
     } catch (error) {
       console.error(error);
       setMessage('An error occurred during login');
@@ -52,12 +52,10 @@ const Login: React.FC = () => {
 
       const res = await response.json();
       const options = JSON.parse(res?.options)
-      console.log("OPTIONS... ",options)
-
+    
       const attResp = await startRegistration(options);
 
-      console.log("ATTRS... ",attResp)
-
+    
       const verifyResponse = await fetch('http://localhost:3080/api/v1/webauthn/verify-registration', {
         method: 'POST',
         headers: {
@@ -71,8 +69,8 @@ const Login: React.FC = () => {
          }),
       });
 
-      const { verified } = await verifyResponse.json();
-      setMessage(verified ? 'Registration successful' : 'Registration failed');
+      const { message } = await verifyResponse.json();
+      setMessage(message === "Success" ? 'Registration successful' : 'Registration failed');
     } catch (error) {
       console.error(error);
       setMessage('An error occurred during registration');

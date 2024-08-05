@@ -76,7 +76,7 @@ class AuthManager:
                 exclude_credentials=exclude_credentials
             )
 
-            challenge = base64.b64encode(options.challenge).decode("utf-8")
+            challenge = base64.urlsafe_b64encode(options.challenge).decode("utf-8")
 
             return challenge, options_to_json(options)
         
@@ -104,8 +104,8 @@ class AuthManager:
                 await session.refresh(new_user)
                 user = new_user
                 
-            base64_cred_id = base64.b64encode(res.credential_id).decode("utf-8")
-            base64_public_key = base64.b64encode(res.credential_public_key).decode("utf-8")
+            base64url_cred_id = base64.urlsafe_b64encode(res.credential_id).decode("utf-8")
+            base64url_public_key = base64.urlsafe_b64encode(res.credential_public_key).decode("utf-8")
 
 
             transports = json.dumps(response["response"]["transports"])
@@ -121,7 +121,7 @@ class AuthManager:
             user = user_result.scalar_one_or_none()
 
             if not user:
-                return None
+                return None, None
             
             allow_credentials = []
 
@@ -143,8 +143,40 @@ class AuthManager:
                 user_verification=UserVerificationRequirement.REQUIRED
             )
 
-            challenge = base64.b64encode(options.challenge).decode("utf-8")
+            challenge = base64.urlsafe_b64encode(options.challenge).decode("utf-8")
             return challenge, options_to_json(options)
+        
+    async def signinResponse(self, challenge: str,email_id:str, response):
+        async with db_session_context() as session:
+            expected_origin = "http://localhost:3080"
+            expected_rpid = "localhost"
+            credential_result = await session.execute(select(PublicKeyCred).where(PublicKeyCred.id == response["id"]))
+            credential = credential_result.scalar_one_or_none()
+
+            if not credential:
+                return None
+            
+            user_result = await session.execute(select(User).where(User.email == email_id))
+            user = user_result.scalar_one_or_none()
+
+            print("USER.... ",user.id)
+
+            if not user:
+                return None
+            
+            res = verify_authentication_response(credential=response,
+                                                 expected_challenge=base64url_to_bytes(challenge),
+                                                 expected_origin=expected_origin,
+                                                 expected_rp_id=expected_rpid,
+                                                 credential_public_key=base64url_to_bytes(credential.public_key),
+                                                 credential_current_sign_count=0,
+                                                 require_user_verification=True
+                                                 )
+
+            if not res.new_sign_count != 1:
+                return None
+            
+            return user.id
 
 
             

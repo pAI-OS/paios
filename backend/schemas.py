@@ -103,3 +103,4 @@ class AuthenticationOptions(BaseModel):
 class VerifyAuthentication(BaseModel):
     email: str
     auth_resp: dict
+    challenge: str
