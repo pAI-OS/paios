@@ -53,6 +53,8 @@ class RegistrationOptions(BaseModel):
 class VerifyRegistration(BaseModel):
     email: str
     att_resp: dict
+    challenge: str
+    user_id: str
 
 class AuthenticationOptions(BaseModel):
     email: str

@@ -19,7 +19,8 @@ from webauthn.helpers.structs import (
     ResidentKeyRequirement,
     PublicKeyCredentialDescriptor,
     PublicKeyCredentialType,
-    AuthenticatorTransport
+    AuthenticatorTransport,
+    UserVerificationRequirement
 )
 from webauthn.helpers.cose import COSEAlgorithmIdentifier
 import json
@@ -75,7 +76,9 @@ class AuthManager:
                 exclude_credentials=exclude_credentials
             )
 
-            return options_to_json(options)
+            challenge = base64.b64encode(options.challenge).decode("utf-8")
+
+            return challenge, options_to_json(options)
         
     async def registrationResponse(self, challenge: str, email_id: str,user_id: str, response):
         async with db_session_context() as session:
@@ -111,6 +114,37 @@ class AuthManager:
             await session.commit()
 
             return True
+
+    async def signinRequestOptions(self, email_id: str):
+        async with db_session_context() as session:
+            user_result = await session.execute(select(User).where(User.email == email_id))
+            user = user_result.scalar_one_or_none()
+
+            if not user:
+                return None
             
+            allow_credentials = []
+
+            creds_result = await session.execute(select(PublicKeyCred).filter(PublicKeyCred.passkey_user_id == user.passkey_user_id))
+            creds = creds_result.scalars().all()
+
+            for cred in creds:
+                transports = [AuthenticatorTransport[transport.upper()] for transport in json.loads(cred.transports)]
+                allow_credentials.append(PublicKeyCredentialDescriptor(
+                        id=base64url_to_bytes(cred.id),
+                        type=PublicKeyCredentialType.PUBLIC_KEY,
+                        transports=transports
+                ))
+
+            options = generate_authentication_options(
+                rp_id="localhost",
+                timeout=12000,
+                allow_credentials=allow_credentials,
+                user_verification=UserVerificationRequirement.REQUIRED
+            )
+
+            challenge = base64.b64encode(options.challenge).decode("utf-8")
+            return challenge, options_to_json(options)
+
 
             

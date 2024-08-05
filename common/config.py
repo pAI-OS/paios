@@ -60,11 +60,11 @@ logging_config: dict[str, Any] = {
     },
     "loggers": {
         "": {"handlers": ["default"], "level": "INFO"}, # root logger
-        "connexion": {"handlers": ["connexion"], "level": "DEBUG", "propagate": False},
-        "uvicorn": {"handlers": ["uvicorn_default"], "level": "INFO", "propagate": False},
+        "connexion": {"handlers": ["connexion"], "level": "DEBUG", "propagate": True},
+        "uvicorn": {"handlers": ["uvicorn_default"], "level": "INFO", "propagate": True},
         "uvicorn.error": {"level": "INFO"},
-        "uvicorn.access": {"handlers": ["access"], "level": "INFO", "propagate": False},
+        "uvicorn.access": {"handlers": ["access"], "level": "INFO", "propagate": True},
         "watchfiles.main": {"level": "ERROR"}, # filter watchfiles noise
-        "sqlalchemy.engine": {"level": "WARNING", "propagate": False}, # filter sqlalchemy noise
+        "sqlalchemy.engine": {"level": "WARNING", "propagate": True}, # filter sqlalchemy noise
     },
 }
