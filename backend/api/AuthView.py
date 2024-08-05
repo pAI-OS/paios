@@ -27,7 +27,7 @@ class AuthView:
         
         return JSONResponse({"message": "Success"}, status_code=200)
     
-    async def generate_authentication_options(self, body: dict):
+    async def generate_authentication_options(self, body: AuthenticationOptions):
         challenge, options = await self.am.signinRequestOptions(body["email"])
 
         if not options:
@@ -37,6 +37,13 @@ class AuthView:
         response = JSONResponse({"options": options}, status_code=200)
         response.set_cookie(key="challenge", value=challenge)
         return response
-    async def verify_authentication(self):
-        return JSONResponse({"message": "Success"}, status_code=200)
+    async def verify_authentication(self, body: VerifyAuthentication):
+        user = await self.am.signinResponse(body["challenge"], body["email"],body["auth_resp"])
+
+        if not user:
+            return JSONResponse({"error": "Authentication failed."}, status_code=401)
+         
+        response = JSONResponse({"message": "Success"}, status_code=200)
+        response.set_cookie(key="user", value=user)
+        return response
     

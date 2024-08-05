@@ -1082,3 +1082,5 @@ components:
           type: string
         auth_resp:
           type: object
+        challenge:
+          type: string
