@@ -727,6 +727,11 @@ paths:
       responses:
         '200':
           description: Registration options generated
+          headers:
+            Set-Cookie:
+              description: A cookie that contains the passkey challenge
+              schema:
+                type: string
           content:
             application/json:
               schema:        
@@ -737,6 +742,13 @@ paths:
     post:
       summary: Verify WebAuthn registration
       description: Verify the registration response for WebAuthn.
+      parameters:
+        - in: cookie
+          name: challenge
+          required: true
+          schema:
+            type: string
+          description: Passkey challenge
       operationId: backend.api.AuthView.verify_registration
       requestBody:
         required: true
@@ -767,6 +779,11 @@ paths:
       responses:
         '200':
           description: Authentication options generated
+          headers:
+            Set-Cookie:
+              description: A cookie that contains the passkey challenge
+              schema:
+                type: string
           content:
             application/json:
               schema:
@@ -1305,6 +1322,8 @@ components:
           type: string
         att_resp:
           type: object
+        challenge:
+          type: string
     AuthenticationOptions:
       type: object
       properties:

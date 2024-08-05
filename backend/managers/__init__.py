@@ -5,6 +5,7 @@ from .ConfigManager import ConfigManager
 from .DownloadsManager import DownloadsManager
 from .UsersManager import UsersManager
 from .PersonasManager import PersonasManager
+from .AuthManager import AuthManager
 
 # List of manager classes
 manager_classes = [
@@ -14,6 +15,7 @@ manager_classes = [
     ConfigManager,
     DownloadsManager,
     UsersManager,
+    AuthManager,
     PersonasManager
 ]
 

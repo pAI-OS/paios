@@ -8,7 +8,7 @@ const Login: React.FC = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await fetch('https://localhost:3080/api/v1/webauthn/generate-authentication-options', {
+      const response = await fetch('http://localhost:3080/api/v1/webauthn/generate-authentication-options', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
