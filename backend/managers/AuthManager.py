@@ -76,7 +76,7 @@ class AuthManager:
                 exclude_credentials=exclude_credentials
             )
 
-            challenge = base64.urlsafe_b64encode(options.challenge).decode("utf-8")
+            challenge = base64.urlsafe_b64encode(options.challenge).decode("utf-8").rstrip("=")
 
             return challenge, options_to_json(options)
         
@@ -104,8 +104,8 @@ class AuthManager:
                 await session.refresh(new_user)
                 user = new_user
                 
-            base64url_cred_id = base64.urlsafe_b64encode(res.credential_id).decode("utf-8")
-            base64url_public_key = base64.urlsafe_b64encode(res.credential_public_key).decode("utf-8")
+            base64url_cred_id = base64.urlsafe_b64encode(res.credential_id).decode("utf-8").rstrip("=")
+            base64url_public_key = base64.urlsafe_b64encode(res.credential_public_key).decode("utf-8").rstrip("=")
 
 
             transports = json.dumps(response["response"]["transports"])
@@ -143,7 +143,7 @@ class AuthManager:
                 user_verification=UserVerificationRequirement.REQUIRED
             )
 
-            challenge = base64.urlsafe_b64encode(options.challenge).decode("utf-8")
+            challenge = base64.urlsafe_b64encode(options.challenge).decode("utf-8").rstrip("=")
             return challenge, options_to_json(options)
         
     async def signinResponse(self, challenge: str,email_id:str, response):
@@ -158,8 +158,6 @@ class AuthManager:
             
             user_result = await session.execute(select(User).where(User.email == email_id))
             user = user_result.scalar_one_or_none()
-
-            print("USER.... ",user.id)
 
             if not user:
                 return None
