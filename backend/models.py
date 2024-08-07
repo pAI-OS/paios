@@ -25,4 +25,12 @@ class Asset(Base):
     title = Column(String, nullable=False)
     creator = Column(String, nullable=True)
     subject = Column(String, nullable=True)
+    description = Column(String, nullable=True)    
+
+class Persona(Base):
+    __tablename__ = "persona"
+    id = Column(String, primary_key=True)
+    name = Column(String, nullable=False)
     description = Column(String, nullable=True)
+    voice_id = Column(String, nullable=True)
+    face_id = Column(String, nullable=True)

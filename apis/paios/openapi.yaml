@@ -549,6 +549,91 @@ paths:
           description: User Not Found
         '409':
           description: Email Already Taken
+  /personas:
+    get:
+      tags:
+        - Persona Management
+      summary: Retrieve all personas
+      description: Get all personas.
+      parameters:
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/range'
+        - $ref: '#/components/parameters/filter'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Persona'
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+    post:
+      summary: Create new persona
+      tags:
+        - Persona Management
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Persona'
+        '400':
+          description: Missing Required Information
+      description: Creates a new persona.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonaCreate'
+  '/personas/{id}':
+    get:
+      tags:
+        - Persona Management
+      summary: Retrieve persona by id
+      description: Retrieve the information of the persona with the matching persona ID.
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Persona'
+    put:
+      summary: Update persona by id
+      tags:
+        - Persona Management
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Persona'
+      description: Updates the persona with the given id.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Persona'
+    delete:
+      summary: Delete persona by id
+      description: Deletes the persona with the given id.
+      tags:
+        - Persona Management
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+    parameters:
+      - $ref: '#/components/parameters/id'  
 tags:
   - name: Abilities Management
     description: Installation and configuration of abilities
@@ -562,6 +647,8 @@ tags:
     description: Management of downloads
   - name: User Management
     description: Management of user accounts
+  - name: Persona Management
+    description: Management of personas
 components:
   headers:
     X-Total-Count:
@@ -959,3 +1046,36 @@ components:
       required:
         - name
         - email
+    Persona:
+      type: object
+      title: Persona
+      properties:
+        id:
+          $ref: '#/components/schemas/uuid4ReadOnly'
+        name:
+          $ref: '#/components/schemas/name'
+        description:
+          $ref: '#/components/schemas/textLong'
+        voice_id:
+          $ref: '#/components/schemas/uuid4'
+        face_id:
+          $ref: '#/components/schemas/uuid4'
+      required:
+        - name
+    PersonaCreate:
+      type: object
+      title: PersonaCreate
+      description: Persona without id which is server-generated.
+      properties:
+        id:
+          $ref: '#/components/schemas/uuid4ReadOnly'
+        name:
+          $ref: '#/components/schemas/name'
+        description:
+          $ref: '#/components/schemas/textLong'
+        voice_id:
+          $ref: '#/components/schemas/uuid4'
+        face_id:
+          $ref: '#/components/schemas/uuid4'
+      required:        
+        - name
