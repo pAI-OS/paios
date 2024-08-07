@@ -4,7 +4,6 @@ from .ChannelsManager import ChannelsManager
 from .ConfigManager import ConfigManager
 from .DownloadsManager import DownloadsManager
 from .UsersManager import UsersManager
-from .PersonasManager import PersonasManager
 
 # List of manager classes
 manager_classes = [
@@ -13,8 +12,7 @@ manager_classes = [
     ChannelsManager,
     ConfigManager,
     DownloadsManager,
-    UsersManager,
-    PersonasManager
+    UsersManager
 ]
 
 # Initialize the managers dynamically

@@ -6,4 +6,3 @@ from .ChannelsView import ChannelsView
 from .ConfigView import ConfigView
 from .DownloadsView import DownloadsView
 from .UsersView import UsersView
-from .PersonasView import PersonasView
