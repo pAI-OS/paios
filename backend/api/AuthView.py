@@ -2,6 +2,7 @@ from starlette.responses import JSONResponse
 from backend.managers.AuthManager import AuthManager
 import logging
 from backend.schemas import RegistrationOptions, VerifyAuthentication, AuthenticationOptions, VerifyRegistration
+from connexion import request
 
 logger = logging.getLogger(__name__)
 
@@ -21,11 +22,15 @@ class AuthView:
     
 
     async def verify_registration(self, body: VerifyRegistration):
-        verify = await self.am.registrationResponse(body["challenge"], body["email"], body["user_id"], body["att_resp"])
-        if not verify:
+        challenge = request.cookies.get("challenge")
+        user = await self.am.registrationResponse(challenge, body["email"], body["user_id"], body["att_resp"])
+        if not user:
             return JSONResponse({"message": "Failed"}, status_code=401)
         
-        return JSONResponse({"message": "Success"}, status_code=200)
+        response = JSONResponse({"message": "Success"}, status_code=200)
+        response.set_cookie(key="challenge",value="", expires=0)
+        response.set_cookie(key="user", value=user)
+        return response
     
     async def generate_authentication_options(self, body: AuthenticationOptions):
         challenge, options = await self.am.signinRequestOptions(body["email"])
@@ -44,6 +49,7 @@ class AuthView:
             return JSONResponse({"error": "Authentication failed."}, status_code=401)
          
         response = JSONResponse({"message": "Success"}, status_code=200)
+        response.set_cookie(key="challenge", value="", expires=0)
         response.set_cookie(key="user", value=user)
         return response
     

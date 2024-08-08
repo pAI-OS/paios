@@ -7,7 +7,7 @@ from starlette.middleware.cors import CORSMiddleware
 def create_backend_app():
     apis_dir = Path(__file__).parent.parent / 'apis' / 'paios'
     connexion_app = AsyncApp(__name__, specification_dir=apis_dir)
-
+    
     allow_origins = [
         'http://localhost',
         'http://localhost:3080',
@@ -20,8 +20,8 @@ def create_backend_app():
        position=MiddlewarePosition.BEFORE_EXCEPTION,
        allow_origins=allow_origins,
        allow_credentials=True,
-       allow_methods=["*"],
-       allow_headers=["*"],
+       allow_methods=["GET","POST","PUT","DELETE","PATCH","HEAD","OPTIONS"],
+       allow_headers=["Content-Range", "X-Total-Count"],
        expose_headers=["Content-Range", "X-Total-Count"],
     )
 

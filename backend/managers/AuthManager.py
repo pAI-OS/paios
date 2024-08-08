@@ -113,7 +113,7 @@ class AuthManager:
             session.add(new_cred)
             await session.commit()
 
-            return True
+            return user.id
 
     async def signinRequestOptions(self, email_id: str):
         async with db_session_context() as session:
