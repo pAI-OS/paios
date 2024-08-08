@@ -1,15 +1,24 @@
 import { AuthProvider } from "react-admin";
+import { login, register } from "./apis/auth";
+import Cookies from "js-cookie"
 
 export const authProvider: AuthProvider = {
     // called when the user attempts to log in
-    login: ({ username }) => {
-        localStorage.setItem("username", username);
-        // accept all username/password combinations
-        return Promise.resolve();
+    login: async ({ email, isRegistering }) => {
+        try {
+            if (isRegistering) {
+                await register(email)
+            } else {
+                await login(email)
+            }
+            return Promise.resolve()
+        } catch (e) {
+            return Promise.reject(e)
+        }
     },
     // called when the user clicks on the logout button
     logout: () => {
-        localStorage.removeItem("username");
+        Cookies.remove("user")
         return Promise.resolve();
     },
     // called when the API returns an error
@@ -22,7 +31,7 @@ export const authProvider: AuthProvider = {
     },
     // called when the user navigates to a new location, to check for authentication
     checkAuth: () => {
-        return localStorage.getItem("username")
+        return Cookies.get("user")
             ? Promise.resolve()
             : Promise.reject();
     },

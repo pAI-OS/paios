@@ -12,7 +12,7 @@ def create_backend_app():
 
     apis_dir = Path(__file__).parent.parent / 'apis' / 'paios'
     connexion_app = AsyncApp(__name__, specification_dir=apis_dir)
-
+    
     allow_origins = [
         'http://localhost:5173',  # Default Vite dev server
         'https://localhost:8443',  # Secure port for local development
@@ -36,13 +36,13 @@ def create_backend_app():
 
     # Add CORS middleware
     connexion_app.add_middleware(
-        CORSMiddleware,
-        position=MiddlewarePosition.BEFORE_EXCEPTION,
-        allow_origins=allow_origins,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-        expose_headers=["Content-Range", "X-Total-Count"],
+       CORSMiddleware,
+       position=MiddlewarePosition.BEFORE_EXCEPTION,
+       allow_origins=allow_origins,
+       allow_credentials=True,
+       allow_methods=["GET","POST","PUT","DELETE","PATCH","HEAD","OPTIONS"],
+       allow_headers=["Content-Range", "X-Total-Count"],
+       expose_headers=["Content-Range", "X-Total-Count"],
     )
 
     # Add API with validation

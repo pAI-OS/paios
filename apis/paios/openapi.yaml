@@ -17,6 +17,8 @@ servers:
 paths:
   /abilities:
     get:
+      security:
+        - cookieAuth: []
       tags:
         - Abilities Management
       summary: Retrieve all abilities
@@ -39,6 +41,8 @@ paths:
               $ref: '#/components/headers/X-Total-Count'
   '/abilities/{id}':
     get:
+      security:
+        - cookieAuth: []
       tags:
         - Abilities Management
       summary: Retrieve ability by id
@@ -54,6 +58,8 @@ paths:
       - $ref: '#/components/parameters/snake_id'
   '/abilities/{id}/install':
     post:
+      security:
+        - cookieAuth: []
       tags:
         - Abilities Management
       summary: Install ability
@@ -71,6 +77,8 @@ paths:
           description: Ability not found
   '/abilities/{id}/upgrade':
     post:
+      security:
+        - cookieAuth: []
       tags:
         - Abilities Management
       summary: Upgrade ability
@@ -88,6 +96,8 @@ paths:
           description: Ability not found
   '/abilities/{id}/uninstall':
     post:
+      security:
+        - cookieAuth: []
       tags:
         - Abilities Management
       summary: Uninstall ability
@@ -104,6 +114,8 @@ paths:
           description: Ability not found
   '/abilities/{id}/start':
     post:
+      security:
+        - cookieAuth: []
       tags:
         - Abilities Management
       summary: Start ability
@@ -116,6 +128,8 @@ paths:
       - $ref: '#/components/parameters/snake_id'
   '/abilities/{id}/stop':
     post:
+      security:
+        - cookieAuth: []
       tags:
         - Abilities Management
       summary: Stop ability
@@ -128,6 +142,8 @@ paths:
       - $ref: '#/components/parameters/snake_id'
   '/abilities/{id}/dependencies/{dependency_id}/download':
     post:
+      security:
+        - cookieAuth: []
       tags:
         - Abilities Management
       summary: Start download
@@ -145,6 +161,8 @@ paths:
           $ref: '#/components/schemas/kebab-snake_id'
   '/abilities/{id}/dependencies/{dependency_id}/install':
     post:
+      security:
+        - cookieAuth: []
       tags:
         - Abilities Management
       summary: Start dependency install
@@ -163,6 +181,8 @@ paths:
           $ref: '#/components/schemas/kebab-snake_id'
   /assets:
     get:
+      security:
+        - cookieAuth: []
       tags:
         - Asset Management
       summary: Retrieve all assets
@@ -184,6 +204,8 @@ paths:
             X-Total-Count:
               $ref: '#/components/headers/X-Total-Count'
     post:
+      security:
+        - cookieAuth: []
       summary: Create new asset
       tags:
         - Asset Management
@@ -204,6 +226,8 @@ paths:
               $ref: '#/components/schemas/AssetCreate'
   '/assets/{id}':
     get:
+      security:
+        - cookieAuth: []
       tags:
         - Asset Management
       summary: Retrieve asset by id
@@ -218,6 +242,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Asset'
     put:
+      security:
+        - cookieAuth: []
       summary: Update asset by id
       tags:
         - Asset Management
@@ -235,6 +261,8 @@ paths:
             schema:
               $ref: '#/components/schemas/Asset'
     delete:
+      security:
+        - cookieAuth: []
       summary: Delete asset by id
       description: Deletes the asset with the given id.
       tags:
@@ -248,6 +276,8 @@ paths:
       - $ref: '#/components/parameters/id'
   /resources:
     get:
+      security:
+        - cookieAuth: []
       tags:
         - Resource Management
       summary: Retrieve all resources
@@ -285,6 +315,8 @@ paths:
               $ref: '#/components/schemas/ChannelCreate'
   '/resources/{id}':
     get:
+      security:
+        - cookieAuth: []
       tags:
         - Resource Management
       summary: Retrieve resource by id
@@ -299,6 +331,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Resource'
     put:
+      security:
+        - cookieAuth: []
       tags:
         - Resource Management
       summary: Update resource by key
@@ -314,6 +348,8 @@ paths:
         '200':
           description: OK
     delete:
+      security:
+        - cookieAuth: []
       tags:
         - Resource Management
       summary: Delete resource by key
@@ -327,6 +363,8 @@ paths:
           description: Not Found
   '/config/{key}':
     get:
+      security:
+        - cookieAuth: []
       tags:
         - Configuration Management
       summary: Retrieve config by key
@@ -341,6 +379,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Config'
     put:
+      security:
+        - cookieAuth: []
       tags:
         - Configuration Management
       summary: Update config by key
@@ -356,6 +396,8 @@ paths:
         '200':
           description: OK
     delete:
+      security:
+        - cookieAuth: []
       tags:
         - Configuration Management
       summary: Delete config by key
@@ -369,6 +411,8 @@ paths:
           description: Not Found
   /downloads:
     get:
+      security:
+        - cookieAuth: []
       tags:
         - Downloads Management
       summary: Retrieve all downloads
@@ -390,6 +434,8 @@ paths:
             X-Total-Count:
               $ref: '#/components/headers/X-Total-Count'
     post:
+      security:
+        - cookieAuth: []
       tags:
         - Downloads Management
       summary: Start new downloads
@@ -414,6 +460,8 @@ paths:
           description: Invalid request
   '/downloads/{id}':
     delete:
+      security:
+        - cookieAuth: []
       tags:
         - Downloads Management
       summary: Delete download
@@ -427,6 +475,8 @@ paths:
           description: Download Not Found
   '/downloads/{id}/pause':
     post:
+      security:
+        - cookieAuth: []
       tags:
         - Downloads Management
       summary: Pause download
@@ -439,6 +489,8 @@ paths:
           description: Download paused
   '/downloads/{id}/resume':
     post:
+      security:
+        - cookieAuth: []
       tags:
         - Downloads Management
       summary: Resume download
@@ -451,6 +503,8 @@ paths:
           description: Download resumed
   /users:
     get:
+      security:
+        - cookieAuth: []
       tags:
         - User Management
       summary: Retrieve all users
@@ -472,6 +526,8 @@ paths:
             X-Total-Count:
               $ref: '#/components/headers/X-Total-Count'
     post:
+      security:
+        - cookieAuth: []
       tags:
         - User Management
       summary: Create new user
@@ -498,6 +554,8 @@ paths:
           description: Email Already Taken
   '/users/{id}':
     get:
+      security:
+        - cookieAuth: []
       tags:
         - User Management
       summary: Retrieve user by id
@@ -514,6 +572,8 @@ paths:
         '404':
           description: User Not Found
     delete:
+      security:
+        - cookieAuth: []
       tags:
         - User Management
       summary: Delete user by id
@@ -526,6 +586,8 @@ paths:
         '404':
           description: Not Found
     put:
+      security:
+        - cookieAuth: []
       tags:
         - User Management
       summary: Update user
@@ -828,6 +890,11 @@ tags:
   - name: Share Management
     description: Management of share links
 components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: user
   headers:
     X-Total-Count:
       description: The total number of items
