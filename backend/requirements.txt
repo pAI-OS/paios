@@ -14,3 +14,7 @@ aiohttp
 aioftp
 aiofiles
 structlog
+pydantic
+webauthn
+greenlet
+sqlmodel
