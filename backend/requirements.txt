@@ -17,5 +17,5 @@ aiohttp
 aioftp
 aiofiles
 structlog
-greenlet
 webauthn
+greenlet
