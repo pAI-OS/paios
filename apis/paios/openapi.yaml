@@ -1,13 +1,13 @@
 openapi: 3.0.3
 info:
   version: '0.1'
-  title: Kwaai pAI-OS API
+  title: Personal Artificial Intelligence Operating System (pAI-OS) API
   description: 'API for pAI-OS admin interfaces (web, app) to backend services.'
   termsOfService: 'https://paios.org'
   contact:
-    name: Kwaai
-    url: 'https://www.kwaai.ai'
-    email: contact@kwaai.ai
+    name: pAI-OS
+    url: 'https://paios.org'
+    email: contact@paios.org
   license:
     url: 'https://github.com/pAI-OS/paios/blob/main/LICENSE'
     name: MIT
@@ -674,11 +674,11 @@ components:
     email:
       type: string
       format: email
-      example: contact@kwaai.ai
+      example: contact@paios.org
       pattern: (?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])
     name:
       type: string
-      example: Kwaai
+      example: pAI-OS
       pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
     textShort:
       type: string
