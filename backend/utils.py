@@ -1,3 +1,7 @@
+from backend.db import db_session_context
+from sqlalchemy import select
+from backend.models import User
+
 # Returns dict with null fields removed (e.g., for OpenAPI spec compliant
 # responses without having to set nullable: true)
 def remove_null_fields(data):
@@ -17,3 +21,10 @@ def filter_dict(data, keys_to_include):
 # ["x", "y"], [1, 2] -> { "x": 1, "y": 2})
 def zip_fields(fields, result):
     return {field: result[i] for i, field in enumerate(fields)}
+
+async def apikey_auth(user_id):
+    async with db_session_context() as session:
+            user_result = await session.execute(select(User).where(User.id == user_id))
+            user = user_result.scalar_one_or_none()
+            
+            return {"uid": user.id}

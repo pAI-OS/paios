@@ -176,13 +176,4 @@ class AuthManager:
                 return None
             
             return user.id
-        
-    async def apikey_auth(user_id, scopes):
-        async with db_session_context() as session:
-            user_result = await session.execute(select(User).where(User.id == user_id))
-            user = user_result.scalar_one_or_none()
-            return user
-
-
-
             
