@@ -729,7 +729,7 @@ components:
       type: apiKey
       in: cookie
       name: user
-      x-apikeyInfoFunc: backend.api.AuthView.apikey_auth
+      x-apikeyInfoFunc: backend.utils.apikey_auth
   headers:
     X-Total-Count:
       description: The total number of items
