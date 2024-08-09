@@ -1,4 +1,5 @@
 python-dotenv
+pydantic
 requests
 openapi-spec-validator
 starlette
@@ -8,9 +9,11 @@ setuptools
 packaging
 alembic
 sqlalchemy
+sqlmodel
 aiosqlite
 asyncio
 aiohttp
 aioftp
 aiofiles
 structlog
+greenlet
