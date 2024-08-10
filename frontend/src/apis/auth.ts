@@ -60,6 +60,10 @@ export const register = async (email: string) => {
       }
     );
 
+    if (response.status === 409) {
+      throw new Error("User already exists");
+    }
+
     if (response.status !== 200) {
       throw new Error("Failed to generate registration options");
     }
@@ -86,9 +90,12 @@ export const register = async (email: string) => {
     );
 
     if (verifyResponse.status !== 200) {
-      throw new Error("Failed to Login user.");
+      throw new Error("Failed to register user.");
     }
   } catch (error) {
-    throw new Error("Failed to login user");
+    if (error instanceof Error) {
+      throw error;
+    }
+    throw new Error("Failed to register user");
   }
 };
