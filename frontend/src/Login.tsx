@@ -17,6 +17,10 @@ const Login: React.FC = () => {
     }
 
     const handleUser = async () => {
+        if (!email.trim()) {
+            notify('Email field cannot be empty', { type: 'error' });
+            return;
+        }
         try {
             await login({ email, isRegistering })
         } catch (e) {
