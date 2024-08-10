@@ -21,10 +21,20 @@ const Login: React.FC = () => {
             notify('Email field cannot be empty', { type: 'error' });
             return;
         }
+
         try {
-            await login({ email, isRegistering })
+            await login({ email, isRegistering });
         } catch (e) {
-            notify(e)
+            console.error('Debug: Error in handleUser:', e);
+            if (e instanceof Error) {
+                if (e.name === 'InvalidStateError' || e.message.includes('The authenticator was previously registered')) {
+                    notify('User already exists. Please login instead.', { type: 'error' });
+                } else {
+                    notify('An error occurred. Please try again.', { type: 'error' });
+                }
+            } else {
+                notify('An unexpected error occurred. Please try again.', { type: 'error' });
+            }
         }
     }
 
