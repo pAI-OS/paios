@@ -1,27 +1,27 @@
 # API testing with Visual Studio Code - REST Client Extention
 
-POST http://localhost:3080/api/v1/channels
+POST http://localhost:3080/api/v1/resources
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
 {
-    "name": "My Channel",
-    "uri": "http://localhost:3080/channels/my-channel"
+    "name": "My Resource",
+    "uri": "http://localhost:3080/resources/my-resource"
 }
 
 ###
-PUT http://localhost:3080/api/v1/channels/llm-api
+PUT http://localhost:3080/api/v1/resources/llm-api
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
 {
     "id": "llm-api",
     "name": "LLM API",
-    "uri": "http://localhost:3080/channels/llm-api"
+    "uri": "http://localhost:3080/resources/llm-api"
 }
 
 ###
-PUT http://localhost:3080/api/v1/channels/imap-sync
+PUT http://localhost:3080/api/v1/resources/imap-sync
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
@@ -33,18 +33,18 @@ Content-Type: application/json
 
 ###
 
-DELETE http://localhost:3080/api/v1/channels/llm-api
+DELETE http://localhost:3080/api/v1/resources/llm-api
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
 ###
 
-GET http://localhost:3080/api/v1/channels/llm-api
+GET http://localhost:3080/api/v1/resources/llm-api
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
 ###
 
-GET http://localhost:3080/api/v1/channels
+GET http://localhost:3080/api/v1/resources
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json

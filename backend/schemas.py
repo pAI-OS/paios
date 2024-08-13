@@ -12,7 +12,7 @@ class ConfigBaseSchema(BaseModel):
 class ConfigSchema(ConfigBaseSchema):
     key: str
 
-# Channel schemas
+# Resource schemas
 class ChannelBaseSchema(BaseModel):
     name: str
     uri: str
@@ -29,9 +29,6 @@ class PersonaBaseSchema(BaseModel):
     description: Optional[str] = None
     voice_id: str = None
     face_id: str = None
-    class Config:
-        orm_mode = True
-        from_attributes = True
 
 class PersonaCreateSchema(PersonaBaseSchema):
     pass

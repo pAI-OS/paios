@@ -6,8 +6,8 @@ class Config(Base):
     key = Column(String, primary_key=True)
     value = Column(String, nullable=True)
 
-class Channel(Base):
-    __tablename__ = "channel"
+class Resource(Base):
+    __tablename__ = "resource"
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False)
     uri = Column(String, nullable=False)
