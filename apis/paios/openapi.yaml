@@ -246,12 +246,12 @@ paths:
           description: Not Found
     parameters:
       - $ref: '#/components/parameters/id'
-  /channels:
+  /resources:
     get:
       tags:
-        - Channel Management
-      summary: Retrieve all channels
-      description: Retrieve the information of all channels.
+        - Resource Management
+      summary: Retrieve all resources
+      description: Retrieve the information of all resources.
       parameters:
         - $ref: '#/components/parameters/sort'
         - $ref: '#/components/parameters/range'
@@ -264,31 +264,31 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Channel'
+                  $ref: '#/components/schemas/Resource'
           headers:
             X-Total-Count:
               $ref: '#/components/headers/X-Total-Count'
     post:
-      summary: Create new channel
+      summary: Create new resource
       tags:
-        - Channel Management
+        - Resource Management
       responses:
         '200':
           description: OK
         '400':
           description: Missing Required Information
-      description: Create a new channel.
+      description: Create a new resource.
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/ChannelCreate'
-  '/channels/{id}':
+  '/resources/{id}':
     get:
       tags:
-        - Channel Management
-      summary: Retrieve channel by id
-      description: Retrieve the information of the channel with the specified id.
+        - Resource Management
+      summary: Retrieve resource by id
+      description: Retrieve the information of the resource with the specified id.
       parameters:
         - $ref: '#/components/parameters/id'
       responses:
@@ -297,27 +297,27 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Channel'
+                $ref: '#/components/schemas/Resource'
     put:
       tags:
-        - Channel Management
-      summary: Update channel by key
-      description: Updates the channel with the specified id.
+        - Resource Management
+      summary: Update resource by key
+      description: Updates the resource with the specified id.
       parameters:
         - $ref: '#/components/parameters/id'
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Channel'
+              $ref: '#/components/schemas/Resource'
       responses:
         '200':
           description: OK
     delete:
       tags:
-        - Channel Management
-      summary: Delete channel by key
-      description: Delete a channel with the specified ID.
+        - Resource Management
+      summary: Delete resource by key
+      description: Delete a resource with the specified ID.
       parameters:
         - $ref: '#/components/parameters/id'
       responses:
@@ -639,8 +639,8 @@ tags:
     description: Installation and configuration of abilities
   - name: Asset Management
     description: Management of assets
-  - name: Channel Management
-    description: Discovery and configuration of input/output interfaces/channels
+  - name: Resource Management
+    description: Discovery and configuration of input/output interfaces/resources
   - name: Configuration Management
     description: Management of configuration
   - name: Downloads Management
@@ -908,10 +908,10 @@ components:
           $ref: '#/components/schemas/textShort'
       required:
         - title
-    Channel:
+    Resource:
       type: object
-      title: Channel
-      description: Channels (input/output)
+      title: Resource
+      description: Resources (input/output)
       properties:
         id:
           $ref: '#/components/schemas/uuid4ReadOnly'
@@ -925,8 +925,8 @@ components:
         - uri
     ChannelCreate:
       type: object
-      title: Channel
-      description: Channels (input/output)
+      title: Resource
+      description: Resources (input/output)
       properties:
         name:
           $ref: '#/components/schemas/name'

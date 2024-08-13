@@ -12,7 +12,7 @@ class ConfigBaseSchema(BaseModel):
 class ConfigSchema(ConfigBaseSchema):
     key: str
 
-# Channel schemas
+# Resource schemas
 class ChannelBaseSchema(BaseModel):
     name: str
     uri: str
