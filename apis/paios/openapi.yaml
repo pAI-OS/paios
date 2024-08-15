@@ -1235,7 +1235,7 @@ components:
         files:
           type: array
           items:
-            $ref: '#/components/schemas/relativePath'
+            $ref: '#/components/schemas/textLong'
         status:
           type: string
           enum:
@@ -1250,7 +1250,9 @@ components:
           enum:
             - llm
             - assistant 
-          example: assistant      
+          example: assistant
+        icon:
+          $ref: '#/components/schemas/uri'      
     ResourceCreate:
       type: object
       title: Resource Create
@@ -1269,7 +1271,7 @@ components:
         files:
           type: array
           items:
-            $ref: '#/components/schemas/relativePath'
+            $ref: '#/components/schemas/textLong'
         status:
           type: string
           enum:
@@ -1284,7 +1286,9 @@ components:
           enum:
             - llm
             - assistant 
-          example: assistant 
+          example: assistant
+        icon:
+          $ref: '#/components/schemas/uri' 
       required:
         - name
         - uri

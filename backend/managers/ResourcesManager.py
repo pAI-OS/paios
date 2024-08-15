@@ -33,7 +33,8 @@ class ResourcesManager:
                         "persona_id": resource_data["persona_id"],
                         "status": resource_data["status"],
                         "allow_edit": resource_data["allow_edit"],
-                        "kind": resource_data["kind"]
+                        "kind": resource_data["kind"],
+                        "icon": resource_data["icon"]
                     }
         async with db_session_context() as session:
             new_resource = Resource(id=str(uuid4()), **resource_data_table)
@@ -52,7 +53,8 @@ class ResourcesManager:
                         "persona_id": resource_data["persona_id"],
                         "status": resource_data["status"],
                         "allow_edit": resource_data["allow_edit"],
-                        "kind": resource_data["kind"]
+                        "kind": resource_data["kind"],
+                        "icon": resource_data["icon"]
                     }
             files = resource_data["files"]
 
@@ -90,7 +92,8 @@ class ResourcesManager:
                     files=files,
                     status=resource.status,
                     allow_edit=resource.allow_edit,
-                    kind=resource.kind)
+                    kind=resource.kind,
+                    icon=resource.icon)
             return None                    
 
     async def retrieve_resources(self, offset: int = 0, limit: int = 100, sort_by: Optional[str] = None, 
