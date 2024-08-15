@@ -884,6 +884,26 @@ paths:
           description: Successfully logged out
         '401':
           description: Unauthorized
+      - $ref: '#/components/parameters/id'
+  '/rag-indexing/{resource_id}':
+    post:
+      tags:
+        - RAG Management
+      summary: Create new rag-indexing
+      description: A pipeline for ingesting data from a source and indexing it. This knowledge will be associated with an assistant id alias channelId type assistant.
+      parameters:
+        - $ref: '#/components/parameters/resource_id'
+      requestBody:
+        description: Post the necessary fields for the API to index documents.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocsPathsCreate'
+      responses:
+        '200':
+          description: Document added
+        '400':
+          description: Missing Required Information        
 tags:
   - name: Abilities Management
     description: Installation and configuration of abilities
@@ -901,6 +921,8 @@ tags:
     description: Management of personas
   - name: Share Management
     description: Management of share links
+  - name: RAG Management
+    description: Management of RAG indexing
 components:
   securitySchemes:
     jwt:
@@ -990,6 +1012,13 @@ components:
       schema:
         type: string
         example: '{"title":"bar"}'
+    resource_id:
+      name: resource_id
+      in: path
+      description: this refers to the assitant id for the resource
+      required: true
+      schema:
+        $ref: '#/components/schemas/uuid4'    
   schemas:
     snake_id:
       type: string
@@ -1490,3 +1519,14 @@ components:
       required:
         - id
         - name    
+    DocsPathsCreate:
+      type: object
+      title: DocsPathsCreate
+      description: Conversation without id which is server-generated.
+      properties:
+        docs_paths:
+          type: array
+          items:
+            $ref: '#/components/schemas/textLong'                      
+      required:        
+        - docs_paths    

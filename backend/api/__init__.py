@@ -9,3 +9,4 @@ from .UsersView import UsersView
 from .PersonasView import PersonasView
 from .SharesView import SharesView
 from .AuthView import AuthView
+from .RagIndexingView import RagIndexingView

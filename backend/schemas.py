@@ -134,3 +134,13 @@ class FaceCreateSchema(FaceBaseSchema):
 
 class FaceSchema(FaceBaseSchema):
     pass
+
+# Document schemas
+class DocsPathsBaseSchema(BaseModel):
+    docs_paths: Optional[List[str]] = None
+
+class DocsPathsCreateSchema(DocsPathsBaseSchema):
+    pass
+
+class DocsPathsSchema(DocsPathsBaseSchema):
+    id: str
