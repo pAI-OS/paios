@@ -17,6 +17,12 @@ class Resource(SQLModelBase, table=True):
     id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
     name: str = Field()
     uri: str = Field()
+    description: str | None = Field(default=None)
+    resource_llm_id: str | None = Field(default=None)
+    persona_id: str | None = Field(default=None)
+    status: str | None = Field(default=None)
+    allow_edit: str | None = Field(default=None)
+    kind: str | None = Field(default=None)
 
 class User(SQLModelBase, table=True):
     id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
@@ -65,6 +71,11 @@ class Share(SQLModelBase, table=True):
     expiration_dt: datetime | None = Field(default=None)  # the link expiration date/time (optional)
     is_revoked: bool = Field()
 
+class File(SQLModelBase, table=True):
+    id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
+    name: str = Field()
+    assistant_id: str | None = Field(default=None, foreign_key="resource.id")
+    
 # Resolve forward references
 User.model_rebuild()
 Cred.model_rebuild()
