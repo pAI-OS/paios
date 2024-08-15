@@ -12,11 +12,17 @@ SessionRef = ForwardRef("Session")
 class Config(SQLModelBase, table=True):
     key: str = Field(primary_key=True)
     value: str | None = Field(default=None)
-
+    
 class Resource(SQLModelBase, table=True):
     id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
     name: str = Field()
     uri: str = Field()
+    description: str | None = Field(default=None)
+    resource_llm_id: str | None = Field(default=None)
+    persona_id: str | None = Field(default=None)
+    status: str | None = Field(default=None)
+    allow_edit: str | None = Field(default=None)
+    kind: str | None = Field(default=None)
 
 class User(SQLModelBase, table=True):
     id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
@@ -65,6 +71,32 @@ class Share(SQLModelBase, table=True):
     expiration_dt: datetime | None = Field(default=None)  # the link expiration date/time (optional)
     is_revoked: bool = Field()
 
+
+class Persona(SQLModelBase, table=True):
+    id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
+    name: str = Field()
+    description: str | None = Field(default=None)
+    voice_id: str | None = Field(default=None)
+    face_id: str | None = Field(default=None)
+
+class Voice(SQLModelBase, table=True):
+    id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
+    xi_id: str = Field()
+    name: str = Field()
+    image_url: str | None = Field(default=None)
+    sample_url: str | None = Field(default=None)
+
+class Face(Base):
+    __tablename__ = "face"
+    id = Column(String, primary_key=True)
+    name = Column(String, nullable=False)
+
+class File(Base):
+    __tablename__ = "file"
+    id = Column(String, primary_key=True)
+    name = Column(String, nullable=False)
+    assistant_id = Column(String, nullable=False)
+    
 # Resolve forward references
 User.model_rebuild()
 Cred.model_rebuild()
