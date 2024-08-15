@@ -2,31 +2,43 @@ from starlette.responses import JSONResponse, Response
 from common.paths import api_base_url
 from backend.managers.ResourcesManager import ResourcesManager
 from backend.pagination import parse_pagination_params
-from backend.schemas import ChannelCreateSchema
+from backend.schemas import ResourceCreateSchema
 from typing import List
 
 class ResourcesView:
     def __init__(self):
-        self.cm = ResourcesManager()
+        self.rm = ResourcesManager()
 
-    async def get(self, resource_id: str):
-        resource = await self.cm.retrieve_resource(resource_id)
+    async def get(self, id: str):
+        resource = await self.rm.retrieve_resource(id)
         if resource is None:
             return JSONResponse({"error": "Resource not found"}, status_code=404)
-        return JSONResponse(resource.model_dump(), status_code=200)
+        return JSONResponse(resource.dict(), status_code=200)
 
-    async def post(self, body: ChannelCreateSchema):
-        new_resource = await self.cm.create_resource(body)
-        return JSONResponse(new_resource.model_dump(), status_code=201, headers={'Location': f'{api_base_url}/resources/{new_resource.id}'})
+    async def post(self, body: ResourceCreateSchema):
+        valid_msg = self.rm.validate_resource_data(body)
+        if valid_msg == None:
+            assistant_id = await self.rm.create_resource(body)
+            files = body["files"]
+            for file_name in files:
+                await self.rm.create_file(file_name, assistant_id)
+            resource = await self.rm.retrieve_resource(assistant_id)
+            return JSONResponse(resource.dict(), status_code=201, headers={'Location': f'{api_base_url}/resources/{resource.id}'})
 
-    async def put(self, resource_id: str, body: ChannelCreateSchema):
-        updated_resource = await self.cm.update_resource(resource_id, body)
+        return JSONResponse({"error": " Invalid resource: " + valid_msg}, status_code=400)        
+
+    async def put(self, id: str, body: ResourceCreateSchema):
+        valid_msg = self.rm.validate_resource_data(body)
+        if valid_msg == None:
+            updated_resource = await self.rm.update_resource(id, body)
+        else:
+            return JSONResponse({"error": " Invalid resource: " + valid_msg}, status_code=400)
         if updated_resource is None:
             return JSONResponse({"error": "Resource not found"}, status_code=404)
-        return JSONResponse(updated_resource.model_dump(), status_code=200)
+        return JSONResponse(updated_resource.dict(), status_code=200)        
 
-    async def delete(self, resource_id: str):
-        success = await self.cm.delete_resource(resource_id)
+    async def delete(self, id: str):
+        success = await self.rm.delete_resource(id)
         if not success:
             return JSONResponse({"error": "Resource not found"}, status_code=404)
         return Response(status_code=204)
@@ -38,9 +50,9 @@ class ResourcesView:
 
         offset, limit, sort_by, sort_order, filters = result
 
-        resources, total_count = await self.cm.retrieve_resources(limit=limit, offset=offset, sort_by=sort_by, sort_order=sort_order, filters=filters)
+        resources, total_count = await self.rm.retrieve_resources(limit=limit, offset=offset, sort_by=sort_by, sort_order=sort_order, filters=filters)
         headers = {
             'X-Total-Count': str(total_count),
             'Content-Range': f'resources {offset}-{offset + len(resources) - 1}/{total_count}'
         }
-        return JSONResponse([resource.model_dump() for resource in resources], status_code=200, headers=headers)
+        return JSONResponse([resource.dict() for resource in resources], status_code=200, headers=headers)
