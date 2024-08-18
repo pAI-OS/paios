@@ -2,6 +2,7 @@ from datetime import datetime
 from sqlmodel import Field, ForeignKey
 from backend.db import SQLModelBase
 from sqlalchemy.orm import relationship
+from sqlalchemy.types import DateTime
 
 class Config(SQLModelBase, table=True):
     key: str = Field(primary_key=True)
@@ -18,6 +19,7 @@ class User(SQLModelBase, table=True):
     email: str = Field()
     passkey_user_id = Field()
     creds = relationship('Cred', backref='owner')
+    sessions = relationship('Session', back_populates='user')
 
 class Cred(SQLModelBase, table=True):
     id: str = Field(primary_key=True)
@@ -26,6 +28,13 @@ class Cred(SQLModelBase, table=True):
     backed_up: str = Field()
     name: str | None = Field(default=None)
     transports: str = Field()
+
+class Session(SQLModelBase, table=True):
+    id: str = Field(primary_key=True)
+    user_id: str = Field(foreign_key="user.id")
+    token: str = Field()
+    expires_at: datetime = Field()
+    user = relationship("User", back_populates="sessions")
 
 class Asset(SQLModelBase, table=True):
     id: str = Field(primary_key=True)

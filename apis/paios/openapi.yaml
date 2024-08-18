@@ -872,6 +872,15 @@ paths:
                 type: object
         '404':
           description: User not found
+  /auth/logout:
+    post:
+      summary: Logout user
+      operationId: backend.api.AuthView.logout
+      responses:
+        '200':
+          description: Successfully logged out
+        '401':
+          description: Unauthorized
 tags:
   - name: Abilities Management
     description: Installation and configuration of abilities
