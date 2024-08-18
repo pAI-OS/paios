@@ -6,8 +6,8 @@ from webauthn import (
     generate_registration_options, 
     options_to_json,
     base64url_to_bytes)
-from sqlalchemy import select, update
-from backend.models import User, PublicKeyCred
+from sqlalchemy import select, update, delete
+from backend.models import User, PublicKeyCred, Session
 from backend.db import db_session_context
 import os
 import base64
@@ -24,6 +24,7 @@ from webauthn.helpers.structs import (
 )
 from webauthn.helpers.cose import COSEAlgorithmIdentifier
 import json
+from datetime import datetime, timedelta
 
 class AuthManager:
     _instance = None
@@ -176,4 +177,22 @@ class AuthManager:
                 return None
             
             return user.id
-            
+
+    async def create_session(self, user_id: str):
+        async with db_session_context() as session:
+            new_session = Session(
+                id=str(uuid4()),
+                user_id=user_id,
+                token=str(uuid4()),  # Generate a unique token
+                expires_at=datetime.utcnow() + timedelta(days=1)  # Set expiration to 1 day from now
+            )
+            session.add(new_session)
+            await session.commit()
+            await session.refresh(new_session)
+            return new_session.id, new_session.token
+
+    async def delete_session(self, token: str):
+        async with db_session_context() as session:
+            stmt = delete(Session).where(Session.token == token)
+            await session.execute(stmt)
+            await session.commit()
