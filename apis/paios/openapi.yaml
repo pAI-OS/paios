@@ -903,7 +903,7 @@ components:
     cookieAuth:
       type: apiKey
       in: cookie
-      name: user
+      name: session_token
       x-apikeyInfoFunc: backend.utils.apikey_auth
   headers:
     X-Total-Count:
