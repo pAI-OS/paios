@@ -42,6 +42,7 @@ export const login = async (email: string) => {
     if (verifyResponse.status !== 200) {
       throw new Error("Failed to register user.");
     }
+    return true
   } catch (error) {
     throw new Error("Failed to register user");
   }
@@ -92,10 +93,20 @@ export const register = async (email: string) => {
     if (verifyResponse.status !== 200) {
       throw new Error("Failed to register user.");
     }
+    return true
   } catch (error) {
     if (error instanceof Error) {
       throw error;
     }
     throw new Error("Failed to register user");
   }
+};
+
+export const logout = async () => {
+  await fetch("http://localhost:3080/api/v1/auth/logout", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
 };

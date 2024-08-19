@@ -1,6 +1,7 @@
 from backend.db import db_session_context
 from sqlalchemy import select
-from backend.models import User
+from backend.models import Session
+from connexion.exceptions import OAuthProblem
 
 # Returns dict with null fields removed (e.g., for OpenAPI spec compliant
 # responses without having to set nullable: true)
@@ -22,9 +23,12 @@ def filter_dict(data, keys_to_include):
 def zip_fields(fields, result):
     return {field: result[i] for i, field in enumerate(fields)}
 
-async def apikey_auth(user_id):
+async def apikey_auth(token):
     async with db_session_context() as session:
-            user_result = await session.execute(select(User).where(User.id == user_id))
-            user = user_result.scalar_one_or_none()
+            session_token_res = await session.execute(select(Session).where(Session.token == token))
+            session_token = session_token_res.scalar_one_or_none()
+
+            if not session_token:
+                raise OAuthProblem("Invalid token")
             
-            return {"uid": user.id}
+            return {"uid": session_token.user_id}

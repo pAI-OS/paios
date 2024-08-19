@@ -105,7 +105,9 @@ class AuthManager:
                 await session.commit()
                 await session.refresh(new_user)
                 user = new_user
-                
+
+            _, token = await self.create_session(user.id)
+            
             base64url_cred_id = base64.urlsafe_b64encode(res.credential_id).decode("utf-8").rstrip("=")
             base64url_public_key = base64.urlsafe_b64encode(res.credential_public_key).decode("utf-8").rstrip("=")
 
@@ -115,7 +117,7 @@ class AuthManager:
             session.add(new_cred)
             await session.commit()
 
-            return user.id
+            return token
 
     async def signinRequestOptions(self, email_id: str):
         async with db_session_context() as session:
@@ -176,7 +178,9 @@ class AuthManager:
             if not res.new_sign_count != 1:
                 return None
             
-            return user.id
+            _, session_token = await self.am.create_session(user.id)
+            
+            return session_token
 
     async def create_session(self, user_id: str):
         async with db_session_context() as session:
