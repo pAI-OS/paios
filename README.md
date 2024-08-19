@@ -23,6 +23,26 @@ git clone --branch canary --single-branch https://github.com/pAI-OS/paios.git
 
 Setup and run the server:
 
+# Alembic
+
+Alembic is used to manage database versioning using migrations.
+
+## Upgrade schema
+
+`alembic upgrade head`
+
+## Downgrade schema
+
+`alembic downgrade -1`
+
+## Update schema
+
+Update backend/models.py then run:
+
+`alembic revision --autogenerate -m "added asset table"`
+
+** NOTE: If you get an error about an already existing table, you can drop the table and run 'alembic upgrade head' again. This is a known issue for the user and the public_key_cred tables. **
+
 _POSIX (Linux/macOS/etc.)_
 
 ```sh
