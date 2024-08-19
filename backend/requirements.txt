@@ -17,3 +17,7 @@ aioftp
 aiofiles
 structlog
 greenlet
+langchain_community
+langchain_chroma
+langchain_openai
+pypdf

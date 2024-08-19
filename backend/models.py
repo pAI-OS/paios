@@ -10,7 +10,7 @@ class Resource(Base):
     __tablename__ = "resource"
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False)
-    uri = Column(String, nullable=False)
+    uri = Column(String, nullable=True)
     description = Column(String, nullable=True)
     resource_llm_id = Column(String, nullable=True)
     persona_id = Column(String, nullable=True)
@@ -57,4 +57,22 @@ class File(Base):
     __tablename__ = "file"
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False)
+    assistant_id = Column(String, nullable=False)
+
+class Message(Base):
+    __tablename__ = "message"
+    id = Column(String, primary_key=True)
+    assistant_id = Column(String, nullable=False)
+    conversation_id = Column(String, nullable=False)
+    timestamp = Column(String, nullable=False)
+    prompt = Column(String, nullable=False)
+    chat_response = Column(String, nullable=False)
+
+class Conversation(Base):
+    __tablename__ = "conversation"
+    id = Column(String, primary_key=True)
+    name = Column(String, nullable=False)
+    created_timestamp = Column(String, nullable=False)
+    last_updated_timestamp = Column(String, nullable=False)
+    archive = Column(String, nullable=False)
     assistant_id = Column(String, nullable=False)

@@ -7,6 +7,9 @@ from langchain_openai import OpenAIEmbeddings
 from common.paths import chroma_db_path
 from pathlib import Path
 import os
+from langchain_core.prompts import ChatPromptTemplate
+from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain.chains import create_retrieval_chain
 
 class RagManager:
     _instance = None
@@ -25,7 +28,7 @@ class RagManager:
                 if not hasattr(self, '_initialized'):
                     self._initialized = True
 
-    async def create_index(self, channel_id: str, docs_paths_data: DocsPathsCreateSchema) -> str: 
+    async def create_index(self, resource_id: str, docs_paths_data: DocsPathsCreateSchema) -> str: 
         
         all_docs = []
         
@@ -35,6 +38,7 @@ class RagManager:
             all_docs.extend(docs) 
 
 
+        #ToDo: Make chunk_size and chunk_overlap configurable
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=1000, chunk_overlap=200, add_start_index=True
         )
@@ -43,15 +47,43 @@ class RagManager:
         path = Path(chroma_db_path)
 
         os.environ.get('OPENAI_API_KEY')        
+        vectorstore = await self.initialize_chroma(resource_id)
+        vectorstore.add_documents(splits)
 
-        if not os.path.exists(path): 
-            vectorstore = Chroma.from_documents(documents=splits, 
-                                    embedding=OpenAIEmbeddings(),
-                                    persist_directory=str(path),
-                                    collection_name = channel_id,
-                                    )
-            print(vectorstore)
-        else:
-            vectorstore = Chroma(persist_directory=str(path),embedding_function=OpenAIEmbeddings())
-            vectorstore.add_documents(splits, collection_name=channel_id)
-        return channel_id
+        return resource_id
+       
+    
+    async def initialize_chroma(self, collection_name: str):
+        
+        path = Path(chroma_db_path)
+        vectorstore = Chroma(persist_directory=str(path),
+                             collection_name=collection_name,
+                             embedding_function=OpenAIEmbeddings())
+        return vectorstore
+    
+    
+    async def retrive_and_generate(self, collection_name, query, llm) -> str:
+        system_prompt = (
+            "You are an assistant for question-answering tasks. "
+            "Use the following pieces of retrieved context to answer "
+            "the question. If you don't know the answer, say that you "
+            "don't know. Use three sentences maximum and keep the "
+            "answer concise."
+            "\n\n"
+            "{context}"
+        )
+    
+        prompt = ChatPromptTemplate.from_messages(
+            [
+                ("system", system_prompt),
+                ("human", "{input}"),
+            ]
+        )
+        vectorstore = await self.initialize_chroma(collection_name)
+        retriever = vectorstore.as_retriever()
+        question_answer_chain = create_stuff_documents_chain(llm, prompt)
+        rag_chain = create_retrieval_chain(retriever, question_answer_chain)
+        response = rag_chain.invoke({"input": query})
+        return response
+    
+    

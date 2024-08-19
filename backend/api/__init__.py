@@ -8,3 +8,5 @@ from .DownloadsView import DownloadsView
 from .UsersView import UsersView
 from .PersonasView import PersonasView
 from .RagIndexingView import RagIndexingView
+from .MessagesView import MessagesView
+from .ConversationsView import ConversationsView

@@ -1,6 +1,5 @@
-from starlette.responses import JSONResponse, Response
+from starlette.responses import JSONResponse
 from backend.managers.RagManager import RagManager
-from backend.pagination import parse_pagination_params
 from backend.schemas import DocsPathsCreateSchema
 
 
