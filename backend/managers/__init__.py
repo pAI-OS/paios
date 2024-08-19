@@ -7,6 +7,8 @@ from .UsersManager import UsersManager
 from .PersonasManager import PersonasManager
 from .AuthManager import AuthManager
 from .RagManager import RagManager
+from .MessagesManager import MessagesManager
+from .ConversationsManager import ConversationsManager
 
 # List of manager classes
 manager_classes = [
@@ -19,7 +21,9 @@ manager_classes = [
     AuthManager,
     PersonasManager
     PersonasManager,
-    RagManager
+    RagManager,
+    MessagesManager,
+    ConversationsManager
 ]
 
 # Initialize the managers dynamically

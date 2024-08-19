@@ -16,7 +16,7 @@ class ConfigSchema(ConfigBaseSchema):
 # Resource schemas
 class ResourceBaseSchema(BaseModel):
     name: str
-    uri: str
+    uri: Optional[str] = None
     description: Optional[str] = None
     resource_llm_id : Optional[str] = None
     persona_id : Optional[str] = None
@@ -41,6 +41,9 @@ class PersonaBaseSchema(BaseModel):
     description: Optional[str] = None
     voice_id: str = None
     face_id: str = None
+    class Config:
+        orm_mode = True
+        from_attributes = True
 
 class PersonaCreateSchema(PersonaBaseSchema):
     pass
@@ -144,4 +147,40 @@ class DocsPathsCreateSchema(DocsPathsBaseSchema):
     pass
 
 class DocsPathsSchema(DocsPathsBaseSchema):
+    id: str
+
+# Message schemas
+class MessageBaseSchema(BaseModel):
+    conversation_id: str
+    assistant_id: str
+    timestamp: str
+    prompt: str
+    chat_response: str
+    class Config:
+        orm_mode = True
+        from_attributes = True
+
+class MessageCreateSchema(MessageBaseSchema):
+    pass
+
+class MessageSchema(MessageBaseSchema):
+    id: str
+
+# Conversation schemas
+class ConversationBaseSchema(BaseModel):
+    name: str
+    created_timestamp: str
+    last_updated_timestamp: str
+    archive: str
+    assistant_id: str
+    messages: Optional[List[MessageBaseSchema]] = None
+   
+    class Config:
+        orm_mode = True
+        from_attributes = True
+ 
+class ConversationCreateSchema(ConversationBaseSchema):
+    pass
+ 
+class ConversationSchema(ConversationBaseSchema):
     id: str
