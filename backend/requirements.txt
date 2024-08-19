@@ -20,3 +20,7 @@ structlog
 webauthn
 greenlet
 pyjwt
+langchain_community
+langchain_chroma
+langchain_openai
+pypdf

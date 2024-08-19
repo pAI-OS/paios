@@ -18,11 +18,8 @@ class ResourcesView:
     async def post(self, body: ResourceCreateSchema):
         valid_msg = self.rm.validate_resource_data(body)
         if valid_msg == None:
-            assistant_id = await self.rm.create_resource(body)
-            files = body["files"]
-            for file_name in files:
-                await self.rm.create_file(file_name, assistant_id)
-            resource = await self.rm.retrieve_resource(assistant_id)
+            resource_id = await self.rm.create_resource(body)
+            resource = await self.rm.retrieve_resource(resource_id)
             return JSONResponse(resource.dict(), status_code=201, headers={'Location': f'{api_base_url}/resources/{resource.id}'})
 
         return JSONResponse({"error": " Invalid resource: " + valid_msg}, status_code=400)        

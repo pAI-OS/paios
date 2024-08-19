@@ -25,24 +25,44 @@ class ResourcesManager:
                     self._initialized = True
     
     async def create_resource(self, resource_data: ResourceCreateSchema) -> str:
-        resource_data_table={  
-                        "name": resource_data["name"], 
-                        "uri": resource_data["uri"], 
-                        "description": resource_data["description"],
-                        "resource_llm_id": resource_data["resource_llm_id"],
-                        "persona_id": resource_data["persona_id"],
-                        "status": resource_data["status"],
-                        "allow_edit": resource_data["allow_edit"],
-                        "kind": resource_data["kind"],
-                        "icon": resource_data["icon"]
-                    }
+        resource_data_table: Dict[str, Any] = {}
+        kind = resource_data.get("kind")
+        
+        if kind == 'assistant':
+            resource_data_table={  
+                                "name": resource_data.get("name"), 
+                                "uri": resource_data.get("uri"), 
+                                "description": resource_data.get("description"),
+                                "resource_llm_id": resource_data.get("resource_llm_id"),
+                                "persona_id": resource_data.get("persona_id"),
+                                "status": resource_data.get("status"),
+                                "allow_edit": resource_data.get("allow_edit"),
+                                "kind": kind
+                            }
+        else:
+            resource_data_table={  
+                                "name": resource_data.get("name"), 
+                                "uri": resource_data.get("uri"), 
+                                "description": resource_data.get("description"),
+                                "kind": kind,
+                                "icon": resource_data.get("icon")
+                            }
+            
         async with db_session_context() as session:
             new_resource = Resource(id=str(uuid4()), **resource_data_table)
             session.add(new_resource)
             await session.commit()
             await session.refresh(new_resource)
+            
+            # Set files for the resource
+            if kind == 'assistant' and resource_data.get("files"):
+                self.create_files_for_resource(new_resource.id, resource_data["files"])
             return new_resource.id        
-
+    
+    async def create_files_for_resource(self, resource_id: str, files: List[str]):
+        for file_name in files:
+            await self.create_file(file_name, resource_id)
+        
     async def update_resource(self, id: str, resource_data: ResourceCreateSchema) -> Optional[ResourceSchema]:
         async with db_session_context() as session:
             resource_data_table={  
@@ -81,19 +101,29 @@ class ResourcesManager:
             files_result = await session.execute(select(File).filter(File.assistant_id == id))
             files = [file.name for file in files_result.scalars()]
             resource = result.scalar_one_or_none()
-            if resource:                
-                return ResourceSchema(
-                    id=resource.id, 
-                    name=resource.name, 
-                    uri=resource.uri, 
-                    description=resource.description, 
-                    resource_llm_id=resource.resource_llm_id,
-                    persona_id=resource.persona_id,
-                    files=files,
-                    status=resource.status,
-                    allow_edit=resource.allow_edit,
-                    kind=resource.kind,
-                    icon=resource.icon)
+            
+            kind = resource.kind
+            if resource:
+                if kind == 'assistant':
+                    return ResourceSchema(
+                        id=resource.id, 
+                        name=resource.name, 
+                        uri=resource.uri, 
+                        description=resource.description, 
+                        resource_llm_id=resource.resource_llm_id,
+                        persona_id=resource.persona_id,
+                        files=files,
+                        status=resource.status,
+                        allow_edit=resource.allow_edit,
+                        kind=resource.kind)
+                else :
+                    return ResourceSchema(
+                        id=resource.id, 
+                        name=resource.name, 
+                        uri=resource.uri, 
+                        description=resource.description,
+                        kind=resource.kind,
+                        icon=resource.icon)
             return None                    
 
     async def retrieve_resources(self, offset: int = 0, limit: int = 100, sort_by: Optional[str] = None, 
@@ -158,10 +188,10 @@ class ResourcesManager:
             return self.create_file(file_name, assistant_id)
 
     def validate_resource_data(self, resource_data: ResourceCreateSchema ) -> str:
-        if not resource_data["status"] in ["public", "private","draft"]:
-            return "Not a valid status"
-        if not resource_data["allow_edit"] in ["True", "False"]:
-            return "Not a valid allow_edit"
-        if not resource_data["kind"] in ["llm", "assistant"]:
+        kind = resource_data["kind"]
+        if not kind in ["llm", "assistant"]:
             return "Not a valid kind"
+        if kind == 'assistant':    
+            if not resource_data["resource_llm_id"]:
+                return "Not a valid resource_llm_id"
         return None

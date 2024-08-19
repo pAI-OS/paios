@@ -10,3 +10,5 @@ from .PersonasView import PersonasView
 from .SharesView import SharesView
 from .AuthView import AuthView
 from .RagIndexingView import RagIndexingView
+from .MessagesView import MessagesView
+from .ConversationsView import ConversationsView

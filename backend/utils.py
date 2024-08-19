@@ -1,6 +1,7 @@
 import os
 from dotenv import set_key
 from common.paths import base_dir
+from datetime import datetime
 
 # set up logging
 from common.log import get_logger
@@ -19,6 +20,7 @@ def get_env_key(key_name, default=None):
             raise ValueError(f"{key_name} is not set in the environment variables")
         set_key(base_dir / '.env', key_name, value)
     return value
+
 
 # Returns dict with null fields removed (e.g., for OpenAPI spec compliant
 # responses without having to set nullable: true)
@@ -39,3 +41,9 @@ def filter_dict(data, keys_to_include):
 # ["x", "y"], [1, 2] -> { "x": 1, "y": 2})
 def zip_fields(fields, result):
     return {field: result[i] for i, field in enumerate(fields)}
+
+# Returns current timestamp in UTC in ISO 8601 format
+def get_current_timestamp():
+    current_time = datetime.utcnow()
+    formatted_time = current_time.strftime('%Y-%m-%dT%H:%M:%SZ')
+    return formatted_time
