@@ -27,7 +27,6 @@ AsyncSessionLocal = sessionmaker(
 
 # use alembic to create the database or migrate to the latest schema
 def init_db():
-    logger.info("Initializing database.")
     alembic_cfg = AlembicConfig()
     os.makedirs(db_path.parent, exist_ok=True)
     alembic_cfg.set_main_option("script_location", str(base_dir / "migrations"))

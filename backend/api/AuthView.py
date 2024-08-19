@@ -1,9 +1,7 @@
 from starlette.responses import JSONResponse
 from backend.managers.AuthManager import AuthManager
-import logging
 from backend.schemas import RegistrationOptions, VerifyAuthentication, AuthenticationOptions, VerifyRegistration
 from connexion import request
-logger = logging.getLogger(__name__)
 from uuid import uuid4
 from backend.models import Session
 from sqlalchemy import delete
