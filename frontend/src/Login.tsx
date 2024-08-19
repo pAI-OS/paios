@@ -16,7 +16,8 @@ const Login: React.FC = () => {
         setEmail("")
     }
 
-    const handleUser = async () => {
+    const handleUser = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault()
         if (!email.trim()) {
             notify('Email field cannot be empty', { type: 'error' });
             return;
@@ -38,7 +39,7 @@ const Login: React.FC = () => {
         }
     }
 
-    const handleChange = (e: { target: { value: React.SetStateAction<string>; }; }) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setEmail(e.target.value)
     }
 
@@ -46,8 +47,10 @@ const Login: React.FC = () => {
         <div className="auth-container">
             <img src={logo} alt="Kwaai Logo" className="logo" />
             <h1>{isRegistering ? "Register" : "Login"}</h1>
-            <input type="email" id="email" placeholder="Email" className="input-field" onChange={handleChange} />
-            <button onClick={handleUser} className="auth-button">{isRegistering ? "Register" : "Login"}</button>
+            <form onSubmit={handleUser}>
+                <input type="email" id="email" placeholder="Email" className="input-field" onChange={handleChange} value={email} />
+                <button type="submit" className="auth-button">{isRegistering ? "Register" : "Login"}</button>
+            </form>
             <p className="auth-link">{isRegistering ? "Already have an account?" : "Don't have an account?"} <button onClick={handleClick}>{isRegistering ? "Login here" : "Register here"}</button></p>
         </div>
     );

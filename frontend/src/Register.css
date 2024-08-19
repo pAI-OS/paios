@@ -17,8 +17,16 @@ h1 {
     margin-bottom: 20px;
 }
 
+form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 300px;
+}
+
 .input-field {
-    width: 300px;
+    width: 100%;
     padding: 10px;
     margin-bottom: 20px;
     border: 1px solid #ccc;
@@ -26,7 +34,7 @@ h1 {
 }
 
 .auth-button {
-    width: 300px;
+    width: 100%;
     padding: 10px;
     background-color: #007bff;
     color: white;

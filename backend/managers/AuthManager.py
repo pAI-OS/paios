@@ -178,7 +178,7 @@ class AuthManager:
             if not res.new_sign_count != 1:
                 return None
             
-            _, session_token = await self.am.create_session(user.id)
+            _, session_token = await self.create_session(user.id)
             
             return session_token
 
