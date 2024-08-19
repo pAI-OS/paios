@@ -5,6 +5,7 @@ from connexion.middleware import MiddlewarePosition
 from starlette.middleware.cors import CORSMiddleware
 
 def create_backend_app():
+    
     apis_dir = Path(__file__).parent.parent / 'apis' / 'paios'
     connexion_app = AsyncApp(__name__, specification_dir=apis_dir)
     

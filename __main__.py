@@ -15,8 +15,6 @@ from backend.env import check_env
 check_env()
 
 # set up logging
-from common.log import get_logger
-logger = get_logger(__name__)
 
 def handle_keyboard_interrupt(signum, frame):
     cleanup()
@@ -24,7 +22,7 @@ def handle_keyboard_interrupt(signum, frame):
 
 def cleanup():
     # Perform any necessary cleanup here
-    logger.info("Performing cleanup tasks.")
+    print("Performing cleanup tasks.")
 
 if __name__ == "__main__":
     # Set up signal handlers
@@ -32,7 +30,6 @@ if __name__ == "__main__":
     #signal.signal(signal.SIGTERM, handle_keyboard_interrupt)
 
     # Create the app
-    logger.info("Creating the app.")
     from app import create_app
     app = create_app()
 
@@ -48,7 +45,6 @@ if __name__ == "__main__":
     # Run the app
     import uvicorn
     
-    logger.info("Running the app with uvicorn.")
     try:
         uvicorn.run("app:create_app", host="localhost", port=3080, factory=True, workers=1, reload=True, reload_dirs=[backend_dir], reload_excludes=[venv_dir], log_config=logging_config)
     except KeyboardInterrupt:

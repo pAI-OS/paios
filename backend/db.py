@@ -1,14 +1,11 @@
 # database helper functions
 import os
-import logging
 from sqlalchemy.orm import sessionmaker, declarative_base
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from alembic import command
 from alembic.config import Config as AlembicConfig
 from common.paths import base_dir, db_path, db_url
 from contextlib import asynccontextmanager
-
-logger = logging.getLogger(__name__)
 
 # Define the SQLAlchemy Base
 Base = declarative_base()
@@ -25,7 +22,6 @@ AsyncSessionLocal = sessionmaker(
 
 # use alembic to create the database or migrate to the latest schema
 def init_db():
-    logger.info("Initializing database.")
     alembic_cfg = AlembicConfig()
     os.makedirs(db_path.parent, exist_ok=True)
     alembic_cfg.set_main_option("script_location", str(base_dir / "migrations"))

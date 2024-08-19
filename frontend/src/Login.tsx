@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import logo from './assets/kwaai.png';
-import './Register.css';
+import './Login.css';
 import { useLogin, useNotify } from "react-admin"
 
 const Login: React.FC = () => {
