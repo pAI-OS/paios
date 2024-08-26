@@ -16,7 +16,7 @@ class ResourcesView:
         return JSONResponse(resource.dict(), status_code=200)
 
     async def post(self, body: ResourceCreateSchema):
-        valid_msg = self.rm.validate_resource_data(body)
+        valid_msg = await self.rm.validate_resource_data(body)
         if valid_msg == None:
             resource_id = await self.rm.create_resource(body)
             resource = await self.rm.retrieve_resource(resource_id)

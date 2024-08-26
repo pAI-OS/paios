@@ -36,7 +36,7 @@ class MessagesManager:
             assistant = result.scalar_one_or_none()
             llm_id = assistant.resource_llm_id
             result = await session.execute(select(Resource).filter(Resource.id == llm_id))
-            llm = result.scalar_one_or_none()
+            llm = result.scalar_one_or_none()                    
             return self.extract_names_from_uri(llm.uri.split('/')[-1])
         
 
@@ -51,6 +51,8 @@ class MessagesManager:
             conversation.last_updated_timestamp = timestamp
             
             model_name = await self.__get_llm_name__(message_data['assistant_id'])
+            if model_name is None:
+                return None
             llm = Ollama(model=model_name)
             
             assistant_id = message_data['assistant_id']

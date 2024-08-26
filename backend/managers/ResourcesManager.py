@@ -1,10 +1,15 @@
 from uuid import uuid4
 from threading import Lock
+import httpx
 from sqlalchemy import select, insert, update, delete, func
 from backend.models import Resource, File
 from backend.db import db_session_context
 from backend.schemas import ResourceCreateSchema, ResourceSchema
 from typing import List, Tuple, Optional, Dict, Any
+
+# This is a mock of the installed models in the system
+ollama_model=[{'name': 'phi3:latest', 'model': 'phi3:latest', 'modified_at': '2024-08-24T21:57:16.6075173-06:00', 'size': 2176178913, 'digest': '4f222292793889a9a40a020799cfd28d53f3e01af25d48e06c5e708610fc47e9', 'details': {'parent_model': '', 'format': 'gguf', 'family': 'phi3', 'families': ['phi3'], 'parameter_size': '3.8B', 'quantization_level': 'Q4_0'}}]
+
 
 class ResourcesManager:
     _instance = None
@@ -66,20 +71,20 @@ class ResourcesManager:
     async def update_resource(self, id: str, resource_data: ResourceCreateSchema) -> Optional[ResourceSchema]:
         async with db_session_context() as session:
             resource_data_table={  
-                        "name": resource_data["name"], 
-                        "uri": resource_data["uri"], 
-                        "description": resource_data["description"],
-                        "resource_llm_id": resource_data["resource_llm_id"],
-                        "persona_id": resource_data["persona_id"],
-                        "status": resource_data["status"],
-                        "allow_edit": resource_data["allow_edit"],
-                        "kind": resource_data["kind"],
-                        "icon": resource_data["icon"]
+                        "name": resource_data.get("name"), 
+                        "uri": resource_data.get("uri"), 
+                        "description": resource_data.get("description"),
+                        "resource_llm_id": resource_data.get("resource_llm_id"),
+                        "persona_id": resource_data.get("persona_id"),
+                        "status": resource_data.get("status"),
+                        "allow_edit": resource_data.get("allow_edit"),
+                        "kind": resource_data.get("kind"),
+                        "icon": resource_data.get("icon")
                     }
-            files = resource_data["files"]
-
-            for file in files:
-                self.update_file(id, file)
+            files = resource_data.get("files")
+            if files:
+                for file in files:
+                    self.update_file(id, file)
             stmt = update(Resource).where(Resource.id == id).values(**resource_data_table)
             result = await session.execute(stmt)
             if result.rowcount > 0:                
@@ -102,8 +107,9 @@ class ResourcesManager:
             files = [file.name for file in files_result.scalars()]
             resource = result.scalar_one_or_none()
             
-            kind = resource.kind
             if resource:
+                kind = resource.kind
+
                 if kind == 'assistant':
                     return ResourceSchema(
                         id=resource.id, 
@@ -135,6 +141,15 @@ class ResourcesManager:
                 for key, value in filters.items():
                     if key == 'name':
                         query = query.filter(Resource.name.ilike(f"%{value}%"))
+                    if key == 'kind' and value == 'llm':
+                        llm_installed = self.map_llm_to_resource(ollama_model)
+                        db_llm_query = query.filter(Resource.kind == "llm")
+                        result = await session.execute(db_llm_query)
+                        db_llm = result.scalars().all()
+                        if db_llm == []:
+                            for llm in llm_installed:
+                                await self.create_resource(llm)
+                        query = query.filter(Resource.kind == value)
                     elif isinstance(value, list):  
                         query = query.filter(getattr(Resource, key).in_(value))
                     else:
@@ -187,11 +202,33 @@ class ResourcesManager:
             await session.commit()
             return self.create_file(file_name, assistant_id)
 
-    def validate_resource_data(self, resource_data: ResourceCreateSchema ) -> str:
+    async def validate_resource_data(self, resource_data: ResourceCreateSchema ) -> str:
         kind = resource_data["kind"]
-        if not kind in ["llm", "assistant"]:
+        if not kind in ["llm", "assistant"]: 
             return "Not a valid kind"
         if kind == 'assistant':    
-            if not resource_data["resource_llm_id"]:
+            if not resource_data.get("resource_llm_id"):
+                return "It is mandatory to provide a resource_llm_id for an assistant"
+            if not await self.retrieve_resource(resource_data.get("resource_llm_id")):
                 return "Not a valid resource_llm_id"
         return None
+
+
+    def map_llm_to_resource(self, installed_models: List[Dict]) -> List[Dict[str,Any]]:
+        resources_llm = []
+        for model in installed_models:
+            model_field= model.get("model")
+            if model_field:
+                resource_llm = {                                
+                                    "name": model_field,
+                                    "uri":"https://ollama.com/library/"+ model_field,
+                                    "description": model_field,
+                                    "resource_llm_id": None,
+                                    "persona_id": None,
+                                    "status": None,
+                                    "allow_edit": None,
+                                    "kind": "llm",
+                                    "icon": None
+                                } 
+            resources_llm.append(resource_llm)                 
+        return resources_llm
