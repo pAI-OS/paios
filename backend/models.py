@@ -1,5 +1,6 @@
-from sqlalchemy import Column, String
+from sqlalchemy import Column, String, ForeignKey
 from backend.db import Base
+from sqlalchemy.types import DateTime, Boolean
 
 class Config(Base):
     __tablename__ = "config"
@@ -34,3 +35,11 @@ class Persona(Base):
     description = Column(String, nullable=True)
     voice_id = Column(String, nullable=True)
     face_id = Column(String, nullable=True)
+
+class Share(Base):
+    __tablename__ = "share"
+    key = Column(String, primary_key=True)  # the short URL tag
+    resource_id = Column(String, ForeignKey("resource.id"), nullable=False)  # the bot ID
+    user_id = Column(String, nullable=True)  # the user granted access (optional)
+    expiration_dt = Column(DateTime, nullable=True)  # the link expiration date/time (optional)
+    is_revoked = Column(Boolean, nullable=False)

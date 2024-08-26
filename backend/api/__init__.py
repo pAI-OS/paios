@@ -7,3 +7,4 @@ from .ConfigView import ConfigView
 from .DownloadsView import DownloadsView
 from .UsersView import UsersView
 from .PersonasView import PersonasView
+from .SharesView import SharesView

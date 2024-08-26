@@ -1,4 +1,5 @@
-from pydantic import BaseModel
+from datetime import datetime
+from pydantic import BaseModel, field_serializer
 from typing import Optional
 
 
@@ -60,3 +61,22 @@ class AssetCreateSchema(AssetBaseSchema):
 
 class AssetSchema(AssetBaseSchema):
     id: str
+
+# Share schemas
+
+class ShareBaseSchema(BaseModel):
+    resource_id: str
+    user_id: Optional[str] = None
+    expiration_dt: Optional[datetime] = None
+    is_revoked: Optional[bool] = False
+
+    @field_serializer('expiration_dt')
+    def serialize_dt(self, dt: datetime, _info):
+        return dt.strftime('%Y-%m-%dT%H:%M:%SZ')
+
+
+class ShareCreateSchema(ShareBaseSchema):
+    pass
+
+class ShareSchema(ShareBaseSchema):
+    key: str
