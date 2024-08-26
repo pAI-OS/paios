@@ -22,7 +22,7 @@ class ResourceBaseSchema(BaseModel):
     files: Optional[List[str]] = None
     status : Optional[str] = None
     allow_edit : Optional[str] = None
-    kind : Optional[str] = None
+    kind : str
     icon : Optional[str] = None
     class Config:
         orm_mode = True

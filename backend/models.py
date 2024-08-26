@@ -16,7 +16,7 @@ class Resource(Base):
     persona_id = Column(String, nullable=True)
     status = Column(String, nullable=True)
     allow_edit = Column(String, nullable=True)
-    kind = Column(String, nullable=True)
+    kind = Column(String, nullable=False)
     icon= Column(String, nullable=True)
 
 class User(Base):
