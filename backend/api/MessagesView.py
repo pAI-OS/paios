@@ -11,5 +11,7 @@ class MessagesView:
 
     async def post(self, body: MessageCreateSchema):
         id = await self.mm.create_message(body)
+        if id is None:
+            return JSONResponse({"error": "llm not found"},status_code=404) 
         message = await self.mm.retrieve_message(id)
         return JSONResponse(message.dict(), status_code=201, headers={'Location': f'{api_base_url}/messages/{id}'})

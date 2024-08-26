@@ -3,7 +3,7 @@ from backend.schemas import DocsPathsCreateSchema
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_chroma import Chroma
-from langchain_openai import OpenAIEmbeddings
+from langchain_ollama import OllamaEmbeddings
 from common.paths import chroma_db_path
 from pathlib import Path
 import os
@@ -46,7 +46,6 @@ class RagManager:
         splits=text_splitter.split_documents(all_docs)                      
         path = Path(chroma_db_path)
 
-        os.environ.get('OPENAI_API_KEY')        
         vectorstore = await self.initialize_chroma(resource_id)
         vectorstore.add_documents(splits)
 
@@ -54,11 +53,12 @@ class RagManager:
        
     
     async def initialize_chroma(self, collection_name: str):
+        embed = OllamaEmbeddings(model="llama3")
         
         path = Path(chroma_db_path)
         vectorstore = Chroma(persist_directory=str(path),
                              collection_name=collection_name,
-                             embedding_function=OpenAIEmbeddings())
+                             embedding_function=embed)
         return vectorstore
     
     

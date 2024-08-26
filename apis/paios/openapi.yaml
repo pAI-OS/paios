@@ -1353,6 +1353,7 @@ components:
           nullable: true
         description:
           $ref: '#/components/schemas/textLong'
+          nullable: true
         resource_llm_id:
           $ref: '#/components/schemas/uuid4'
           nullable: true
@@ -1386,7 +1387,7 @@ components:
           $ref: '#/components/schemas/uri'
     ResourceCreate:
       type: object
-      title: Resource Create
+      title: ResourceCreate
       description: Resources (input/output)
       properties:
         name:
