@@ -1,7 +1,7 @@
 from uuid import uuid4
 from threading import Lock
 import httpx
-from sqlalchemy import select, insert, update, delete, func
+from sqlalchemy import select, update, delete, func
 from backend.models import Resource, File
 from backend.db import db_session_context
 from backend.schemas import ResourceCreateSchema, ResourceSchema
@@ -58,15 +58,7 @@ class ResourcesManager:
             session.add(new_resource)
             await session.commit()
             await session.refresh(new_resource)
-            
-            # Set files for the resource
-            if kind == 'assistant' and resource_data.get("files"):
-                self.create_files_for_resource(new_resource.id, resource_data["files"])
             return new_resource.id        
-    
-    async def create_files_for_resource(self, resource_id: str, files: List[str]):
-        for file_name in files:
-            await self.create_file(file_name, resource_id)
         
     async def update_resource(self, id: str, resource_data: ResourceCreateSchema) -> Optional[ResourceSchema]:
         async with db_session_context() as session:
@@ -81,10 +73,6 @@ class ResourcesManager:
                         "kind": resource_data.get("kind"),
                         "icon": resource_data.get("icon")
                     }
-            files = resource_data.get("files")
-            if files:
-                for file in files:
-                    self.update_file(id, file)
             stmt = update(Resource).where(Resource.id == id).values(**resource_data_table)
             result = await session.execute(stmt)
             if result.rowcount > 0:                
@@ -185,22 +173,6 @@ class ResourcesManager:
             total_count = total_count.scalar()
 
             return resources, total_count
-        
-    async def create_file(self, file_name: str, assistant_id: str ) -> str:        
-        async with db_session_context() as session:
-            new_file = File(id=str(uuid4()), name=file_name, assistant_id=assistant_id)
-            session.add(new_file)
-            await session.commit()
-            await session.refresh(new_file)
-            return new_file.id
-
-    async def update_file(self, assistant_id: str, file_name: str) -> str:
-        async with db_session_context() as session:
-            # delete the file from the database if it exists
-            stmt = delete(File).where(File.assistant_id == assistant_id)
-            await session.execute(stmt)
-            await session.commit()
-            return self.create_file(file_name, assistant_id)
 
     async def validate_resource_data(self, resource_data: ResourceCreateSchema ) -> str:
         kind = resource_data["kind"]
