@@ -16,7 +16,7 @@ def create_backend_app():
         'http://localhost',
         'http://localhost:3080',
         'http://localhost:5173',
-        'http://localhost:3000'
+        'https://localhost:3000'
     ]
 
    # Add CORS middleware
