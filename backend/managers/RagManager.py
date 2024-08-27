@@ -10,6 +10,8 @@ import os
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain
+from starlette.datastructures import UploadFile
+from typing import List
 
 class RagManager:
     _instance = None
@@ -51,6 +53,29 @@ class RagManager:
 
         return resource_id
        
+    async def create_index_2(self, resource_id: str, path_files: List[str]) -> str:
+       
+        all_docs = []
+       
+        for path in path_files:
+            print(f"path = {path}")
+            loader = PyPDFLoader(path)
+            docs = loader.load()    
+            all_docs.extend(docs)
+ 
+
+        #ToDo: Make chunk_size and chunk_overlap configurable
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=1000, chunk_overlap=200, add_start_index=True
+        )
+       
+        splits=text_splitter.split_documents(all_docs)                      
+        path = Path(chroma_db_path)
+ 
+        vectorstore = await self.initialize_chroma(resource_id)
+        vectorstore.add_documents(splits)
+ 
+        return resource_id
     
     async def initialize_chroma(self, collection_name: str):
         embed = OllamaEmbeddings(model="llama3")

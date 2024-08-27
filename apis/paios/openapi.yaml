@@ -768,6 +768,29 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ConversationCreate'
+  '/upload/{resource_id}':
+    post:
+      summary: Upload a file
+      tags:
+        - File Upload Management
+      operationId: backend.api.UploadView.post
+      description: Uploads a file associated with a given resource_id and name.
+      parameters:
+        - $ref: '#/components/parameters/resource_id'
+      responses:
+        '201':
+          description: Uploaded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Upload'
+        '400':
+          description: Missing Required Information
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UploadCreate'
 tags:
   - name: Abilities Management
     description: Installation and configuration of abilities
@@ -789,6 +812,8 @@ tags:
     description: Management of Messages
   - name: Conversation Management
     description: Management of conversations
+  - name: File Upload Management
+    description: Management of file uploads
 components:
   headers:
     X-Total-Count:
@@ -1404,4 +1429,24 @@ components:
           $ref: '#/components/schemas/boolean_str'                
       required:        
         - name
-        - archive     
+        - archive
+    Upload:
+      type: object
+      title: Upload
+      properties:
+        name:
+          $ref: '#/components/schemas/textShort'
+      required:        
+        - name
+    UploadCreate:
+      type: object
+      title: Upload files
+      description: Upload files to add to the resource
+      properties:
+        files:
+          type: array
+          items:
+            format: binary
+            description: The file to upload
+      required:
+        - files
