@@ -27,7 +27,7 @@ class ConversationsManager:
     async def create_conversation(self, resource_id: str, conversation_data: ConversationCreateSchema) -> str:
         async with db_session_context() as session:
             
-            if not self.validate_assistant_id(resource_id):
+            if not await self.validate_assistant_id(resource_id):
                 return None
             
             timestamp = get_current_timestamp()            

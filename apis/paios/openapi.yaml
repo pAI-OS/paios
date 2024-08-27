@@ -896,9 +896,9 @@ paths:
       requestBody:
         description: Post the necessary fields for the API to index documents.
         content:
-          application/json:
+          multipart/form-data:
             schema:
-              $ref: '#/components/schemas/DocsPathsCreate'
+              $ref: '#/components/schemas/IndexCreate'
       responses:
         '200':
           description: Document added
@@ -1744,4 +1744,16 @@ components:
           $ref: '#/components/schemas/boolean_str'                
       required:        
         - name
-        - archive     
+        - archive
+    IndexCreate:
+      type: object
+      title: Index files
+      description: Upload files to indexig
+      properties:
+        files:
+          type: array
+          items:
+            format: binary
+            description: The file to upload
+      required:
+        - files
