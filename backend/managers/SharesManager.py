@@ -7,7 +7,7 @@ from backend.schemas import ShareCreateSchema, ShareSchema
 from typing import List, Tuple, Optional, Dict, Any
 import rstr
 
-SHARE_KEY_REGEX = '[a-z]{3}-[a-z]{3}-[a-z]{3}'
+SHARE_ID_REGEX = '[a-z]{3}-[a-z]{3}-[a-z]{3}'
 
 class SharesManager:
     _instance = None
@@ -31,48 +31,48 @@ class SharesManager:
         async with db_session_context() as session:
             new_key = None
             while not new_key:
-                new_key = rstr.xeger(SHARE_KEY_REGEX)
-                result = await session.execute(select(Share).filter(Share.key == new_key))
+                new_key = rstr.xeger(SHARE_ID_REGEX)
+                result = await session.execute(select(Share).filter(Share.id == new_key))
                 share = result.scalar_one_or_none()
                 if share:  # new_key already in use
                     new_key = None
-            new_share = Share(key=new_key, resource_id=resource_id, user_id=user_id,
+            new_share = Share(id=new_key, resource_id=resource_id, user_id=user_id,
                               expiration_dt=expiration_dt, is_revoked=is_revoked)
             session.add(new_share)
             await session.commit()
             await session.refresh(new_share)
-            return ShareSchema(key=new_share.key, resource_id=new_share.resource_id,
+            return ShareSchema(id=new_share.id, resource_id=new_share.resource_id,
                                user_id=new_share.user_id, expiration_dt=new_share.expiration_dt,
                                is_revoked=new_share.is_revoked)
 
-    async def update_share(self, key: str, resource_id, user_id, expiration_dt, is_revoked) -> Optional[ShareSchema]:
+    async def update_share(self, id: str, resource_id, user_id, expiration_dt, is_revoked) -> Optional[ShareSchema]:
         async with db_session_context() as session:
-            stmt = update(Share).where(Share.key == key).values(resource_id=resource_id,
+            stmt = update(Share).where(Share.id == id).values(resource_id=resource_id,
                                                                 user_id=user_id,
                                                                 expiration_dt=expiration_dt,
                                                                 is_revoked=is_revoked)
             result = await session.execute(stmt)
             if result.rowcount > 0:
                 await session.commit()
-                updated_share = await session.get(Share, key)
-                return ShareSchema(key=updated_share.key, resource_id=updated_share.resource_id,
+                updated_share = await session.get(Share, id)
+                return ShareSchema(id=updated_share.id, resource_id=updated_share.resource_id,
                                user_id=updated_share.user_id, expiration_dt=updated_share.expiration_dt,
                                is_revoked=updated_share.is_revoked)
             return None
 
-    async def delete_share(self, key: str) -> bool:
+    async def delete_share(self, id: str) -> bool:
         async with db_session_context() as session:
-            stmt = delete(Share).where(Share.key == key)
+            stmt = delete(Share).where(Share.id == id)
             result = await session.execute(stmt)
             await session.commit()
             return result.rowcount > 0
 
-    async def retrieve_share(self, key: str) -> Optional[ShareSchema]:
+    async def retrieve_share(self, id: str) -> Optional[ShareSchema]:
         async with db_session_context() as session:
-            result = await session.execute(select(Share).filter(Share.key == key))
+            result = await session.execute(select(Share).filter(Share.id == id))
             share = result.scalar_one_or_none()
             if share:
-                return ShareSchema(key=share.key, resource_id=share.resource_id, user_id=share.user_id,
+                return ShareSchema(id=share.id, resource_id=share.resource_id, user_id=share.user_id,
                                    expiration_dt=share.expiration_dt, is_revoked=share.is_revoked)
             return None
 
@@ -84,31 +84,31 @@ class SharesManager:
             print("filters: {}".format(filters))
 
             if filters:
-                for attr, value in filters.items():
+                for key, value in filters.items():
                     if isinstance(value, list):
-                        query = query.filter(getattr(Share, attr).in_(value))
+                        query = query.filter(getattr(Share, key).in_(value))
                     else:
-                        query = query.filter(getattr(Share, attr) == value)
+                        query = query.filter(getattr(Share, key) == value)
 
-            if sort_by and sort_by in ['key', 'resource_id', 'user_id', 'expiration_dt', 'is_revoked']:
+            if sort_by and sort_by in ['id', 'resource_id', 'user_id', 'expiration_dt', 'is_revoked']:
                 order_column = getattr(Share, sort_by)
                 query = query.order_by(order_column.desc() if sort_order.lower() == 'desc' else order_column)
 
             query = query.offset(offset).limit(limit)
 
             result = await session.execute(query)
-            shares = [ShareSchema(key=share.key, resource_id=share.resource_id, user_id=share.user_id,
+            shares = [ShareSchema(id=share.id, resource_id=share.resource_id, user_id=share.user_id,
                                   expiration_dt=share.expiration_dt, is_revoked=share.is_revoked) 
                         for share in result.scalars().all()]
 
             # Get total count
             count_query = select(func.count()).select_from(Share)
             if filters:
-                for attr, value in filters.items():
+                for key, value in filters.items():
                     if isinstance(value, list):
-                        count_query = count_query.filter(getattr(Share, attr).in_(value))
+                        count_query = count_query.filter(getattr(Share, key).in_(value))
                     else:
-                        count_query = count_query.filter(getattr(Share, attr) == value)
+                        count_query = count_query.filter(getattr(Share, key) == value)
 
             total_count = await session.execute(count_query)
             total_count = total_count.scalar()

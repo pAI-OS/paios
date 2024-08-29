@@ -13,6 +13,7 @@ export const CustomMenu = () => (
     <Menu.ResourceItem name="abilities" />
     <Menu.ResourceItem name="resources" />
     <Menu.ResourceItem name="downloads" />
+    <Menu.ResourceItem name="shares" />
     <MenuItem component="a" href={`${apiBase}/ui`}>
       <ListItemIcon>
         <ApiIcon />

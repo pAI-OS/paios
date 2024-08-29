@@ -8,8 +8,8 @@ class SharesView:
     def __init__(self):
         self.slm = SharesManager()
 
-    async def get(self, key: str):
-        share = await self.slm.retrieve_share(key)
+    async def get(self, id: str):
+        share = await self.slm.retrieve_share(id)
         if share is None:
             return JSONResponse(headers={"error": "Share not found"}, status_code=404)
         return JSONResponse(share.model_dump(), status_code=200)
@@ -22,13 +22,13 @@ class SharesView:
                                                 user_id=body['user_id'],
                                                 expiration_dt=expiration_dt,
                                                 is_revoked=False)
-        return JSONResponse(new_share.model_dump(), status_code=201, headers={'Location': f'{api_base_url}/shares/{new_share.key}'})
+        return JSONResponse(new_share.model_dump(), status_code=201, headers={'Location': f'{api_base_url}/shares/{new_share.id}'})
 
-    async def put(self, key: str, body: dict):
+    async def put(self, id: str, body: dict):
         print("expiration_dt: {}".format(body['expiration_dt']))
         expiration_dt = datetime.fromisoformat(body['expiration_dt']).astimezone(tz=timezone.utc)
         print("converted expiration_dt: {}".format(expiration_dt))
-        updated_share = await self.slm.update_share(key,
+        updated_share = await self.slm.update_share(id,
                                                     resource_id=body['resource_id'],
                                                     user_id=body['user_id'],
                                                     expiration_dt=expiration_dt,
@@ -37,8 +37,8 @@ class SharesView:
             return JSONResponse({"error": "Share not found"}, status_code=404)
         return JSONResponse(updated_share.model_dump(), status_code=200)
 
-    async def delete(self, key: str):
-        success = await self.slm.delete_share(key)
+    async def delete(self, id: str):
+        success = await self.slm.delete_share(id)
         if not success:
             return JSONResponse({"error": "Share not found"}, status_code=404)
         return Response(status_code=204)

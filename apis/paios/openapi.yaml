@@ -671,12 +671,12 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ShareCreate'
-  '/shares/{key}':
+  '/shares/{id}':
     get:
       tags:
         - Share Management
-      summary: Retrieve resource by key
-      description: Retrieve the information of the resource with the specified key.
+      summary: Retrieve share link by id
+      description: Retrieve the information of the share with the specified id.
       parameters:
         - $ref: '#/components/parameters/shortUrlKey'
       responses:
@@ -689,8 +689,8 @@ paths:
     put:
       tags:
         - Share Management
-      summary: Update resource by key
-      description: Updates the resource with the specified key.
+      summary: Update share link by id
+      description: Updates the share with the specified id.
       parameters:
         - $ref: '#/components/parameters/shortUrlKey'
       requestBody:
@@ -704,8 +704,8 @@ paths:
     delete:
       tags:
         - Share Management
-      summary: Delete resource by key
-      description: Delete a resource with the specified key.
+      summary: Delete share link by id
+      description: Delete a share with the specified id.
       parameters:
         - $ref: '#/components/parameters/shortUrlKey'
       responses:
@@ -769,9 +769,9 @@ components:
         example: api_key
         pattern: '^[a-zA-Z0-9_]+$'
     shortUrlKey:
-      name: key
+      name: id
       in: path
-      description: key of the object
+      description: id of the object
       required: true
       schema:
         $ref: '#/components/schemas/shortUrlKey'
@@ -1180,7 +1180,7 @@ components:
       type: object
       title: Share
       properties:
-        key:
+        id:
           $ref: '#/components/schemas/shortUrlKeyReadOnly'
         resource_id:
           $ref: '#/components/schemas/uuid4'
@@ -1192,12 +1192,12 @@ components:
         is_revoked:
           type: boolean
       required:
-        - key
+        - id
         - resource_id
     ShareCreate:
       type: object
       title: ShareCreate
-      description: Share without key which is server-generated.
+      description: Share without id which is server-generated.
       properties:
         resource_id:
           $ref: '#/components/schemas/uuid4'

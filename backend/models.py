@@ -38,7 +38,7 @@ class Persona(Base):
 
 class Share(Base):
     __tablename__ = "share"
-    key = Column(String, primary_key=True)  # the short URL tag
+    id = Column(String, primary_key=True)  # the short URL tag, eg abc-def-ghi
     resource_id = Column(String, ForeignKey("resource.id"), nullable=False)  # the bot ID
     user_id = Column(String, nullable=True)  # the user granted access (optional)
     expiration_dt = Column(DateTime, nullable=True)  # the link expiration date/time (optional)

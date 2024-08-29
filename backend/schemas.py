@@ -79,4 +79,4 @@ class ShareCreateSchema(ShareBaseSchema):
     pass
 
 class ShareSchema(ShareBaseSchema):
-    key: str
+    id: str
