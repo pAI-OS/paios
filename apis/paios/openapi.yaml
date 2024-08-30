@@ -1123,11 +1123,6 @@ components:
         persona_id:
           $ref: '#/components/schemas/uuid4'
           nullable: true
-        files:
-          type: array
-          nullable: true
-          items:
-            $ref: '#/components/schemas/textLong'
         status:
           type: string
           nullable: true
@@ -1395,11 +1390,11 @@ components:
           $ref: '#/components/schemas/uuid4'
         conversation_id:
           $ref: '#/components/schemas/uuid4'
+          nullable: true
         prompt:
           $ref: '#/components/schemas/textLong'
       required:        
         - assistant_id
-        - conversation_id
         - prompt
     Conversation:
       type: object

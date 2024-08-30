@@ -2,7 +2,7 @@ from uuid import uuid4
 from threading import Lock
 import httpx
 from sqlalchemy import select, update, delete, func
-from backend.models import Resource, File
+from backend.models import Resource
 from backend.db import db_session_context
 from backend.schemas import ResourceCreateSchema, ResourceSchema
 from typing import List, Tuple, Optional, Dict, Any
@@ -91,8 +91,6 @@ class ResourcesManager:
     async def retrieve_resource(self, id: str) -> Optional[ResourceSchema]:
         async with db_session_context() as session:
             result = await session.execute(select(Resource).filter(Resource.id == id))
-            files_result = await session.execute(select(File).filter(File.assistant_id == id))
-            files = [file.name for file in files_result.scalars()]
             resource = result.scalar_one_or_none()
             
             if resource:
@@ -106,7 +104,6 @@ class ResourcesManager:
                         description=resource.description, 
                         resource_llm_id=resource.resource_llm_id,
                         persona_id=resource.persona_id,
-                        files=files,
                         status=resource.status,
                         allow_edit=resource.allow_edit,
                         kind=resource.kind)
@@ -151,11 +148,7 @@ class ResourcesManager:
 
             result = await session.execute(query)
             resources = result.scalars().all()
-            for resource in resources:
-                files_result = await session.execute(select(File).filter(File.assistant_id == resource.id))
-                files = [file.name for file in files_result.scalars()]
-                resource.files = files
-
+            
             resources = [ResourceSchema.from_orm(resource) for resource in resources]
 
             # Get total count
