@@ -17,6 +17,8 @@ from backend.db import db_session_context
 from sqlalchemy import delete, select, func
 from pathlib import Path
 from typing import List, Tuple, Optional, Dict, Any
+from common.config import text_splitter_config, system_prompt_config,embedder_config
+
 
 class RagManager:
     _instance = None
@@ -58,7 +60,9 @@ class RagManager:
             file_info_list.append({"file_id": file_id, "file_name": file_name})
         
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000, chunk_overlap=200, add_start_index=True
+            chunk_size=text_splitter_config.get("chunk_size"), 
+            chunk_overlap=text_splitter_config.get("chunk_overlap"), 
+            add_start_index=text_splitter_config.get("add_start_index")
         )
         
         # Split documents while retaining metadata
@@ -104,7 +108,7 @@ class RagManager:
             return self.create_file(file_name, assistant_id)
             
     async def initialize_chroma(self, collection_name: str):
-        embed = OllamaEmbeddings(model="llama3")
+        embed = OllamaEmbeddings(model=embedder_config.get("model_name"))
         
         path = Path(chroma_db_path)
         vectorstore = Chroma(persist_directory=str(path),
@@ -113,15 +117,7 @@ class RagManager:
         return vectorstore
     
     async def retrieve_and_generate(self, collection_name, query, llm) -> str:
-        system_prompt = (
-            "You are an assistant for question-answering tasks. "
-            "Use the following pieces of retrieved context to answer "
-            "the question. If you don't know the answer, say that you "
-            "don't know. Use three sentences maximum and keep the "
-            "answer concise."
-            "\n\n"
-            "{context}"
-        )
+        system_prompt = ( system_prompt_config.get("text"))
     
         prompt = ChatPromptTemplate.from_messages(
             [

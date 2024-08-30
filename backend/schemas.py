@@ -19,8 +19,7 @@ class ResourceBaseSchema(BaseModel):
     uri: Optional[str] = None
     description: Optional[str] = None
     resource_llm_id : Optional[str] = None
-    persona_id : Optional[str] = None
-    files: Optional[List[str]] = None
+    persona_id : Optional[str] = None    
     status : Optional[str] = None
     allow_edit : Optional[str] = None
     kind : str

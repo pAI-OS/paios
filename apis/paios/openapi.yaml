@@ -1433,11 +1433,7 @@ components:
         resource_llm_id:
           $ref: '#/components/schemas/uuid4'
         persona_id:
-          $ref: '#/components/schemas/uuid4'
-        files:
-          type: array
-          items:
-            $ref: '#/components/schemas/textLong'
+          $ref: '#/components/schemas/uuid4'        
         status:
           type: string
           enum:
@@ -1781,7 +1777,7 @@ components:
         - archive
     IndexCreate:
       type: object
-      title: Index files
+      title: IndexCreate
       description: Upload files to indexig
       properties:
         files:
@@ -1801,7 +1797,7 @@ components:
           $ref: '#/components/schemas/name'
     FileDelete:
       type: object
-      title: Files Delete
+      title: FilesDelete
       properties:
         file_ids:
           type: array
