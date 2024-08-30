@@ -1157,11 +1157,7 @@ components:
         resource_llm_id:
           $ref: '#/components/schemas/uuid4'
         persona_id:
-          $ref: '#/components/schemas/uuid4'
-        files:
-          type: array
-          items:
-            $ref: '#/components/schemas/textLong'
+          $ref: '#/components/schemas/uuid4'        
         status:
           type: string
           enum:
@@ -1348,17 +1344,6 @@ components:
       required:
         - id
         - name
-    DocsPathsCreate:
-      type: object
-      title: DocsPathsCreate
-      description: Conversation without id which is server-generated.
-      properties:
-        docs_paths:
-          type: array
-          items:
-            $ref: '#/components/schemas/textLong'                      
-      required:        
-        - docs_paths
     Message:
       type: object
       title: Message
@@ -1440,7 +1425,7 @@ components:
         - archive
     IndexCreate:
       type: object
-      title: Index files
+      title: IndexCreate
       description: Upload files to indexig
       properties:
         files:
@@ -1460,7 +1445,7 @@ components:
           $ref: '#/components/schemas/name'
     FileDelete:
       type: object
-      title: Files Delete
+      title: FilesDelete
       properties:
         file_ids:
           type: array

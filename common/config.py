@@ -68,3 +68,22 @@ logging_config: dict[str, Any] = {
         "sqlalchemy.engine": {"level": "WARNING", "propagate": False}, # filter sqlalchemy noise
     },
 }
+
+text_splitter_config: dict[str, Any] = {
+                                        "chunk_size":1000, 
+                                        "chunk_overlap":200, 
+                                         "add_start_index":True
+                                     }
+
+system_prompt_config:str =  { "text":""" 
+                You are an assistant for question-answering tasks.
+                Use the following pieces of retrieved context to answer
+                the question. If you don't know the answer, say that you
+                don't know. Use three sentences maximum and keep the
+                answer concise.
+                \n\n
+                "{context}"
+                """}
+embedder_config:str ={
+    "model_name": "llama3"
+    }
