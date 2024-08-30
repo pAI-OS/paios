@@ -73,7 +73,6 @@ class Share(SQLModelBase, table=True):
     expiration_dt: datetime | None = Field(default=None)  # the link expiration date/time (optional)
     is_revoked: bool = Field()
 
-
 class Persona(SQLModelBase, table=True):
     id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
     name: str = Field()

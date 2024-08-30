@@ -886,9 +886,47 @@ paths:
           description: Unauthorized
       - $ref: '#/components/parameters/id'
   '/rag-indexing/{resource_id}':
+    delete:
+      tags:
+        - Files Management
+      summary: Delete all files by assistant id
+      description: Delete all files.
+      operationId: backend.api.RagIndexingView.delete
+      parameters:
+        - $ref: '#/components/parameters/resource_id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileDelete'
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+    get:
+      tags:
+        - Files Management
+      summary: Retrieve all files by assistant id
+      description: Get all files.
+      operationId: backend.api.RagIndexingView.search
+      parameters:
+        - $ref: '#/components/parameters/resource_id'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/File'
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
     post:
       tags:
-        - RAG Management
+        - Files Management
       summary: Create new rag-indexing
       description: A pipeline for ingesting data from a source and indexing it. This knowledge will be associated with an assistant id alias channelId type assistant.
       parameters:
@@ -1037,6 +1075,7 @@ tags:
   - name: Share Management
     description: Management of share links
   - name: RAG Management
+  - name: Files Management
     description: Management of RAG indexing
   - name: Message Management
     description: Management of Messages
@@ -1757,3 +1796,19 @@ components:
             description: The file to upload
       required:
         - files
+    File:
+      type: object
+      title: File
+      properties:
+        id:
+          $ref: '#/components/schemas/uuid4ReadOnly'
+        name:
+          $ref: '#/components/schemas/name'
+    FileDelete:
+      type: object
+      title: Files Delete
+      properties:
+        file_ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/uuid4'

@@ -184,3 +184,18 @@ class ConversationCreateSchema(ConversationBaseSchema):
  
 class ConversationSchema(ConversationBaseSchema):
     id: str
+
+# File schemas
+class FileBaseSchema(BaseModel):
+    name: str
+    num_chunks: str
+    
+    class Config:
+        orm_mode = True
+        from_attributes = True
+
+class FileCreateSchema(FileBaseSchema):
+    pass
+
+class FileSchema(FileBaseSchema):
+    id: str
