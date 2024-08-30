@@ -58,7 +58,7 @@ class MessagesManager:
             assistant_id = message_data['assistant_id']
             query = message_data['prompt']
             rm = RagManager()
-            response = await rm.retrive_and_generate(assistant_id, query, llm)
+            response = await rm.retrieve_and_generate(assistant_id, query, llm)
             message_data["chat_response"] = response["answer"]
             message_data['timestamp'] = timestamp
             

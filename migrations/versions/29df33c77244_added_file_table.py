@@ -22,6 +22,7 @@ def upgrade() -> None:
     sa.Column('id', sqlmodel.sql.sqltypes.AutoString(), nullable=False),    
     sa.Column('name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('assistant_id', sqlmodel.sql.sqltypes.AutoString(), nullable=True),   
+    sa.Column('num_chunks', sqlmodel.sql.sqltypes.AutoString(), nullable=False),   
     sa.PrimaryKeyConstraint('id')
     )
 
