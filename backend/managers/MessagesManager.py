@@ -29,44 +29,64 @@ class MessagesManager:
                 if not hasattr(self, '_initialized'):
                     self._initialized = True
                     
-    async def __get_llm_name__(self, assistant_id):
-        # Get the llm_id from the assistant_id
+    async def __get_llm_name__(self, assistant_id) -> Tuple[Optional[str], Optional[str]]:
         async with db_session_context() as session:
             result = await session.execute(select(Resource).filter(Resource.id == assistant_id))
             assistant = result.scalar_one_or_none()
+            if not assistant:
+                return None, "Assistant not found"
+            
             llm_id = assistant.resource_llm_id
             result = await session.execute(select(Resource).filter(Resource.id == llm_id))
-            llm = result.scalar_one_or_none()                    
-            return self.extract_names_from_uri(llm.uri.split('/')[-1])
+            llm = result.scalar_one_or_none()
+            if not llm:
+                return None, "LLM resource not found"
+            
+            return self.extract_names_from_uri(llm.uri.split('/')[-1]), None
         
 
-    async def create_message(self, message_data: MessageCreateSchema) -> str:
-        async with db_session_context() as session:
-            timestamp = get_current_timestamp()
-            
-            # update conversation last_updated_timestamp
-            conversation_id = message_data['conversation_id']
-            result = await session.execute(select(Conversation).filter(Conversation.id == conversation_id))
-            conversation = result.scalar_one_or_none()
-            conversation.last_updated_timestamp = timestamp
-            
-            model_name = await self.__get_llm_name__(message_data['assistant_id'])
-            if model_name is None:
-                return None
-            llm = Ollama(model=model_name)
-            
-            assistant_id = message_data['assistant_id']
-            query = message_data['prompt']
-            rm = RagManager()
-            response = await rm.retrieve_and_generate(assistant_id, query, llm)
-            message_data["chat_response"] = response["answer"]
-            message_data['timestamp'] = timestamp
-            
-            new_message = Message(id=str(uuid4()), **message_data)
-            session.add(new_message)
-            await session.commit() 
-            await session.refresh(new_message)
-            return new_message.id    
+    async def create_message(self, message_data: MessageCreateSchema) -> Tuple[Optional[str], Optional[str]]:
+        try:
+            async with db_session_context() as session:
+                timestamp = get_current_timestamp()
+                
+                conversation_id = message_data.get('conversation_id')
+                
+                if conversation_id:  # If conversation_id is provided, proceed as usual
+                    result = await session.execute(select(Conversation).filter(Conversation.id == conversation_id))
+                    conversation = result.scalar_one_or_none()
+                    if not conversation:
+                        return None, "Conversation not found"
+                    
+                    conversation.last_updated_timestamp = timestamp
+                
+                model_name, error_message = await self.__get_llm_name__(message_data['assistant_id'])
+                if error_message:
+                    return None, error_message
+                
+                llm = Ollama(model=model_name)
+                
+                assistant_id = message_data['assistant_id']
+                query = message_data['prompt']
+                rm = RagManager()
+                response = await rm.retrieve_and_generate(assistant_id, query, llm)
+                chat_response = response["answer"]
+                
+                if conversation_id:  # If conversation_id is provided, create a new message
+                    message_data["chat_response"] = chat_response
+                    message_data['timestamp'] = timestamp
+                    
+                    new_message = Message(id=str(uuid4()), **message_data)
+                    session.add(new_message)
+                    await session.commit()
+                    await session.refresh(new_message)
+                    return new_message.id, None
+                else:  # If conversation_id is not provided, return chat_response only
+                    return chat_response, None
+        
+        except Exception as e:
+            # Handle any unexpected errors
+            return None, f"An unexpected error occurred: {str(e)}"
 
     async def retrieve_message(self, id:str) -> Optional[MessageSchema]:
         async with db_session_context() as session:            
