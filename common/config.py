@@ -1,5 +1,6 @@
 from typing import Any
 from common.paths import log_dir
+import os
 
 logging_config: dict[str, Any] = {
     "version": 1,
@@ -69,21 +70,11 @@ logging_config: dict[str, Any] = {
     },
 }
 
-text_splitter_config: dict[str, Any] = {
-                                        "chunk_size":1000, 
-                                        "chunk_overlap":200, 
-                                         "add_start_index":True
-                                     }
 
-system_prompt_config:str =  { "text":""" 
-                You are an assistant for question-answering tasks.
-                Use the following pieces of retrieved context to answer
-                the question. If you don't know the answer, say that you
-                don't know. Use three sentences maximum and keep the
-                answer concise.
-                \n\n
-                "{context}"
-                """}
-embedder_config:str ={
-    "model_name": "llama3"
-    }
+CHUNK_SIZE = os.getenv("CHUNK_SIZE", 1000)
+CHUNK_OVERLAP = os.getenv("CHUNK_OVERLAP", 200)
+ADD_START_INDEX = os.getenv("ADD_START_INDEX", True)
+MAX_TOKENS = os.getenv("MAX_TOKENS", 12)
+
+SYSTEM_PROMPT = os.getenv("SYSTEM_PROMPT", "You are an assistant for question-answering tasks.Use the following pieces of retrieved context to answer the question. If you don't know the answer, say that you don't know. Use three sentences maximum and keep the answer concise.")
+EMBEDDER_MODEL = os.getenv("EMBEDDER_MODEL", "llama3")

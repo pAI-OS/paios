@@ -25,7 +25,7 @@ class ResourcesView:
         return JSONResponse({"error": " Invalid resource: " + valid_msg}, status_code=400)        
 
     async def put(self, id: str, body: ResourceCreateSchema):
-        valid_msg = self.rm.validate_resource_data(body)
+        valid_msg = await self.rm.validate_resource_data(body)
         if valid_msg == None:
             updated_resource = await self.rm.update_resource(id, body)
         else:

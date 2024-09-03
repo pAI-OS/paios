@@ -17,8 +17,7 @@ from backend.db import db_session_context
 from sqlalchemy import delete, select, func
 from pathlib import Path
 from typing import List, Tuple, Optional, Dict, Any
-from common.config import text_splitter_config, system_prompt_config,embedder_config
-
+from common.config import CHUNK_SIZE, CHUNK_OVERLAP, ADD_START_INDEX,SYSTEM_PROMPT,EMBEDDER_MODEL
 
 class RagManager:
     _instance = None
@@ -60,9 +59,9 @@ class RagManager:
             file_info_list.append({"file_id": file_id, "file_name": file_name})
         
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=text_splitter_config.get("chunk_size"), 
-            chunk_overlap=text_splitter_config.get("chunk_overlap"), 
-            add_start_index=text_splitter_config.get("add_start_index")
+            chunk_size=CHUNK_SIZE, 
+            chunk_overlap=CHUNK_OVERLAP, 
+            add_start_index=ADD_START_INDEX
         )
         
         # Split documents while retaining metadata
@@ -108,7 +107,7 @@ class RagManager:
             return self.create_file(file_name, assistant_id)
             
     async def initialize_chroma(self, collection_name: str):
-        embed = OllamaEmbeddings(model=embedder_config.get("model_name"))
+        embed = OllamaEmbeddings(model=EMBEDDER_MODEL)
         
         path = Path(chroma_db_path)
         vectorstore = Chroma(persist_directory=str(path),
@@ -117,7 +116,7 @@ class RagManager:
         return vectorstore
     
     async def retrieve_and_generate(self, collection_name, query, llm) -> str:
-        system_prompt = ( system_prompt_config.get("text"))
+        system_prompt = (SYSTEM_PROMPT + "\n\n{context}")
     
         prompt = ChatPromptTemplate.from_messages(
             [

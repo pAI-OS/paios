@@ -730,7 +730,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Conversation'
+                  $ref: '#/components/schemas/Conversations'
           headers:
             X-Total-Count:
               $ref: '#/components/headers/X-Total-Count'
@@ -1384,6 +1384,29 @@ components:
     Conversation:
       type: object
       title: Conversation
+      properties:
+        id:
+          $ref: '#/components/schemas/uuid4ReadOnly'
+        name:
+          $ref: '#/components/schemas/textShort'
+        created_timestamp:
+          $ref: '#/components/schemas/timestamp'
+        last_updated_timestamp:
+          $ref: '#/components/schemas/timestamp'
+        archive:
+          $ref: '#/components/schemas/boolean_str'
+        assistant_id:
+          $ref: '#/components/schemas/uuid4'
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+      required:        
+        - name        
+        - archive
+    Conversations:
+      type: object
+      title: Conversations
       properties:
         id:
           $ref: '#/components/schemas/uuid4ReadOnly'
