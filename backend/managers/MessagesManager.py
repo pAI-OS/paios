@@ -11,10 +11,12 @@ from backend.managers.RagManager import RagManager
 from langchain_community.llms import Ollama
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains.combine_documents import create_stuff_documents_chain
+from common.config import MAX_TOKENS
 
 class MessagesManager:
     _instance = None
     _lock = Lock()
+    _default_max_tokens = MAX_TOKENS
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
@@ -28,6 +30,7 @@ class MessagesManager:
             with self._lock:
                 if not hasattr(self, '_initialized'):
                     self._initialized = True
+                    self.max_tokens = self._default_max_tokens
                     
     async def __get_llm_name__(self, assistant_id) -> Tuple[Optional[str], Optional[str]]:
         async with db_session_context() as session:
@@ -44,6 +47,8 @@ class MessagesManager:
             
             return self.extract_names_from_uri(llm.uri.split('/')[-1]), None
         
+    def set_max_tokens(self, max_tokens: int):
+        self.max_tokens = max_tokens
 
     async def create_message(self, message_data: MessageCreateSchema) -> Tuple[Optional[str], Optional[str]]:
         try:
@@ -64,7 +69,7 @@ class MessagesManager:
                 if error_message:
                     return None, error_message
                 
-                llm = Ollama(model=model_name)
+                llm = Ollama(model=model_name, num_predict=self.max_tokens)
                 
                 assistant_id = message_data['assistant_id']
                 query = message_data['prompt']
