@@ -18,6 +18,7 @@ from sqlalchemy import delete, select, func
 from pathlib import Path
 from typing import List, Tuple, Optional, Dict, Any
 from common.config import CHUNK_SIZE, CHUNK_OVERLAP, ADD_START_INDEX,SYSTEM_PROMPT,EMBEDDER_MODEL
+from backend.managers import ResourcesManager
 
 class RagManager:
     _instance = None
@@ -116,8 +117,12 @@ class RagManager:
         return vectorstore
     
     async def retrieve_and_generate(self, collection_name, query, llm) -> str:
-        system_prompt = (SYSTEM_PROMPT + "\n\n{context}")
-    
+        resources_m = ResourcesManager()
+        resource = await resources_m.retrieve_resource(collection_name)        
+        personality_prompt = resource.description
+        
+        system_prompt = (SYSTEM_PROMPT + "\n\n{context}" + "\n\nYou should answer the question just as the following assistant's personality would do it:" + personality_prompt) 
+           
         prompt = ChatPromptTemplate.from_messages(
             [
                 ("system", system_prompt),
