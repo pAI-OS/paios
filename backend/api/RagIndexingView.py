@@ -23,9 +23,9 @@ class RagIndexingView:
         success_chroma_db = await self.rm.delete_documents_from_chroma(resource_id, file_ids)
         success_db = await self.rm.delete_file_from_db(file_ids)
         if not (success_chroma_db or success_db):
-            return JSONResponse({"error": "File not found"}, status_code=404)
-        
-        return JSONResponse(status_code=204)
+            return JSONResponse({"error": "File not found"}, status_code=404)        
+        return Response(status_code=204)    
+    
     
     async def search(self, resource_id: str ,filter: str = None, range: str = None, sort: str = None):
         result = parse_pagination_params(filter, range, sort)

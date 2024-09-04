@@ -57,7 +57,7 @@ class MessagesManager:
                 
                 conversation_id = message_data.get('conversation_id')
                 
-                if conversation_id:  # If conversation_id is provided, proceed as usual
+                if conversation_id:
                     result = await session.execute(select(Conversation).filter(Conversation.id == conversation_id))
                     conversation = result.scalar_one_or_none()
                     if not conversation:
@@ -77,7 +77,7 @@ class MessagesManager:
                 response = await rm.retrieve_and_generate(assistant_id, query, llm)
                 chat_response = response["answer"]
                 
-                if conversation_id:  # If conversation_id is provided, create a new message
+                if conversation_id:
                     message_data["chat_response"] = chat_response
                     message_data['timestamp'] = timestamp
                     
@@ -86,11 +86,10 @@ class MessagesManager:
                     await session.commit()
                     await session.refresh(new_message)
                     return new_message.id, None
-                else:  # If conversation_id is not provided, return chat_response only
+                else:
                     return chat_response, None
         
         except Exception as e:
-            # Handle any unexpected errors
             return None, f"An unexpected error occurred: {str(e)}"
 
     async def retrieve_message(self, id:str) -> Optional[MessageSchema]:
