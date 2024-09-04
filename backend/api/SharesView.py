@@ -15,22 +15,28 @@ class SharesView:
         return JSONResponse(share.model_dump(), status_code=200)
 
     async def post(self, body: dict):
-        print("expiration_dt: {}".format(body['expiration_dt']))
-        expiration_dt = datetime.fromisoformat(body['expiration_dt']).astimezone(tz=timezone.utc)
-        print("converted expiration_dt: {}".format(expiration_dt))
+        expiration_dt = None
+        if 'expiration_dt' in body and body['expiration_dt'] is not None:
+            expiration_dt = datetime.fromisoformat(body['expiration_dt']).astimezone(tz=timezone.utc)
+        user_id = None
+        if 'user_id' in body and body['user_id']:
+            user_id = body['user_id']
         new_share = await self.slm.create_share(resource_id=body['resource_id'],
-                                                user_id=body['user_id'],
+                                                user_id=user_id,
                                                 expiration_dt=expiration_dt,
                                                 is_revoked=False)
         return JSONResponse(new_share.model_dump(), status_code=201, headers={'Location': f'{api_base_url}/shares/{new_share.id}'})
 
     async def put(self, id: str, body: dict):
-        print("expiration_dt: {}".format(body['expiration_dt']))
-        expiration_dt = datetime.fromisoformat(body['expiration_dt']).astimezone(tz=timezone.utc)
-        print("converted expiration_dt: {}".format(expiration_dt))
+        expiration_dt = None
+        if 'expiration_dt' in body and body['expiration_dt'] is not None:
+            expiration_dt = datetime.fromisoformat(body['expiration_dt']).astimezone(tz=timezone.utc)
+        user_id = None
+        if 'user_id' in body and body['user_id']:
+            user_id = body['user_id']
         updated_share = await self.slm.update_share(id,
                                                     resource_id=body['resource_id'],
-                                                    user_id=body['user_id'],
+                                                    user_id=user_id,
                                                     expiration_dt=expiration_dt,
                                                     is_revoked=body['is_revoked'])
         if updated_share is None:

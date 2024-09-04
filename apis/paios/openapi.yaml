@@ -1185,10 +1185,12 @@ components:
         resource_id:
           $ref: '#/components/schemas/uuid4'
         user_id:
-          $ref: '#/components/schemas/uuid4'
+          type: string
+          nullable: true
         expiration_dt:
           type: string
           format: date-time
+          nullable: true
         is_revoked:
           type: boolean
       required:

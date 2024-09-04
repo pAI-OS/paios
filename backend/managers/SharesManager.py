@@ -81,8 +81,6 @@ class SharesManager:
         async with db_session_context() as session:
             query = select(Share)
 
-            print("filters: {}".format(filters))
-
             if filters:
                 for key, value in filters.items():
                     if isinstance(value, list):
