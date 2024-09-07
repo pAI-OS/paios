@@ -1,5 +1,6 @@
 {
     "id": "aws",
+    "name": "Amazon Web Services (AWS)",
     "versions": {
         "package": "0.1.0",
         "product": "1.35"
@@ -15,13 +16,16 @@
         "email": "samj@samj.net",
         "url": "https://samjohnston.org"
     },
+    "language": "python",
     "license": "MIT",
-    "dependencies": {
-        "python": [
+    "dependencies": [
             {
-                "name": "boto3",
-                "version": "1.35"
+                "type": "python",
+                "id": "boto3",
+                "name": "Boto3",
+                "versions": {
+                    "required": ">=1.35.0"
+                }
             }
-        ]
-    }
+    ]
 }
