@@ -1,6 +1,6 @@
 {
     "id": "aws",
-    "name": "Amazon Web Services (AWS)",
+    "name": "Amazon Web Services",
     "versions": {
         "package": "0.1.0",
         "product": "1.35"
