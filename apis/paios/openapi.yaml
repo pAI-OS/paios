@@ -630,6 +630,8 @@ paths:
       responses:
         '204':
           description: No Content
+        '400':
+          description: Cannot delete persona as it is associated with an assistant
         '404':
           description: Not Found
     parameters:
@@ -959,7 +961,7 @@ components:
     textLong:
       type: string
       example: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-      pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
+      pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?¡¿\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
     bytes:
       type: integer
       description: Bytes
