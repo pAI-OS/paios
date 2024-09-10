@@ -167,9 +167,9 @@ class ResourcesManager:
 
             return resources, total_count
 
-    async def validate_resource_data(self, resource_data: ResourceCreateSchema ) -> str:
+    async def validate_resource_data(self, resource_data: ResourceCreateSchema ) -> Optional[str]:
         kind = resource_data["kind"]
-        if not kind in ["llm", "assistant"]: 
+        if kind not in ["llm", "assistant"]: 
             return "Not a valid kind"
         if kind == 'assistant':    
             if not resource_data.get("resource_llm_id"):

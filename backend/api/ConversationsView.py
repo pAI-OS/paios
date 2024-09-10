@@ -18,11 +18,11 @@ class ConversationsView:
         return JSONResponse(conversation.dict(), status_code=200)
  
     async def post(self, resource_id: str, body: ConversationCreateSchema):        
-        id = await self.cm.create_conversation(resource_id, body)
-        conversation = await self.cm.retrieve_conversation(id)
+        conversation_id = await self.cm.create_conversation(resource_id, body)
+        conversation = await self.cm.retrieve_conversation(conversation_id)
         if conversation is None:
             return JSONResponse({"error": "Assistant not found"}, status_code=404)
-        return JSONResponse(conversation.dict(), status_code=201, headers={'Location': f'{api_base_url}/conversations/{id}'})
+        return JSONResponse(conversation.dict(), status_code=201, headers={'Location': f'{api_base_url}/conversations/{conversation_id}'})
         
     async def put(self, id: str, body: ConversationCreateSchema):
         conversation_db = await self.cm.retrieve_conversation(id)
