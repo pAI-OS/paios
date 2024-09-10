@@ -4,6 +4,8 @@ from common.paths import api_base_url
 from backend.pagination import parse_pagination_params
 from backend.schemas import ConversationCreateSchema
  
+
+NOT_FOUND_RESPONSE = JSONResponse({"error": "Conversation not found"}, status_code=404)
  
 class ConversationsView:
     def __init__(self):
@@ -12,7 +14,7 @@ class ConversationsView:
     async def get(self, id: str):        
         conversation = await self.cm.retrieve_conversation(id)
         if conversation is None:
-            return JSONResponse({"error": "Conversation not found"}, status_code=404)
+            return NOT_FOUND_RESPONSE
         return JSONResponse(conversation.dict(), status_code=200)
  
     async def post(self, resource_id: str, body: ConversationCreateSchema):        
@@ -25,7 +27,7 @@ class ConversationsView:
     async def put(self, id: str, body: ConversationCreateSchema):
         conversation_db = await self.cm.retrieve_conversation(id)
         if conversation_db is None:
-            return JSONResponse({"error": "Conversation not found"}, status_code=404)
+            return NOT_FOUND_RESPONSE
         await self.cm.update_conversation(id, conversation_db, body)
         conversation = await self.cm.retrieve_conversation(id)        
         return JSONResponse(conversation.dict(), status_code=200)
@@ -33,7 +35,7 @@ class ConversationsView:
     async def delete(self, id: str):
         success = await self.cm.delete_conversation(id)
         if not success:
-            return JSONResponse({"error": "Conversation not found"}, status_code=404)
+            return NOT_FOUND_RESPONSE
         return Response(status_code=204)
  
     async def search(self, filter: str = None, range: str = None, sort: str = None):
