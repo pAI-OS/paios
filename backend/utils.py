@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 # Returns dict with null fields removed (e.g., for OpenAPI spec compliant
 # responses without having to set nullable: true)
@@ -22,6 +22,6 @@ def zip_fields(fields, result):
 
 # Returns current timestamp in UTC in ISO 8601 format
 def get_current_timestamp():
-    current_time = datetime.utcnow()
+    current_time = datetime.now(timezone.utc)
     formatted_time = current_time.strftime('%Y-%m-%dT%H:%M:%SZ')
     return formatted_time

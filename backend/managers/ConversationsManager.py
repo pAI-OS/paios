@@ -24,7 +24,7 @@ class ConversationsManager:
                 if not hasattr(self, '_initialized'):
                     self._initialized = True
     
-    async def create_conversation(self, resource_id: str, conversation_data: ConversationCreateSchema) -> str:
+    async def create_conversation(self, resource_id: str, conversation_data: ConversationCreateSchema) -> Optional[str]:
         async with db_session_context() as session:
             
             if not await self.validate_assistant_id(resource_id):
@@ -115,47 +115,46 @@ class ConversationsManager:
                 )
             return None
 
- 
     async def retrieve_conversations(self, offset: int = 0, limit: int = 100, sort_by: Optional[str] = None,
-                                sort_order:str = 'asc',  filters: Optional[Dict[str, Any]] = None) -> Tuple[List[ConversationSchema], int]:
+                                sort_order: str = 'asc', filters: Optional[Dict[str, Any]] = None) -> Tuple[List[ConversationSchema], int]:
         async with db_session_context() as session:
-            query = select(Conversation)
- 
-            if filters:
-                for key, value in filters.items():
-                    if key == 'name':
-                        query = query.filter(Conversation.name.ilike(f"%{value}%"))
-                    elif isinstance(value, list):
-                        query = query.filter(getattr(Conversation, key).in_(value))
-                    else:
-                        query = query.filter(getattr(Conversation, key) == value)
- 
-            if sort_by and sort_by in ['id', 'name', 'archive', 'assistant_id']:
-                order_column = getattr(Conversation, sort_by)
-                query = query.order_by(order_column.desc() if sort_order.lower() == 'desc' else order_column)
- 
+            query = self._apply_filters(select(Conversation), filters)
+            query = self._apply_sorting(query, sort_by, sort_order)
             query = query.offset(offset).limit(limit)
- 
+            
             result = await session.execute(query)
             conversations = result.scalars().all()
- 
             conversations = [ConversationSchema.from_orm(conversation) for conversation in conversations]
- 
+            
             # Get total count
-            count_query = select(func.count()).select_from(Conversation)
-            if filters:
-                for key, value in filters.items():
-                    if key == 'name':
-                        count_query = count_query.filter(Conversation.name.ilike(f"%{value}%"))
-                    elif isinstance(value, list):
-                        count_query = count_query.filter(getattr(Conversation, key).in_(value))
-                    else:
-                        count_query = count_query.filter(getattr(Conversation, key) == value)
- 
-            total_count = await session.execute(count_query)
-            total_count = total_count.scalar()
- 
+            total_count = await self._get_total_count(session, filters)
+            
             return conversations, total_count
+
+    def _apply_filters(self, query, filters: Optional[Dict[str, Any]]):
+        if filters:
+            for key, value in filters.items():
+                if key == 'name':
+                    query = query.filter(Conversation.name.ilike(f"%{value}%"))
+                elif isinstance(value, list):
+                    query = query.filter(getattr(Conversation, key).in_(value))
+                else:
+                    query = query.filter(getattr(Conversation, key) == value)
+        return query
+
+    def _apply_sorting(self, query, sort_by: Optional[str], sort_order: str):
+        if sort_by and sort_by in ['id', 'name', 'archive', 'assistant_id']:
+            order_column = getattr(Conversation, sort_by)
+            query = query.order_by(order_column.desc() if sort_order.lower() == 'desc' else order_column)
+        return query
+
+    async def _get_total_count(self, session, filters: Optional[Dict[str, Any]]) -> int:
+        count_query = select(func.count()).select_from(Conversation)
+        count_query = self._apply_filters(count_query, filters)
+        total_count = await session.execute(count_query)
+        return total_count.scalar()
+
+    
         
     async def validate_assistant_id(self, assistant_id: str) -> bool:
         async with db_session_context() as session:
