@@ -1,7 +1,7 @@
 from uuid import uuid4
 from threading import Lock
-from sqlalchemy import select, insert, update, delete, func
-from backend.models import Persona
+from sqlalchemy import select, update, delete, func
+from backend.models import Persona, Resource
 from backend.db import db_session_context
 from backend.schemas import PersonaSchema, PersonaCreateSchema
 from typing import List, Tuple, Optional, Dict, Any
@@ -41,12 +41,17 @@ class PersonasManager:
                 return PersonaSchema(id=updated_persona.id, **persona_data)
             return None
 
-    async def delete_persona(self, id) -> bool:
+    async def delete_persona(self, id) -> Tuple[bool, Optional[str]]:
         async with db_session_context() as session:
+            
+            result = await session.execute(select(Resource).filter(Resource.persona_id == id, Resource.kind == "assistant"))
+            assistant = result.scalar_one_or_none()
+            if assistant:
+                return False, "Cannot delete persona as it is associated with an assistant"
             stmt = delete(Persona).where(Persona.id == id)
             result = await session.execute(stmt)
             await session.commit()
-            return result.rowcount > 0
+            return result.rowcount > 0, None
 
     async def retrieve_persona(self, id:str) -> Optional[PersonaSchema]:
         async with db_session_context() as session:            

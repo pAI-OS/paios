@@ -1,5 +1,6 @@
 from typing import Any
 from common.paths import log_dir
+import os
 
 logging_config: dict[str, Any] = {
     "version": 1,

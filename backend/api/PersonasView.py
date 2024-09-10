@@ -28,9 +28,11 @@ class PersonasView:
         return JSONResponse(persona.dict(), status_code=200)
 
     async def delete(self, id: str):
-        success = await self.pm.delete_persona(id)
-        if not success:
+        success, error_message = await self.pm.delete_persona(id)
+        if not success and not error_message:
             return JSONResponse({"error": "Persona not found"}, status_code=404)
+        elif not success and error_message:
+            return JSONResponse({"error": error_message}, status_code=400)
         return Response(status_code=204)
 
     async def search(self, filter: str = None, range: str = None, sort: str = None):
