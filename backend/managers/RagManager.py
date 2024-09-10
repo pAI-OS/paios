@@ -17,8 +17,11 @@ from backend.db import db_session_context
 from sqlalchemy import delete, select, func
 from pathlib import Path
 from typing import List, Tuple, Optional, Dict, Any
-from common.config import CHUNK_SIZE, CHUNK_OVERLAP, ADD_START_INDEX,SYSTEM_PROMPT,EMBEDDER_MODEL
 from backend.managers import ResourcesManager
+from distutils.util import strtobool
+import os
+import logging
+logger = logging.getLogger(__name__)
 
 class RagManager:
     _instance = None
@@ -60,9 +63,9 @@ class RagManager:
             file_info_list.append({"file_id": file_id, "file_name": file_name})
         
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=CHUNK_SIZE, 
-            chunk_overlap=CHUNK_OVERLAP, 
-            add_start_index=ADD_START_INDEX
+            chunk_size=int(os.environ.get('CHUNK_SIZE')),
+            chunk_overlap=int(os.environ.get('CHUNK_OVERLAP')),
+            add_start_index=bool(strtobool(os.environ.get('ADD_START_INDEX')))
         )
         
         # Split documents while retaining metadata
@@ -108,7 +111,7 @@ class RagManager:
             return self.create_file(file_name, assistant_id)
             
     async def initialize_chroma(self, collection_name: str):
-        embed = OllamaEmbeddings(model=EMBEDDER_MODEL)
+        embed = OllamaEmbeddings(model=os.environ.get('EMBEDDER_MODEL'))
         
         path = Path(chroma_db_path)
         vectorstore = Chroma(persist_directory=str(path),
@@ -121,7 +124,7 @@ class RagManager:
         resource = await resources_m.retrieve_resource(collection_name)        
         personality_prompt = resource.description
         
-        system_prompt = (SYSTEM_PROMPT + "\n\n{context}" + "\n\nYou should answer the question just as the following assistant's personality would do it:" + personality_prompt) 
+        system_prompt = (os.environ.get('SYSTEM_PROMPT') + "\n\n{context}" + "\n\nYou should answer the question just as the following assistant's personality would do it: " + personality_prompt)
            
         prompt = ChatPromptTemplate.from_messages(
             [
@@ -151,11 +154,27 @@ class RagManager:
                 with open(file_path, "wb") as buffer:
                     shutil.copyfileobj(file.file, buffer)
 
-            return await self.create_index(resource_id, all_docs)   
+            result = await self.create_index(resource_id, all_docs)   
+            await self.delete_tmp_files(resource_id)
+            return result
         except Exception as e:
             print(f"An error occurred while uploading files: {e}")
             return "File upload failed"
 
+    async def delete_tmp_files(self, assistant_id: str):
+        try:
+            # Define the directory path using the assistant_id
+            directory = Path(f"./uploads/{assistant_id}")
+            
+            # Check if the directory exists
+            if directory.exists() and directory.is_dir():
+                # Remove the directory and all its contents
+                shutil.rmtree(directory)
+            else:
+                logger.error(f"Directory for assistant {assistant_id} does not exist.", exc_info=True)
+        except Exception as e:
+            logger.error(f"An error occurred while deleting folder for assistant {assistant_id}: {e}", exc_info=True)
+        
     async def retrieve_file(self, id:str) -> Optional[FileSchema]:
         async with db_session_context() as session:            
             result = await session.execute(select(File).filter(File.id == id))

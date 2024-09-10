@@ -1,6 +1,6 @@
 from uuid import uuid4
 from threading import Lock
-from sqlalchemy import select, insert, update, delete, func
+from sqlalchemy import select
 from backend.models import Message, Conversation, Resource
 from backend.db import db_session_context
 from backend.schemas import MessageSchema, MessageCreateSchema
@@ -11,12 +11,11 @@ from backend.managers.RagManager import RagManager
 from langchain_community.llms import Ollama
 from langchain_core.prompts import ChatPromptTemplate
 from langchain.chains.combine_documents import create_stuff_documents_chain
-from common.config import MAX_TOKENS
+import os
 
 class MessagesManager:
     _instance = None
     _lock = Lock()
-    _default_max_tokens = MAX_TOKENS
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
@@ -30,7 +29,7 @@ class MessagesManager:
             with self._lock:
                 if not hasattr(self, '_initialized'):
                     self._initialized = True
-                    self.max_tokens = self._default_max_tokens
+                    self.max_tokens = os.environ.get('MAX_TOKENS')
                     
     async def __get_llm_name__(self, assistant_id) -> Tuple[Optional[str], Optional[str]]:
         async with db_session_context() as session:

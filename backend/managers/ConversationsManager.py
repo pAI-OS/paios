@@ -47,22 +47,35 @@ class ConversationsManager:
             timestamp = get_current_timestamp()
             conversation_data_dict = conversation_data.dict()
             conversation_data_dict['last_updated_timestamp'] = timestamp
-            conversation_data_dict['archive'] = new_conversation_data['archive']
-            conversation_data_dict['name'] = new_conversation_data['name']
-           
-            stmt = update(Conversation).where(Conversation.id == id).values(**conversation_data_dict)
-            result = await session.execute(stmt)
-            if result.rowcount > 0:
-                await session.commit()
-                updated_conversation = await session.get(Conversation, id)
-                return ConversationSchema(
-                    id=updated_conversation.id,
-                    name=updated_conversation.name,
-                    created_timestamp=updated_conversation.created_timestamp,
-                    last_updated_timestamp=updated_conversation.last_updated_timestamp,
-                    archive=updated_conversation.archive,
-                    assistant_id=updated_conversation.assistant_id
-                )
+            conversation_data_dict['archive'] = new_conversation_data.get('archive', conversation_data_dict.get('archive'))
+            conversation_data_dict['name'] = new_conversation_data.get('name', conversation_data_dict.get('name'))
+
+            if 'messages' in conversation_data_dict:
+                conversation_data_dict.pop('messages')
+
+            stmt = (
+                update(Conversation)
+                .where(Conversation.id == id)
+                .values(**conversation_data_dict)
+                .execution_options(synchronize_session="fetch")
+            )
+            
+            try:
+                result = await session.execute(stmt)
+                if result.rowcount > 0:
+                    await session.commit()
+                    updated_conversation = await session.get(Conversation, id)
+                    return ConversationSchema(
+                        id=updated_conversation.id,
+                        name=updated_conversation.name,
+                        created_timestamp=updated_conversation.created_timestamp,
+                        last_updated_timestamp=updated_conversation.last_updated_timestamp,
+                        archive=updated_conversation.archive,
+                        assistant_id=updated_conversation.assistant_id
+                    )
+            except Exception as e:
+                await session.rollback()
+                raise e
             return None
  
     async def delete_conversation(self, id) -> bool:
