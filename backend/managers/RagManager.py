@@ -17,11 +17,12 @@ from backend.db import db_session_context
 from sqlalchemy import delete, select, func
 from pathlib import Path
 from typing import List, Tuple, Optional, Dict, Any
-from backend.managers import ResourcesManager
+from backend.managers import ResourcesManager, PersonasManager
 from distutils.util import strtobool
 import os
 import logging
 from typing import Union
+from langchain.prompts import PromptTemplate
 
 logger = logging.getLogger(__name__)
 
@@ -52,15 +53,13 @@ class RagManager:
 
         for path in path_files:
             loader = PyPDFLoader(path)
-            docs = loader.load()  
-            all_docs.append(docs[0])
+            docs = loader.load() # Return a list of documents for each file
+            all_docs.append(docs)
             file_id = str(uuid4())
-            all_ids.append(file_id)
-            
-            # Extract just the file name
+            all_ids.append(file_id)            
             file_name = Path(path).name
             file_names.append(file_name)
-            
+
             # Collect file_id and file_name into a dictionary
             file_info_list.append({"file_id": file_id, "file_name": file_name})
         
@@ -69,14 +68,14 @@ class RagManager:
             chunk_overlap=int(os.environ.get('CHUNK_OVERLAP')),
             add_start_index=bool(strtobool(os.environ.get('ADD_START_INDEX')))
         )
-        
+
         # Split documents while retaining metadata
         split_documents = []
         split_ids = []
-        
+
         for doc, doc_id in zip(all_docs, all_ids):
             #split the document into smaller chunks
-            splits = text_splitter.split_documents([doc])
+            splits = text_splitter.split_documents(doc)
             all_chunks.append(len(splits))
             # Append each chunk to the split_documents list
             for i, split in enumerate(splits):
@@ -84,9 +83,9 @@ class RagManager:
                 split_documents.append(split)
                 # Create unique IDs for each split based on the original ID and chunk index
                 split_ids.append(f"{doc_id}-{i}")
-        
+
         await self.create_files_for_resource(resource_id, file_names, all_ids, all_chunks)
-        
+
         # add the split documents to the vectorstore
         vectorstore = await self.initialize_chroma(resource_id)
         vectorstore.add_documents(documents=split_documents, ids=split_ids)
@@ -114,21 +113,29 @@ class RagManager:
     
     async def retrieve_and_generate(self, collection_name, query, llm) -> str:
         resources_m = ResourcesManager()
+        personas_m = PersonasManager()
         resource = await resources_m.retrieve_resource(collection_name)        
-        personality_prompt = resource.description
-        
-        system_prompt = (os.environ.get('SYSTEM_PROMPT') + "\n\n{context}" + "\n\nYou should answer the question just as the following assistant's personality would do it: " + personality_prompt)
-           
-        prompt = ChatPromptTemplate.from_messages(
-            [
-                ("system", system_prompt),
-                ("human", "{input}"),
-            ]
+        persona_id = resource.persona_id
+        persona = await personas_m.retrieve_persona(persona_id)
+        personality_prompt = persona.description
+        # Combine the system prompt and context        
+        system_prompt = (os.environ.get('SYSTEM_PROMPT') + "\n\n{context}" +
+                        "\n\nHere is some information about the assistant expertise to help you answer your questions: " +
+                        personality_prompt)
+        # system_prompt = (os.environ.get('SYSTEM_PROMPT') + "\n\n{context}" )
+        prompt_template = PromptTemplate(
+            input_variables=["context", "input"],
+            template=system_prompt + "\n\n{input}"
         )
+        print(f"Prompt: {prompt_template}\n")
         vectorstore = await self.initialize_chroma(collection_name)
         retriever = vectorstore.as_retriever()
-        question_answer_chain = create_stuff_documents_chain(llm, prompt)
+
+        # Use the LLM chain with the prompt
+        question_answer_chain = create_stuff_documents_chain(llm, prompt_template)
         rag_chain = create_retrieval_chain(retriever, question_answer_chain)
+        
+        # Invoke the RAG chain with query as input
         response = rag_chain.invoke({"input": query})
         return response  
     
@@ -137,7 +144,7 @@ class RagManager:
             all_docs = []
             for file in files:
                 # Define the directory where files will be saved
-                directory = Path(f"./uploads/{resource_id}")
+                directory = Path(f"./uploads/{resource_id}")                
                 directory.mkdir(parents=True, exist_ok=True)
                 
                 # Save the file
@@ -218,7 +225,6 @@ class RagManager:
             result = await session.execute(query)
             files = [FileSchema.from_orm(file) for file in result.scalars().all()]
 
-            # Get total count
             total_count = await self._get_total_count(filters)
 
             return files, total_count

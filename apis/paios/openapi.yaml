@@ -1713,7 +1713,7 @@ components:
         prompt:
           $ref: '#/components/schemas/textLong'
         chat_response:
-          $ref: '#/components/schemas/textLong'
+          type: string
       required:
         - assistant_id
         - conversation_id
