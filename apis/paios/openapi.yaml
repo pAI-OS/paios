@@ -282,7 +282,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ChannelCreate'
+              $ref: '#/components/schemas/ResourceCreate'
   '/resources/{id}':
     get:
       tags:
@@ -633,7 +633,179 @@ paths:
         '404':
           description: Not Found
     parameters:
-      - $ref: '#/components/parameters/id'  
+      - $ref: '#/components/parameters/id'
+  '/rag-indexing/{resource_id}':
+    delete:
+      tags:
+        - Files Management
+      summary: Delete all files by assistant id
+      description: Delete all files.
+      operationId: backend.api.RagIndexingView.delete
+      parameters:
+        - $ref: '#/components/parameters/resource_id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileDelete'
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+    get:
+      tags:
+        - Files Management
+      summary: Retrieve all files by assistant id
+      description: Get all files.
+      operationId: backend.api.RagIndexingView.search
+      parameters:
+        - $ref: '#/components/parameters/resource_id'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/File'
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+    post:
+      tags:
+        - Files Management
+      summary: Create new rag-indexing
+      description: A pipeline for ingesting data from a source and indexing it. This knowledge will be associated with an assistant id alias channelId type assistant.
+      parameters:
+        - $ref: '#/components/parameters/resource_id'
+      requestBody:
+        description: Post the necessary fields for the API to index documents.
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/IndexCreate'
+      responses:
+        '200':
+          description: Document added
+        '400':
+          description: Missing Required Information        
+  /messages:
+    post:
+      summary: Create new message
+      tags:
+        - Message Management
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '400':
+          description: Missing Required Information
+      description: Creates a new message.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageCreate'
+  /conversations:
+    get:      
+      tags:
+        - Conversation Management
+      summary: Retrieve all conversations.
+      description: Get all conversations.
+      parameters:
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/range'
+        - $ref: '#/components/parameters/filter'
+      operationId: backend.api.ConversationsView.search
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Conversation'
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+  '/conversations/{id}':
+    get:
+      tags:
+        - Conversation Management
+      summary: Retrieve conversation by id
+      description: Retrieve the information of the conversation with the matching conversation ID.
+      operationId: backend.api.ConversationsView.get
+      parameters:
+        - $ref: '#/components/parameters/id'      
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+    put:
+      summary: Update conversation by id
+      tags:
+        - Conversation Management
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+      description: Updates the conversation with the given id.
+      operationId: backend.api.ConversationsView.put
+      parameters:
+        - $ref: '#/components/parameters/id'      
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationUpdate'
+    delete:
+      summary: Delete conversation by id
+      description: Deletes the conversation with the given id.
+      operationId: backend.api.ConversationsView.delete
+      parameters:
+        - $ref: '#/components/parameters/id'
+      tags:
+        - Conversation Management
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+  '/conversations/{resource_id}':
+    post:
+      summary: Create new conversation
+      tags:
+        - Conversation Management
+      operationId: backend.api.ConversationsView.post
+      parameters:
+        - $ref: '#/components/parameters/resource_id'            
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+        '400':
+          description: Missing Required Information
+      description: Creates a new conversation.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConversationCreate'
 tags:
   - name: Abilities Management
     description: Installation and configuration of abilities
@@ -649,6 +821,12 @@ tags:
     description: Management of user accounts
   - name: Persona Management
     description: Management of personas
+  - name: Files Management
+    description: Management of RAG indexing
+  - name: Message Management
+    description: Management of Messages
+  - name: Conversation Management
+    description: Management of conversations
 components:
   headers:
     X-Total-Count:
@@ -725,6 +903,13 @@ components:
       schema:
         type: string
         example: '{"title":"bar"}'
+    resource_id:
+      name: resource_id
+      in: path
+      description: this refers to the assitant id for the resource
+      required: true
+      schema:
+        $ref: '#/components/schemas/uuid4'    
   schemas:
     snake_id:
       type: string
@@ -799,6 +984,15 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/uuid4'
+    boolean_str:
+      type: string
+      example: 'True'
+      pattern: ^True|False$
+    timestamp:
+      type: string
+      format: date-time
+      example: "2023-07-29T12:34:56Z"
+      pattern: ^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$    
     Ability:
       type: object
       title: Ability
@@ -919,22 +1113,80 @@ components:
           $ref: '#/components/schemas/name'
         uri:
           $ref: '#/components/schemas/uri'
-      required:
-        - id
-        - name
-        - uri
-    ChannelCreate:
+          nullable: true
+        description:
+          $ref: '#/components/schemas/textLong'
+          nullable: true
+        resource_llm_id:
+          $ref: '#/components/schemas/uuid4'
+          nullable: true
+        persona_id:
+          $ref: '#/components/schemas/uuid4'
+          nullable: true
+        files:
+          type: array
+          nullable: true
+          items:
+            $ref: '#/components/schemas/textLong'
+        status:
+          type: string
+          nullable: true
+          enum:
+            - public
+            - draft
+            - private
+          example: public
+        allow_edit:
+          nullable: true
+          $ref: '#/components/schemas/boolean_str'
+        kind:
+          type: string
+          enum:
+            - llm
+            - assistant 
+          example: assistant
+        icon:
+          nullable: true
+          $ref: '#/components/schemas/uri'
+    ResourceCreate:
       type: object
-      title: Resource
+      title: ResourceCreate
       description: Resources (input/output)
       properties:
         name:
           $ref: '#/components/schemas/name'
         uri:
           $ref: '#/components/schemas/uri'
+        description:
+          $ref: '#/components/schemas/textLong'
+        resource_llm_id:
+          $ref: '#/components/schemas/uuid4'
+        persona_id:
+          $ref: '#/components/schemas/uuid4'
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/textLong'
+        status:
+          type: string
+          enum:
+            - public
+            - draft
+            - private
+          example: public
+        allow_edit:
+          $ref: '#/components/schemas/boolean_str'
+        kind:
+          type: string
+          enum:
+            - llm
+            - assistant 
+          example: assistant
+        icon:
+          $ref: '#/components/schemas/uri' 
       required:
         - name
-        - uri
+        - kind
     Config:
       title: Config
       type: object
@@ -1079,3 +1331,143 @@ components:
           $ref: '#/components/schemas/uuid4'
       required:        
         - name
+    Voice:
+      type: object
+      title: Voice
+      properties:
+        id:
+          $ref: '#/components/schemas/textShort'
+        name:
+          $ref: '#/components/schemas/textShort'
+      required:
+        - id
+        - name
+    Face:
+      type: object
+      title: Face
+      properties:
+        id:
+          $ref: '#/components/schemas/uuid4ReadOnly'
+        name:
+          $ref: '#/components/schemas/textShort'
+      required:
+        - id
+        - name
+    DocsPathsCreate:
+      type: object
+      title: DocsPathsCreate
+      description: Conversation without id which is server-generated.
+      properties:
+        docs_paths:
+          type: array
+          items:
+            $ref: '#/components/schemas/textLong'                      
+      required:        
+        - docs_paths
+    Message:
+      type: object
+      title: Message
+      properties:
+        id:
+          $ref: '#/components/schemas/uuid4ReadOnly'
+        assistant_id:
+          $ref: '#/components/schemas/uuid4'
+        conversation_id:
+          $ref: '#/components/schemas/uuid4'
+        timestamp:
+          $ref: '#/components/schemas/timestamp'
+        prompt:
+          $ref: '#/components/schemas/textLong'
+        chat_response:
+          $ref: '#/components/schemas/textLong'
+      required:
+        - assistant_id
+        - conversation_id
+        - timestamp
+        - prompt
+        - chat_response
+    MessageCreate:
+      type: object
+      title: MessageCreate
+      description: Message of a conversation.
+      properties:
+        assistant_id:
+          $ref: '#/components/schemas/uuid4'
+        conversation_id:
+          $ref: '#/components/schemas/uuid4'
+        prompt:
+          $ref: '#/components/schemas/textLong'
+      required:        
+        - assistant_id
+        - conversation_id
+        - prompt
+    Conversation:
+      type: object
+      title: Conversation
+      properties:
+        id:
+          $ref: '#/components/schemas/uuid4ReadOnly'
+        name:
+          $ref: '#/components/schemas/textShort'
+        created_timestamp:
+          $ref: '#/components/schemas/timestamp'
+        last_updated_timestamp:
+          $ref: '#/components/schemas/timestamp'
+        archive:
+          $ref: '#/components/schemas/boolean_str'
+        assistant_id:
+          $ref: '#/components/schemas/uuid4'
+      required:        
+        - name        
+        - archive        
+    ConversationCreate:
+      type: object
+      title: ConversationCreate
+      description: Conversation without id which is server-generated.
+      properties:
+        name:
+          $ref: '#/components/schemas/textLong'
+        archive:
+          $ref: '#/components/schemas/boolean_str'                
+      required:        
+        - name
+    ConversationUpdate:
+      type: object
+      title: ConversationUpdate
+      description: Conversation to be updated by id.
+      properties:
+        name:
+          $ref: '#/components/schemas/textLong'
+        archive:
+          $ref: '#/components/schemas/boolean_str'                
+      required:        
+        - name
+        - archive
+    IndexCreate:
+      type: object
+      title: Index files
+      description: Upload files to indexig
+      properties:
+        files:
+          type: array
+          items:
+            format: binary
+            description: The file to upload
+      required:
+        - files
+    File:
+      type: object
+      title: File
+      properties:
+        id:
+          $ref: '#/components/schemas/uuid4ReadOnly'
+        name:
+          $ref: '#/components/schemas/name'
+    FileDelete:
+      type: object
+      title: Files Delete
+      properties:
+        file_ids:
+          type: array
+          items:
+            $ref: '#/components/schemas/uuid4'
