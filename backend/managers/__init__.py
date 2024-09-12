@@ -15,7 +15,7 @@ manager_classes = [
     ConfigManager,
     DownloadsManager,
     UsersManager,
-    AuthManager
+    AuthManager,
     PersonasManager
 ]
 
