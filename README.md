@@ -66,7 +66,7 @@ Visit [http://localhost:3080/](http://localhost:3080/)
 Clone the entire repository
 
 ```sh
-git clone https://github.com/Kwaai-AI-Lab/paios.git
+git clone https://github.com/pAI-OS/paios.git
 ```
 
 > 🤖 **Tip:** Early Adopters don't need to build the frontend on the canary branch because it's done automatically on every commit to main.
@@ -86,3 +86,4 @@ python -m paios
 ```
 
 Visit [http://localhost:3080/](http://localhost:3080/)
+

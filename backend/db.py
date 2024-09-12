@@ -1,6 +1,8 @@
 # database helper functions
 import os
 from sqlalchemy.orm import sessionmaker, declarative_base
+import logging
+from sqlmodel import SQLModel
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from alembic import command
 from alembic.config import Config as AlembicConfig
@@ -9,6 +11,11 @@ from contextlib import asynccontextmanager
 
 # Define the SQLAlchemy Base
 Base = declarative_base()
+logger = logging.getLogger(__name__)
+
+# Define SQLModelBase class
+class SQLModelBase(SQLModel):
+    pass
 
 # Create async engine
 engine = create_async_engine(db_url, echo=False)

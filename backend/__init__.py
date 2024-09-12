@@ -11,3 +11,4 @@ required_directories = [
 for directory in required_directories:
     if not os.path.exists(directory):
         os.makedirs(directory)
+

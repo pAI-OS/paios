@@ -20,4 +20,4 @@ To start the local prism server:
 
 prism can also load the API directly from the repo:
 
-    prism proxy 'https://raw.githubusercontent.com/Kwaai-AI-Lab/Paios/main/apis/paios/openapi.yaml'
+    prism proxy 'https://raw.githubusercontent.com/pAI-OS/Paios/main/apis/paios/openapi.yaml'

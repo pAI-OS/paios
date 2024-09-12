@@ -1,13 +1,13 @@
 openapi: 3.0.3
 info:
   version: '0.1'
-  title: Kwaai pAI-OS API
+  title: Personal Artificial Intelligence Operating System (pAI-OS) API
   description: 'API for pAI-OS admin interfaces (web, app) to backend services.'
   termsOfService: 'https://paios.org'
   contact:
-    name: Kwaai
-    url: 'https://www.kwaai.ai'
-    email: contact@kwaai.ai
+    name: pAI-OS
+    url: 'https://paios.org'
+    email: contact@paios.org
   license:
     url: 'https://github.com/pAI-OS/paios/blob/main/LICENSE'
     name: MIT
@@ -274,14 +274,14 @@ paths:
           description: Not Found
     parameters:
       - $ref: '#/components/parameters/id'
-  /channels:
+  /resources:
     get:
       security:
         - cookieAuth: []
       tags:
-        - Channel Management
-      summary: Retrieve all channels
-      description: Retrieve the information of all channels.
+        - Resource Management
+      summary: Retrieve all resources
+      description: Retrieve the information of all resources.
       parameters:
         - $ref: '#/components/parameters/sort'
         - $ref: '#/components/parameters/range'
@@ -294,35 +294,35 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Channel'
+                  $ref: '#/components/schemas/Resource'
           headers:
             X-Total-Count:
               $ref: '#/components/headers/X-Total-Count'
     post:
       security:
-        - cookieAuth: []
-      summary: Create new channel
+        - cookieAuth: []     
+      summary: Create new resource
       tags:
-        - Channel Management
+        - Resource Management
       responses:
         '200':
           description: OK
         '400':
           description: Missing Required Information
-      description: Create a new channel.
+      description: Create a new resource.
       requestBody:
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/ChannelCreate'
-  '/channels/{id}':
+  '/resources/{id}':
     get:
       security:
         - cookieAuth: []
       tags:
-        - Channel Management
-      summary: Retrieve channel by id
-      description: Retrieve the information of the channel with the specified id.
+        - Resource Management
+      summary: Retrieve resource by id
+      description: Retrieve the information of the resource with the specified id.
       parameters:
         - $ref: '#/components/parameters/id'
       responses:
@@ -331,21 +331,21 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Channel'
+                $ref: '#/components/schemas/Resource'
     put:
       security:
         - cookieAuth: []
       tags:
-        - Channel Management
-      summary: Update channel by key
-      description: Updates the channel with the specified id.
+        - Resource Management
+      summary: Update resource by key
+      description: Updates the resource with the specified id.
       parameters:
         - $ref: '#/components/parameters/id'
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Channel'
+              $ref: '#/components/schemas/Resource'
       responses:
         '200':
           description: OK
@@ -353,9 +353,9 @@ paths:
       security:
         - cookieAuth: []
       tags:
-        - Channel Management
-      summary: Delete channel by key
-      description: Delete a channel with the specified ID.
+        - Resource Management
+      summary: Delete resource by key
+      description: Delete a resource with the specified ID.
       parameters:
         - $ref: '#/components/parameters/id'
       responses:
@@ -719,19 +719,106 @@ paths:
           description: Successfully logged out
         '401':
           description: Unauthorized
+  /personas:
+    get:
+      tags:
+        - Persona Management
+      summary: Retrieve all personas
+      description: Get all personas.
+      parameters:
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/range'
+        - $ref: '#/components/parameters/filter'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Persona'
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+    post:
+      summary: Create new persona
+      tags:
+        - Persona Management
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Persona'
+        '400':
+          description: Missing Required Information
+      description: Creates a new persona.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonaCreate'
+  '/personas/{id}':
+    get:
+      tags:
+        - Persona Management
+      summary: Retrieve persona by id
+      description: Retrieve the information of the persona with the matching persona ID.
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Persona'
+    put:
+      summary: Update persona by id
+      tags:
+        - Persona Management
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Persona'
+      description: Updates the persona with the given id.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Persona'
+    delete:
+      summary: Delete persona by id
+      description: Deletes the persona with the given id.
+      tags:
+        - Persona Management
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
+    parameters:
+      - $ref: '#/components/parameters/id'  
 tags:
   - name: Abilities Management
     description: Installation and configuration of abilities
   - name: Asset Management
     description: Management of assets
-  - name: Channel Management
-    description: Discovery and configuration of input/output interfaces/channels
+  - name: Resource Management
+    description: Discovery and configuration of input/output interfaces/resources
   - name: Configuration Management
     description: Management of configuration
   - name: Downloads Management
     description: Management of downloads
   - name: User Management
     description: Management of user accounts
+  - name: Persona Management
+    description: Management of personas
 components:
   securitySchemes:
     cookieAuth:
@@ -850,11 +937,11 @@ components:
     email:
       type: string
       format: email
-      example: contact@kwaai.ai
+      example: contact@paios.org
       pattern: (?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])
     name:
       type: string
-      example: Kwaai
+      example: pAI-OS
       pattern: ^[A-Za-z0-9\s\-_,.;:()!@#$%&*+=?\/\\|~^'"\[\]{}áéíóúñ©€£¥]+$
     textShort:
       type: string
@@ -997,10 +1084,10 @@ components:
           $ref: '#/components/schemas/textShort'
       required:
         - title
-    Channel:
+    Resource:
       type: object
-      title: Channel
-      description: Channels (input/output)
+      title: Resource
+      description: Resources (input/output)
       properties:
         id:
           $ref: '#/components/schemas/uuid4ReadOnly'
@@ -1014,8 +1101,8 @@ components:
         - uri
     ChannelCreate:
       type: object
-      title: Channel
-      description: Channels (input/output)
+      title: Resource
+      description: Resources (input/output)
       properties:
         name:
           $ref: '#/components/schemas/name'
@@ -1163,3 +1250,36 @@ components:
           type: object
         challenge:
           type: string
+    Persona:
+      type: object
+      title: Persona
+      properties:
+        id:
+          $ref: '#/components/schemas/uuid4ReadOnly'
+        name:
+          $ref: '#/components/schemas/name'
+        description:
+          $ref: '#/components/schemas/textLong'
+        voice_id:
+          $ref: '#/components/schemas/uuid4'
+        face_id:
+          $ref: '#/components/schemas/uuid4'
+      required:
+        - name
+    PersonaCreate:
+      type: object
+      title: PersonaCreate
+      description: Persona without id which is server-generated.
+      properties:
+        id:
+          $ref: '#/components/schemas/uuid4ReadOnly'
+        name:
+          $ref: '#/components/schemas/name'
+        description:
+          $ref: '#/components/schemas/textLong'
+        voice_id:
+          $ref: '#/components/schemas/uuid4'
+        face_id:
+          $ref: '#/components/schemas/uuid4'
+      required:        
+        - name

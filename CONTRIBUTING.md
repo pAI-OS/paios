@@ -1,4 +1,4 @@
-# Contributing to Kwaai's Personal AI Operating System (pAI-OS)
+# Contributing to Personal AI Operating System (pAI-OS)
 
 Thank you for your interest in contributing to pAI-OS! We welcome contributions from the community to help make pAI-OS even better.
 
@@ -46,7 +46,7 @@ By contributing to pAI-OS, you acknowledge that your contributions will be licen
 
 ## Contact
 
-If you have any questions or need further assistance, please reach out to the project maintainers at [contact@kwaai.ai](mailto:contact@kwaai.ai).
+If you have any questions or need further assistance, please reach out to the project maintainers at [contact@paios.org](mailto:contact@paios.org).
 
 We appreciate your contributions to pAI-OS!
 

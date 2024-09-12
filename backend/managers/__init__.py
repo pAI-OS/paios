@@ -1,20 +1,22 @@
 from .AbilitiesManager import AbilitiesManager
 from .AssetsManager import AssetsManager
-from .ChannelsManager import ChannelsManager
+from .ResourcesManager import ResourcesManager
 from .ConfigManager import ConfigManager
 from .DownloadsManager import DownloadsManager
 from .UsersManager import UsersManager
 from .AuthManager import AuthManager
+from .PersonasManager import PersonasManager
 
 # List of manager classes
 manager_classes = [
     AbilitiesManager,
     AssetsManager,
-    ChannelsManager,
+    ResourcesManager,
     ConfigManager,
     DownloadsManager,
     UsersManager,
     AuthManager
+    PersonasManager
 ]
 
 # Initialize the managers dynamically

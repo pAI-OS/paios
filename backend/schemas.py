@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
 
+
 # We have *Create schemas because API clients ideally don't set the id field, it's set by the server
 # Alternatively we could have made the id optional but then we would have to check if it's set by the client
 
@@ -11,7 +12,7 @@ class ConfigBaseSchema(BaseModel):
 class ConfigSchema(ConfigBaseSchema):
     key: str
 
-# Channel schemas
+# Resource schemas
 class ChannelBaseSchema(BaseModel):
     name: str
     uri: str
@@ -20,6 +21,19 @@ class ChannelCreateSchema(ChannelBaseSchema):
     pass
 
 class ChannelSchema(ChannelBaseSchema):
+    id: str
+
+# Persona schemas
+class PersonaBaseSchema(BaseModel):
+    name: str
+    description: Optional[str] = None
+    voice_id: str = None
+    face_id: str = None
+
+class PersonaCreateSchema(PersonaBaseSchema):
+    pass
+
+class PersonaSchema(PersonaBaseSchema):
     id: str
 
 # User schemas

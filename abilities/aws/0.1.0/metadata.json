@@ -1,0 +1,30 @@
+{
+    "id": "aws",
+    "name": "Amazon Web Services",
+    "versions": {
+        "package": "0.1.0",
+        "product": "1.35"
+    },
+    "description": "Amazon Web Services (AWS) integration",
+    "author": {
+        "name": "Amazon Web Services (AWS)",
+        "url": "https://aws.amazon.com/sdk-for-python/"
+    },
+    "maintainer": {
+        "name": "Sam Johnston",
+        "email": "samj@samj.net",
+        "url": "https://samjohnston.org"
+    },
+    "language": "python",
+    "license": "MIT",
+    "dependencies": [
+            {
+                "type": "python",
+                "id": "boto3",
+                "name": "Boto3",
+                "versions": {
+                    "required": ">=1.35.0"
+                }
+            }
+    ]
+}

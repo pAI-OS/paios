@@ -1,6 +1,6 @@
 # pAI-OS Abilities
 
-Welcome to Kwaai's Personal AI Operating System (pAI-OS) abilities. This directory is a comprehensive library of modular components, known as "abilities," which extend the core functionality of pAI-OS. Each ability is housed in its own directory and serves a specific purpose, from data storage solutions to protocol support and advanced AI integrations.
+The Personal Artificial Intelligence Operating System (pAI-OS) abilities directory is a library of modular components, known as "abilities," which extend the core functionality of pAI-OS. Each ability is housed in its own directory and serves a specific purpose, from data storage solutions to protocol support and advanced AI integrations.
 
 ## Overview
 

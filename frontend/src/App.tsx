@@ -3,7 +3,7 @@ import { Admin, Resource } from 'react-admin';
 import { UserList, UserCreate, UserEdit, UserShow } from "./users";
 import { AbilityList, AbilityShow } from "./abilities";
 import { AssetList, AssetCreate, AssetEdit, AssetShow } from "./assets";
-import { ChannelList, ChannelShow } from "./channels";
+import { ChannelList, ChannelShow } from "./resources";
 import { DownloadsList } from "./downloads";
 import { dataProvider } from "./dataProvider";
 import DocIcon from "@mui/icons-material/Book";
@@ -26,7 +26,7 @@ export const App = () => (
     <Resource name="assets" list={AssetList} create={AssetCreate} edit={AssetEdit} show={AssetShow} recordRepresentation='name' icon={DocIcon} />
     <Resource name="users" list={UserList} create={UserCreate} edit={UserEdit} show={UserShow} recordRepresentation='name' icon={UserIcon} />
     <Resource name="abilities" list={AbilityList} show={AbilityShow} recordRepresentation='id' icon={ExtensionIcon} />
-    <Resource name="channels" list={ChannelList} show={ChannelShow} recordRepresentation='id' icon={SyncAltIcon} />
+    <Resource name="resources" list={ChannelList} show={ChannelShow} recordRepresentation='id' icon={SyncAltIcon} />
     <Resource name="downloads" list={DownloadsList} />
   </Admin>
 );

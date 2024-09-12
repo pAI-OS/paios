@@ -2,8 +2,9 @@
 # otherwise connexion will throw "TypeError: 'module' object is not callable"
 from .AbilitiesView import AbilitiesView
 from .AssetsView import AssetsView
-from .ChannelsView import ChannelsView
+from .ResourcesView import ResourcesView
 from .ConfigView import ConfigView
 from .DownloadsView import DownloadsView
 from .UsersView import UsersView
 from .AuthView import AuthView
+from .PersonasView import PersonasView
