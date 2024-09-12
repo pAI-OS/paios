@@ -10,7 +10,14 @@ class Resource(Base):
     __tablename__ = "resource"
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False)
-    uri = Column(String, nullable=False)
+    uri = Column(String, nullable=True)
+    description = Column(String, nullable=True)
+    resource_llm_id = Column(String, nullable=True)
+    persona_id = Column(String, nullable=True)
+    status = Column(String, nullable=True)
+    allow_edit = Column(String, nullable=True)
+    kind = Column(String, nullable=False)
+    icon= Column(String, nullable=True)
 
 class User(Base):
     __tablename__ = "user"
@@ -34,3 +41,39 @@ class Persona(Base):
     description = Column(String, nullable=True)
     voice_id = Column(String, nullable=True)
     face_id = Column(String, nullable=True)
+
+class Voice(Base):
+    __tablename__ = "voice"
+    id = Column(String, primary_key=True)
+    voice_id = Column(String, nullable=False)
+    name = Column(String, nullable=False)
+
+class Face(Base):
+    __tablename__ = "face"
+    id = Column(String, primary_key=True)
+    name = Column(String, nullable=False)
+
+class File(Base):
+    __tablename__ = "file"
+    id = Column(String, primary_key=True)
+    name = Column(String, nullable=False)
+    assistant_id = Column(String, nullable=False)
+    num_chunks = Column(String, nullable=False)
+
+class Message(Base):
+    __tablename__ = "message"
+    id = Column(String, primary_key=True)
+    assistant_id = Column(String, nullable=False)
+    conversation_id = Column(String, nullable=False)
+    timestamp = Column(String, nullable=False)
+    prompt = Column(String, nullable=False)
+    chat_response = Column(String, nullable=False)
+
+class Conversation(Base):
+    __tablename__ = "conversation"
+    id = Column(String, primary_key=True)
+    name = Column(String, nullable=False)
+    created_timestamp = Column(String, nullable=False)
+    last_updated_timestamp = Column(String, nullable=False)
+    archive = Column(String, nullable=False)
+    assistant_id = Column(String, nullable=False)
