@@ -1,4 +1,4 @@
-import random
+import secrets
 import string
 from threading import Lock
 from sqlalchemy import select, insert, update, delete, func
@@ -9,7 +9,7 @@ from typing import List, Tuple, Optional, Dict, Any
 
 def generate_share_id():
     # SHARE_ID_REGEX = '[a-z]{3}-[a-z]{3}-[a-z]{3}'
-    return '-'.join(''.join(random.choices(string.ascii_lowercase, k=3)) for _ in range(3))
+    return '-'.join(''.join(secrets.choice(string.ascii_lowercase) for _ in range(3)) for _ in range(3))
 
 class SharesManager:
     _instance = None
