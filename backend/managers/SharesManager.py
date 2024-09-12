@@ -1,13 +1,15 @@
-from uuid import uuid4
+import random
+import string
 from threading import Lock
 from sqlalchemy import select, insert, update, delete, func
 from backend.models import Share
 from backend.db import db_session_context
 from backend.schemas import ShareCreateSchema, ShareSchema
 from typing import List, Tuple, Optional, Dict, Any
-import rstr
 
-SHARE_ID_REGEX = '[a-z]{3}-[a-z]{3}-[a-z]{3}'
+def generate_share_id():
+    # SHARE_ID_REGEX = '[a-z]{3}-[a-z]{3}-[a-z]{3}'
+    return '-'.join(''.join(random.choices(string.ascii_lowercase, k=3)) for _ in range(3))
 
 class SharesManager:
     _instance = None
@@ -31,7 +33,7 @@ class SharesManager:
         async with db_session_context() as session:
             new_key = None
             while not new_key:
-                new_key = rstr.xeger(SHARE_ID_REGEX)
+                new_key = generate_share_id()
                 result = await session.execute(select(Share).filter(Share.id == new_key))
                 share = result.scalar_one_or_none()
                 if share:  # new_key already in use

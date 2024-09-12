@@ -17,4 +17,3 @@ aioftp
 aiofiles
 structlog
 greenlet
-rstr
