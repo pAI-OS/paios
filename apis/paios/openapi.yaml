@@ -282,7 +282,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ChannelCreate'
+              $ref: '#/components/schemas/ResourceCreate'
   '/resources/{id}':
     get:
       tags:
@@ -799,6 +799,10 @@ components:
       properties:
         id:
           $ref: '#/components/schemas/uuid4'
+    boolean_str:
+      type: string
+      example: 'True'
+      pattern: ^True|False$    
     Ability:
       type: object
       title: Ability
@@ -919,19 +923,65 @@ components:
           $ref: '#/components/schemas/name'
         uri:
           $ref: '#/components/schemas/uri'
-      required:
-        - id
-        - name
-        - uri
-    ChannelCreate:
+        description:
+          $ref: '#/components/schemas/textLong'
+        resource_llm_id:
+          $ref: '#/components/schemas/uuid4'
+        persona_id:
+          $ref: '#/components/schemas/uuid4'
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/relativePath'
+        status:
+          type: string
+          enum:
+            - public
+            - draft
+            - private
+          example: public
+        allow_edit:
+          $ref: '#/components/schemas/boolean_str'
+        kind:
+          type: string
+          enum:
+            - llm
+            - assistant 
+          example: assistant      
+    ResourceCreate:
       type: object
-      title: Resource
+      title: Resource Create
       description: Resources (input/output)
       properties:
         name:
           $ref: '#/components/schemas/name'
         uri:
           $ref: '#/components/schemas/uri'
+        description:
+          $ref: '#/components/schemas/textLong'
+        resource_llm_id:
+          $ref: '#/components/schemas/uuid4'
+        persona_id:
+          $ref: '#/components/schemas/uuid4'
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/relativePath'
+        status:
+          type: string
+          enum:
+            - public
+            - draft
+            - private
+          example: public
+        allow_edit:
+          $ref: '#/components/schemas/boolean_str'
+        kind:
+          type: string
+          enum:
+            - llm
+            - assistant 
+          example: assistant 
       required:
         - name
         - uri
@@ -1079,3 +1129,25 @@ components:
           $ref: '#/components/schemas/uuid4'
       required:        
         - name
+    Voice:
+      type: object
+      title: Voice
+      properties:
+        id:
+          $ref: '#/components/schemas/textShort'
+        name:
+          $ref: '#/components/schemas/textShort'
+      required:
+        - id
+        - name
+    Face:
+      type: object
+      title: Face
+      properties:
+        id:
+          $ref: '#/components/schemas/uuid4ReadOnly'
+        name:
+          $ref: '#/components/schemas/textShort'
+      required:
+        - id
+        - name    
