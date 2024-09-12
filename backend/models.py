@@ -1,45 +1,38 @@
-from sqlalchemy import Column, String, ForeignKey
-from backend.db import Base
-from sqlalchemy.types import DateTime, Boolean
+from sqlmodel import Field
+from backend.db import SQLModelBase
 
-class Config(Base):
-    __tablename__ = "config"
-    key = Column(String, primary_key=True)
-    value = Column(String, nullable=True)
+class Config(SQLModelBase, table=True):
+    key: str = Field(primary_key=True)
+    value: str | None = Field(default=None)
 
-class Resource(Base):
-    __tablename__ = "resource"
-    id = Column(String, primary_key=True)
-    name = Column(String, nullable=False)
-    uri = Column(String, nullable=False)
+class Resource(SQLModelBase, table=True):
+    id: str = Field(primary_key=True)
+    name: str = Field()
+    uri: str = Field()
 
-class User(Base):
-    __tablename__ = "user"
-    id = Column(String, primary_key=True)
-    name = Column(String, nullable=False)
-    email = Column(String, nullable=False)
+class User(SQLModelBase, table=True):
+    id: str = Field(primary_key=True)
+    name: str = Field()
+    email: str = Field()
 
-class Asset(Base):
-    __tablename__ = "asset"
-    id = Column(String, primary_key=True)
-    user_id = Column(String, nullable=True)
-    title = Column(String, nullable=False)
-    creator = Column(String, nullable=True)
-    subject = Column(String, nullable=True)
-    description = Column(String, nullable=True)    
+class Asset(SQLModelBase, table=True):
+    id: str = Field(primary_key=True)
+    user_id: str | None = Field(default=None, foreign_key="user.id")
+    title: str = Field()
+    creator: str | None = Field(default=None)
+    subject: str | None = Field(default=None)
+    description: str | None = Field(default=None)
 
-class Persona(Base):
-    __tablename__ = "persona"
-    id = Column(String, primary_key=True)
-    name = Column(String, nullable=False)
-    description = Column(String, nullable=True)
-    voice_id = Column(String, nullable=True)
-    face_id = Column(String, nullable=True)
+class Persona(SQLModelBase, table=True):
+    id: str = Field(primary_key=True)
+    name: str = Field()
+    description: str | None = Field(default=None)
+    voice_id: str | None = Field(default=None)
+    face_id: str | None = Field(default=None)
 
-class Share(Base):
-    __tablename__ = "share"
-    id = Column(String, primary_key=True)  # the short URL tag, eg abc-def-ghi
-    resource_id = Column(String, ForeignKey("resource.id"), nullable=False)  # the bot ID
-    user_id = Column(String, nullable=True)  # the user granted access (optional)
-    expiration_dt = Column(DateTime, nullable=True)  # the link expiration date/time (optional)
-    is_revoked = Column(Boolean, nullable=False)
+class Share(SQLModelBase, table=True):
+    id = str = Field(primary_key=True)  # the short URL tag, eg abc-def-ghi
+    resource_id = str = Field(foreign_key="resource.id")  # the bot ID
+    user_id = str | None = Field(default=None)  # the user granted access (optional)
+    expiration_dt = DateTime | None = Field(default=None)  # the link expiration date/time (optional)
+    is_revoked = Boolean = Field()
