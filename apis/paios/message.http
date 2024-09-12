@@ -1,0 +1,11 @@
+# API testing with Visual Studio Code - REST Client Extention
+
+POST http://localhost:3080/api/v1/messages
+Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
+Content-Type: application/json
+
+{
+  "assistant_id":"0c302893-e695-413e-abf7-06e4cd2ef923",   
+  "conversation_id":"0c302893-e695-413e-abf7-06e4cd2ef9ac",   
+  "prompt": "Hello, how can I do a factorization?"
+}
