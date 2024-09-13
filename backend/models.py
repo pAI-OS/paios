@@ -1,8 +1,9 @@
-from sqlalchemy import Column, String, ForeignKey
+from datetime import datetime
+from sqlalchemy import Column, String, ForeignKey, Boolean
 from backend.db import Base
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import DateTime
-from sqlmodel import Field
+from sqlmodel import Field, Relationship
 from backend.db import SQLModelBase
 
 class Config(SQLModelBase, table=True):
@@ -14,31 +15,29 @@ class Resource(SQLModelBase, table=True):
     name: str = Field()
     uri: str = Field()
 
-class User(Base):
-    __tablename__ = "user"
-    id = Column(String, primary_key=True)
-    name = Column(String, nullable=True)
-    email = Column(String, nullable=False)
-    passkey_user_id = Column(String, nullable=False)
-    creds = relationship('PublicKeyCred', backref='owner')
-    sessions = relationship("Session", back_populates="user")
+class User(SQLModelBase, table=True):
+    id: str = Field(primary_key=True)
+    name: str = Field()
+    email: str = Field()
+    passkey_user_id: str = Field()
+    creds: list["PublicKeyCred"] = Relationship(back_populates="owner")
+    sessions: list["Session"] = Relationship(back_populates="user")
 
-class PublicKeyCred(Base):
-    __tablename__ = "public_key_cred"
-    id = Column(String, primary_key=True)
-    public_key = Column(String, nullable=False)
-    passkey_user_id = Column(String, ForeignKey("user.passkey_user_id"), nullable=False)
-    backed_up = Column(String, nullable=False)
-    name = Column(String, nullable=True)
-    transports = Column(String)
+class PublicKeyCred(SQLModelBase, table=True):
+    id: str = Field(primary_key=True)
+    public_key: str = Field()
+    passkey_user_id: str = Field(foreign_key="user.passkey_user_id")
+    backed_up: str = Field()
+    name: str | None = Field(default=None)
+    transports: str | None = Field(default=None)
+    owner: User = Relationship(back_populates="creds")
 
-class Session(Base):
-    __tablename__ = "session"
-    id = Column(String, primary_key=True)
-    user_id = Column(String, ForeignKey("user.id"), nullable=False)
-    token = Column(String, nullable=False)
-    expires_at = Column(DateTime, nullable=False)
-    user = relationship("User", back_populates="sessions")
+class Session(SQLModelBase, table=True):
+    id: str = Field(primary_key=True)
+    user_id: str = Field(foreign_key="user.id")
+    token: str = Field()
+    expires_at: datetime = Field()
+    user: User = Relationship(back_populates="sessions")
 
 class Asset(SQLModelBase, table=True):
     id: str = Field(primary_key=True)
@@ -54,3 +53,10 @@ class Persona(SQLModelBase, table=True):
     description: str | None = Field(default=None)
     voice_id: str | None = Field(default=None)
     face_id: str | None = Field(default=None)
+
+class Share(SQLModelBase, table=True):
+    id: str = Field(primary_key=True)  # the short URL tag, eg abc-def-ghi
+    resource_id: str = Field(foreign_key="resource.id")  # the bot ID
+    user_id: str | None = Field(default=None, foreign_key="user.id")  # the user granted access (optional)
+    expiration_dt: datetime | None = Field(default=None)  # the link expiration date/time (optional)
+    is_revoked: bool = Field(default=False)
