@@ -6,7 +6,7 @@ from langchain_chroma import Chroma
 from langchain_ollama import OllamaEmbeddings
 from common.paths import chroma_db_path
 from pathlib import Path
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain
 import shutil
@@ -16,13 +16,11 @@ from backend.models import File
 from backend.db import db_session_context
 from sqlalchemy import delete, select, func
 from pathlib import Path
-from typing import List, Tuple, Optional, Dict, Any
+from typing import List, Tuple, Optional, Dict, Any, Union
 from backend.managers import ResourcesManager, PersonasManager
 from distutils.util import strtobool
 import os
 import logging
-from typing import Union
-from langchain.prompts import PromptTemplate
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +51,7 @@ class RagManager:
 
         for path in path_files:
             loader = PyPDFLoader(path)
-            docs = loader.load() # Return a list of documents for each file
+            docs = loader.load()
             all_docs.append(docs)
             file_id = str(uuid4())
             all_ids.append(file_id)            

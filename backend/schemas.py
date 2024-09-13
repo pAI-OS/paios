@@ -76,14 +76,20 @@ class AssetSchema(AssetBaseSchema):
 
 # Voice schemas
 class VoiceBaseSchema(BaseModel):
-    voice_id: str
+    xi_id: str
     name: str
+    text_to_speak: Optional[str] = None
+    image_url: Optional[str] = None
+    sample_url: Optional[str] = None         
+    class Config:
+        orm_mode = True
+        from_attributes = True
 
 class VoiceCreateSchema(VoiceBaseSchema):
-    id: str
+    pass
 
 class VoiceSchema(VoiceBaseSchema):
-    pass
+    id:str
 
 # Face schemas
 class FaceBaseSchema(BaseModel):

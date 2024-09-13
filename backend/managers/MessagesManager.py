@@ -4,13 +4,10 @@ from sqlalchemy import select
 from backend.models import Message, Conversation, Resource
 from backend.db import db_session_context
 from backend.schemas import MessageSchema, MessageCreateSchema
-from typing import List, Tuple, Optional, Dict, Any
+from typing import Tuple, Optional
 from backend.utils import get_current_timestamp
 from backend.managers.RagManager import RagManager
-
 from langchain_community.llms import Ollama
-from langchain_core.prompts import ChatPromptTemplate
-from langchain.chains.combine_documents import create_stuff_documents_chain
 import os
 
 class MessagesManager:

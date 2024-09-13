@@ -45,8 +45,10 @@ class Persona(Base):
 class Voice(Base):
     __tablename__ = "voice"
     id = Column(String, primary_key=True)
-    voice_id = Column(String, nullable=False)
+    xi_id = Column(String, nullable=False)
     name = Column(String, nullable=False)
+    image_url = Column(String, nullable=True)
+    sample_url = Column(String, nullable=True)
 
 class Face(Base):
     __tablename__ = "face"
