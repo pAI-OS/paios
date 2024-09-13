@@ -1059,6 +1059,29 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ConversationCreate'
+  /voices:
+    get:
+      summary: Retrieve all the xi_labs voices
+      tags:
+        - Voice Management
+      description: Retrieve the information of all the xi_labs voices
+      operationId: backend.api.VoicesFacesView.search
+      parameters:
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/range'
+        - $ref: '#/components/parameters/filter'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Voice'
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
 tags:
   - name: Abilities Management
     description: Installation and configuration of abilities
@@ -1083,6 +1106,8 @@ tags:
     description: Management of Messages
   - name: Conversation Management
     description: Management of conversations
+  - name: Voice Management
+    description: Management of voices
 components:
   securitySchemes:
     jwt:
@@ -1271,6 +1296,14 @@ components:
       format: date-time
       example: "2023-07-29T12:34:56Z"
       pattern: ^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$    
+    voice_image_url:
+      type: string      
+      example: '/voice-icon.png'
+      pattern: ^\/.*\.png$
+    sample_mp3_url:
+      type: string      
+      example: '/Laura.mp3'
+      pattern: ^\/.*\.mp3$   
     Ability:
       type: object
       title: Ability
@@ -1670,12 +1703,40 @@ components:
       title: Voice
       properties:
         id:
+          $ref: '#/components/schemas/uuid4ReadOnly'
+        xi_id:
           $ref: '#/components/schemas/textShort'
         name:
           $ref: '#/components/schemas/textShort'
+        text_to_speak:
+          type: string
+          nullable: true
+        image_url:
+          $ref: '#/components/schemas/voice_image_url'
+          nullable: true
+        sample_url:
+          $ref: '#/components/schemas/sample_mp3_url'
+          nullable: true
+    VoiceCreate:
+      type: object
+      title: VoiceCreate
+      description: Voice without id which is server-generated.
+      properties:                  
+        xi_id:
+          $ref: '#/components/schemas/textShort'
+        name:
+          $ref: '#/components/schemas/textShort'
+        text_to_speak:
+          type: string
+          nullable: true
+        image_url:
+          $ref: '#/components/schemas/voice_image_url'
+          nullable: true
+        sample_url:
+          $ref: '#/components/schemas/sample_mp3_url'
+          nullable: true          
       required:
         - id
-        - name
     Face:
       type: object
       title: Face

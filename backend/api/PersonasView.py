@@ -16,9 +16,12 @@ class PersonasView:
         return JSONResponse(persona.dict(), status_code=200)
 
     async def post(self, body: PersonaCreateSchema):
-        id = await self.pm.create_persona(body)
-        persona = await self.pm.retrieve_persona(id)
-        return JSONResponse(persona.dict(), status_code=201, headers={'Location': f'{api_base_url}/personas/{id}'})
+        valid_msg = await self.pm.validate_persona_data(body)
+        if valid_msg == None:
+            voice_id = await self.pm.create_persona(body)
+            persona = await self.pm.retrieve_persona(voice_id)
+            return JSONResponse(persona.dict(), status_code=201, headers={'Location': f'{api_base_url}/personas/{persona.id}'})
+        return JSONResponse({"error": " Invalid persona: " + valid_msg}, status_code=400)
 
     async def put(self, id: str, body: PersonaCreateSchema):
         await self.pm.update_persona(id, body)
