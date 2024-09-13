@@ -1,3 +1,10 @@
+.paios-heading {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    color: #333;
+    margin-bottom: 30px;
+}
+
 .auth-container {
     display: flex;
     flex-direction: column;
@@ -9,11 +16,16 @@
 
 .logo {
     width: 150px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 h1 {
     font-size: 2em;
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: 1.8em;
     margin-bottom: 20px;
 }
 

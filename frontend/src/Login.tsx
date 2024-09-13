@@ -45,8 +45,9 @@ const Login: React.FC = () => {
 
     return (
         <div className="auth-container">
+            <h1 className="paios-heading">pAI-OS</h1>
             <img src={logo} alt="Kwaai Logo" className="logo" />
-            <h1>{isRegistering ? "Register" : "Login"}</h1>
+            <h2>{isRegistering ? "Register" : "Login"}</h2>
             <form onSubmit={handleUser}>
                 <input type="email" id="email" placeholder="Email" className="input-field" onChange={handleChange} value={email} />
                 <button type="submit" className="auth-button">{isRegistering ? "Register" : "Login"}</button>
