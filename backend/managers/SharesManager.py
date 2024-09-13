@@ -7,9 +7,9 @@ from backend.db import db_session_context
 from backend.schemas import ShareCreateSchema, ShareSchema
 from typing import List, Tuple, Optional, Dict, Any
 
-def generate_share_id():
-    # SHARE_ID_REGEX = '[a-z]{3}-[a-z]{3}-[a-z]{3}'
-    return '-'.join(''.join(secrets.choice(string.ascii_lowercase) for _ in range(3)) for _ in range(3))
+def generate_share_id(num_blocks = 3, block_size = 4):
+    # `abcd-efgh-ijkl` format by default
+    return '-'.join(''.join(secrets.choice(string.ascii_lowercase) for _ in range(block_size)) for _ in range(num_blocks))
 
 class SharesManager:
     _instance = None
