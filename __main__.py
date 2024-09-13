@@ -40,6 +40,14 @@ if __name__ == "__main__":
     from app import create_app
     app = create_app()
 
+    # Define host and port
+    host = "localhost"
+    port = 8443
+
+    # Log connection details
+    logger.info(f"You can access pAI-OS at https://{host}:{port}.")
+    logger.info("Bypass certificate warnings if using self-signed certificates.")
+
     # Run the app
     import uvicorn
     
@@ -50,8 +58,8 @@ if __name__ == "__main__":
     try:
         uvicorn.run(
             "app:create_app", 
-            host="localhost", 
-            port=8443, 
+            host=host, 
+            port=port, 
             factory=True, 
             workers=1, 
             reload=True, 

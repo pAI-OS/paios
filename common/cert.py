@@ -83,7 +83,7 @@ def check_cert(key_passphrase: str | None = None):
         except Exception as e:
             logger.error(f"Error generating certificate and key: {e}")
     else:
-        logger.info(f"Certificate and key already exist at {cert_dir}")
+        logger.info(f"Using existing certificate and key.")
 
 # Example usage
 if __name__ == "__main__":
