@@ -1,27 +1,27 @@
 # API testing with Visual Studio Code - REST Client Extention
 
-POST http://localhost:3080/api/v1/resources
+POST https://localhost:8443/api/v1/resources
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
 {
     "name": "My Resource",
-    "uri": "http://localhost:3080/resources/my-resource"
+    "uri": "https://localhost:8443/resources/my-resource"
 }
 
 ###
-PUT http://localhost:3080/api/v1/resources/llm-api
+PUT https://localhost:8443/api/v1/resources/llm-api
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
 {
     "id": "llm-api",
     "name": "LLM API",
-    "uri": "http://localhost:3080/resources/llm-api"
+    "uri": "https://localhost:8443/resources/llm-api"
 }
 
 ###
-PUT http://localhost:3080/api/v1/resources/imap-sync
+PUT https://localhost:8443/api/v1/resources/imap-sync
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
@@ -33,18 +33,18 @@ Content-Type: application/json
 
 ###
 
-DELETE http://localhost:3080/api/v1/resources/llm-api
+DELETE https://localhost:8443/api/v1/resources/llm-api
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
 ###
 
-GET http://localhost:3080/api/v1/resources/llm-api
+GET https://localhost:8443/api/v1/resources/llm-api
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
 ###
 
-GET http://localhost:3080/api/v1/resources
+GET https://localhost:8443/api/v1/resources
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json

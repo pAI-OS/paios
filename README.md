@@ -39,7 +39,7 @@ python .\paios\scripts\setup_environment.py (only on first run)
 python -m paios
 ```
 
-Visit [http://localhost:3080/](http://localhost:3080/)
+Visit [https://localhost:8443/](https://localhost:8443/)
 
 ### Developers
 
@@ -65,5 +65,5 @@ Run the uvicorn server:
 python -m paios
 ```
 
-Visit [http://localhost:3080/](http://localhost:3080/)
+Visit [https://localhost:8443/](https://localhost:8443/)
 

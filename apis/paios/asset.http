@@ -1,6 +1,6 @@
 # API testing with Visual Studio Code - REST Client Extention
 
-POST http://localhost:3080/api/v1/assets
+POST https://localhost:8443/api/v1/assets
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
@@ -13,7 +13,7 @@ Content-Type: application/json
 
 ###
 
-PUT http://localhost:3080/api/v1/assets/1cbb0bc5-bae2-4b9d-9555-f2282f767047
+PUT https://localhost:8443/api/v1/assets/1cbb0bc5-bae2-4b9d-9555-f2282f767047
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
@@ -26,12 +26,12 @@ Content-Type: application/json
 
 ###
 
-GET http://localhost:3080/api/v1/assets/1cbb0bc5-bae2-4b9d-9555-f2282f767047
+GET https://localhost:8443/api/v1/assets/1cbb0bc5-bae2-4b9d-9555-f2282f767047
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
 ###
 
-DELETE http://localhost:3080/api/v1/assets/1cbb0bc5-bae2-4b9d-9555-f2282f767047
+DELETE https://localhost:8443/api/v1/assets/1cbb0bc5-bae2-4b9d-9555-f2282f767047
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json

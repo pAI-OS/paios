@@ -14,7 +14,7 @@ def create_backend_app():
 
     allow_origins = [
         'http://localhost',
-        'http://localhost:3080',
+        'https://localhost:8443',
         'http://localhost:5173'
     ]
 

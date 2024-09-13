@@ -1,11 +1,11 @@
 # API testing with Visual Studio Code - REST Client Extention
 
-POST http://localhost:3080/api/v1/abilities/chroma/start
+POST https://localhost:8443/api/v1/abilities/chroma/start
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
 ###
 
-POST http://localhost:3080/api/v1/abilities/chroma/stop
+POST https://localhost:8443/api/v1/abilities/chroma/stop
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json

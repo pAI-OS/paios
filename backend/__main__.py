@@ -7,8 +7,16 @@ from pathlib import Path
 base_dir = Path(__file__).parent
 if base_dir not in sys.path:
     sys.path.append(str(base_dir))
+from common.paths import backend_dir, venv_dir, cert_dir
+from common.config import logging_config
+
+# check environment
 from backend.env import check_env
-from common.paths import backend_dir, venv_dir
+check_env()
+
+# set up logging
+from common.log import get_logger
+logger = get_logger(__name__)
 
 def handle_keyboard_interrupt(signum, frame):
     print(f"KeyboardInterrupt (ID: {signum}) has been caught. Cleaning up...")
@@ -17,29 +25,47 @@ def handle_keyboard_interrupt(signum, frame):
 
 def cleanup():
     # Perform any necessary cleanup here
-    print("Performing cleanup tasks...")
+    logger.info("Performing cleanup tasks.")
 
-def main():
+if __name__ == "__main__":
     # Set up signal handlers
     signal.signal(signal.SIGINT, handle_keyboard_interrupt)
     signal.signal(signal.SIGTERM, handle_keyboard_interrupt)
 
-    # Check if the environment is set up and activated before importing dependencies
-    check_env()
-    from starlette.staticfiles import StaticFiles
+    # Ensure certificates are generated
+    from common.cert import check_cert
+    check_cert()
 
     # Create the app
+    logger.info("Creating the app.")
     from app import create_app
     app = create_app()
 
     # Run the app
     import uvicorn
+    
+    cert_path = cert_dir / "cert.pem"
+    key_path = cert_dir / "key.pem"
+    
+    logger.info("Running the app with uvicorn.")
     try:
-        uvicorn.run("app:create_app", host="localhost", port=3080, factory=True, workers=1, reload=True, reload_dirs=[backend_dir], reload_excludes=[venv_dir])
+        uvicorn.run(
+            "app:create_app", 
+            host="localhost", 
+            port=8443, 
+            factory=True, 
+            workers=1, 
+            reload=True, 
+            reload_dirs=[backend_dir], 
+            reload_excludes=[venv_dir], 
+            log_config=logging_config,
+            ssl_certfile=str(cert_path),
+            ssl_keyfile=str(key_path),
+            #ssl_keyfile_password=key_passphrase  # Pass the passphrase if the key is encrypted
+        )
+    except PermissionError as e:
+        logger.error(f"Permission error: {e}. Ensure the application has access to the certificate and key files.")
     except KeyboardInterrupt:
         pass
     finally:
         cleanup()
-
-if __name__ == "__main__":
-    main()

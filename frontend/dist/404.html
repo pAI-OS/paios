@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            max-width: 600px;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            font-size: 3em;
+            margin-bottom: 0.5em;
+        }
+        p {
+            font-size: 1.2em;
+            margin-bottom: 1em;
+        }
+        code {
+            background-color: #e9ecef;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+        }
+        .tip-box {
+            text-align: left;
+            font-size: 0.9em;
+            background-color: #f1f1f1;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="favicon.png" alt="Project Logo" class="logo">
+        <h1>404</h1>
+        <p>Not Found</p>
+        <div class="tip-box">
+            <p>You may have reached this page because the frontend has not been built or are using API-only mode.</p>
+            <p>To build the frontend, run:</p>
+            <p><code>npm run build</code> in the frontend directory.</p>
+            <p>Or, to run a development server, use:</p>
+            <p><code>npm run dev</code> and connect to that instead.</p>
+            <p>Alternatively, you can checkout the <code><a href="https://github.com/pAI-OS/paios/tree/canary">canary</a></code> branch which includes a build.</p>
+        </div>
+    </div>
+</body>
+</html>

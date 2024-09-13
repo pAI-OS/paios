@@ -21,7 +21,7 @@ def add_frontend_app(app):
         app.add_url_rule(
             '/{path:path}', 
             endpoint='frontend', 
-            view_func=StaticFiles(directory=static_dir, html=True)
+            view_func=StaticFiles(directory=static_dir, check_dir=False, html=True)
         )
     else:
         logger.info(f"Skipping serving frontend: {static_dir} directory not found. Options:")
