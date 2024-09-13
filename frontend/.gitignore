@@ -24,3 +24,9 @@ dist-ssr
 
 # local config
 .env
+
+dist/*
+!dist/404.html
+!dist/favicon.png
+
+
