@@ -49,6 +49,13 @@ class Session(SQLModelBase, table=True):
     token: str = Field()
     expires_at: datetime = Field()
     user: User = Relationship(back_populates="sessions")
+    
+class Voice(SQLModelBase, table=True):
+    id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
+    xi_id: str = Field()
+    name: str = Field()
+    image_url: str | None = Field(default=None)
+    sample_url: str | None = Field(default=None)
 
 class Asset(SQLModelBase, table=True):
     id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))

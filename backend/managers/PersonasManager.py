@@ -5,6 +5,7 @@ from backend.models import Persona, Resource
 from backend.db import db_session_context
 from backend.schemas import PersonaSchema, PersonaCreateSchema
 from typing import List, Tuple, Optional, Dict, Any
+from backend.managers.VoicesFacesManager import VoicesFacesManager
 
 class PersonasManager:
     _instance = None
@@ -105,3 +106,11 @@ class PersonasManager:
             total_count = total_count.scalar()
 
             return personas, total_count
+        
+    async def validate_persona_data(self, persona_data: PersonaCreateSchema ) -> Optional[str]:
+        vfm = VoicesFacesManager()       
+        if not persona_data.get("voice_id"):          
+           return "It is mandatory to provide a voice_id for a persona"
+        if not await vfm.retrieve_voice(persona_data.get("voice_id")):
+                return "Not a valid voice_id"
+        return None
