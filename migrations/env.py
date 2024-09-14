@@ -14,7 +14,7 @@ sys.path.append(str(repo_root))
 from common.paths import db_path
 
 # import the models so SQLModel.metadata is populated
-from backend.models import Base
+from backend.models import SQLModelBase
 
 from alembic import context
 
@@ -31,7 +31,7 @@ config.set_main_option("sqlalchemy.url", f"sqlite:///{db_path}")
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = Base.metadata
+target_metadata = SQLModelBase.metadata
 # target_metadata = [Base.met]
 
 # other values from the config, defined by the needs of env.py,
