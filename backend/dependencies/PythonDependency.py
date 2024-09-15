@@ -23,9 +23,8 @@ class PythonDependency(Dependency):
     def refresh_status(self, ability, dependency):
         try:
             package_name = dependency.get('id')
-            required_version = dependency.get('required', '')
-
             versions = dependency.get('versions', {})
+            required_version = versions.get('required', '')
 
             self._refresh_versions(package_name, required_version, versions)
 
