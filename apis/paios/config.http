@@ -1,6 +1,6 @@
 # API testing with Visual Studio Code - REST Client Extention
 
-PUT https://localhost:3080/api/v1/config/openapi-key
+PUT /api/v1/config/openapi-key
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
@@ -8,6 +8,6 @@ Content-Type: application/json
 
 ###
 
-GET https://localhost:3080/api/v1/config/openapi-key
+GET /api/v1/config/openapi-key
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json

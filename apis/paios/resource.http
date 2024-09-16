@@ -1,6 +1,6 @@
 # API testing with Visual Studio Code - REST Client Extention
 
-POST https://localhost:3080/api/v1/resources
+POST /api/v1/resources
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
@@ -10,7 +10,7 @@ Content-Type: application/json
 }
 
 ###
-PUT https://localhost:3080/api/v1/resources/llm-api
+PUT /api/v1/resources/llm-api
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
@@ -21,7 +21,7 @@ Content-Type: application/json
 }
 
 ###
-PUT https://localhost:3080/api/v1/resources/imap-sync
+PUT /api/v1/resources/imap-sync
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
@@ -33,18 +33,18 @@ Content-Type: application/json
 
 ###
 
-DELETE https://localhost:3080/api/v1/resources/llm-api
+DELETE /api/v1/resources/llm-api
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
 ###
 
-GET https://localhost:3080/api/v1/resources/llm-api
+GET /api/v1/resources/llm-api
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
 ###
 
-GET https://localhost:3080/api/v1/resources
+GET /api/v1/resources
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json

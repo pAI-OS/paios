@@ -85,5 +85,5 @@ Run the uvicorn server:
 python -m paios
 ```
 
-Visit [http://localhost:3080/](http://localhost:3080/)
+Visit [https://localhost:3080/](https://localhost:3080/)
 
