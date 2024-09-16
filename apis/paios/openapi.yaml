@@ -613,7 +613,7 @@ paths:
           description: User Not Found
         '409':
           description: Email Already Taken
-  /webauthn/generate-registration-options:
+  /auth/register/start:
     post:
       summary: Generate WebAuthn registration options
       description: Generate registration options for WebAuthn.
@@ -638,7 +638,7 @@ paths:
                 type: object
         '404':
           description: User not found
-  /webauthn/verify-registration:
+  /auth/register/finish:
     post:
       summary: Verify WebAuthn registration
       description: Verify the registration response for WebAuthn.
@@ -665,7 +665,7 @@ paths:
                 type: object
         '404':
           description: User not found
-  /webauthn/generate-authentication-options:
+  /auth/login/start:
     post:
       summary: Generate WebAuthn authentication options
       description: Generate authentication options for WebAuthn.
@@ -690,7 +690,7 @@ paths:
                 type: object
         '404':
           description: User not found
-  /webauthn/verify-authentication:
+  /auth/login/finish:
     post:
       summary: Verify WebAuthn authentication
       description: Verify the authentication response for WebAuthn.
