@@ -6,7 +6,7 @@ import {
 export const login = async (email: string) => {
   try {
     const response = await fetch(
-      "https://localhost:3080/api/v1/auth/login/start",
+      "/api/v1/auth/login/start",
       {
         method: "POST",
         headers: {
@@ -25,7 +25,7 @@ export const login = async (email: string) => {
     const authResp = await startAuthentication(options);
 
     const verifyResponse = await fetch(
-      "https://localhost:3080/api/v1/auth/login/finish",
+      "/api/v1/auth/login/finish",
       {
         method: "POST",
         headers: {
@@ -51,7 +51,7 @@ export const login = async (email: string) => {
 export const register = async (email: string) => {
   try {
     const response = await fetch(
-      "https://localhost:3080/api/v1/auth/register/start",
+      "/api/v1/auth/register/start",
       {
         method: "POST",
         headers: {
@@ -75,7 +75,7 @@ export const register = async (email: string) => {
     const attResp = await startRegistration(options);
 
     const verifyResponse = await fetch(
-      "https://localhost:3080/api/v1/auth/register/finish",
+      "/api/v1/auth/register/finish",
       {
         method: "POST",
         headers: {
@@ -103,7 +103,7 @@ export const register = async (email: string) => {
 };
 
 export const logout = async () => {
-  await fetch("https://localhost:3080/api/v1/auth/logout", {
+  await fetch("/api/v1/auth/logout", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
