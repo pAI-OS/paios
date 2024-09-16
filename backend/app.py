@@ -13,9 +13,9 @@ def create_backend_app():
     connexion_app = AsyncApp(__name__, specification_dir=apis_dir)
     
     allow_origins = [
-        'http://localhost',
-        'http://localhost:3080',
-        'http://localhost:5173'
+        'https://localhost',
+        'https://localhost:3080',
+        'https://localhost:5173'
     ]
 
    # Add CORS middleware

@@ -6,7 +6,7 @@ import {
 export const login = async (email: string) => {
   try {
     const response = await fetch(
-      "http://localhost:3080/api/v1/webauthn/generate-authentication-options",
+      "https://localhost:3080/api/v1/webauthn/generate-authentication-options",
       {
         method: "POST",
         headers: {
@@ -25,7 +25,7 @@ export const login = async (email: string) => {
     const authResp = await startAuthentication(options);
 
     const verifyResponse = await fetch(
-      "http://localhost:3080/api/v1/webauthn/verify-authentication",
+      "https://localhost:3080/api/v1/webauthn/verify-authentication",
       {
         method: "POST",
         headers: {
@@ -51,7 +51,7 @@ export const login = async (email: string) => {
 export const register = async (email: string) => {
   try {
     const response = await fetch(
-      "http://localhost:3080/api/v1/webauthn/generate-registration-options",
+      "https://localhost:3080/api/v1/webauthn/generate-registration-options",
       {
         method: "POST",
         headers: {
@@ -75,7 +75,7 @@ export const register = async (email: string) => {
     const attResp = await startRegistration(options);
 
     const verifyResponse = await fetch(
-      "http://localhost:3080/api/v1/webauthn/verify-registration",
+      "https://localhost:3080/api/v1/webauthn/verify-registration",
       {
         method: "POST",
         headers: {
@@ -103,7 +103,7 @@ export const register = async (email: string) => {
 };
 
 export const logout = async () => {
-  await fetch("http://localhost:3080/api/v1/auth/logout", {
+  await fetch("https://localhost:3080/api/v1/auth/logout", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

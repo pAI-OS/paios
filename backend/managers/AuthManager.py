@@ -84,7 +84,7 @@ class AuthManager:
         
     async def registrationResponse(self, challenge: str, email_id: str,user_id: str, response):
         async with db_session_context() as session:
-            expected_origin = "http://localhost:3080"
+            expected_origin = "https://localhost:3080"
             expected_rpid = "localhost"
 
             res = verify_registration_response(credential=response, 
@@ -152,7 +152,7 @@ class AuthManager:
         
     async def signinResponse(self, challenge: str,email_id:str, response):
         async with db_session_context() as session:
-            expected_origin = "http://localhost:3080"
+            expected_origin = "https://localhost:3080"
             expected_rpid = "localhost"
             credential_result = await session.execute(select(PublicKeyCred).where(PublicKeyCred.id == response["id"]))
             credential = credential_result.scalar_one_or_none()
