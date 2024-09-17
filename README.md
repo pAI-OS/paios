@@ -58,8 +58,7 @@ python .\paios\scripts\setup_environment.py (only on first run)
 .\paios\.venv\Scripts\Activate.ps1
 python -m paios
 ```
-
-Visit [https://localhost:3080/](https://localhost:3080/)
+Visit [https://localhost:8443/](https://localhost:8443/)
 
 ### Developers
 
@@ -85,5 +84,5 @@ Run the uvicorn server:
 python -m paios
 ```
 
-Visit [https://localhost:3080/](https://localhost:3080/)
+Visit [https://localhost:8443/](https://localhost:8443/)
 

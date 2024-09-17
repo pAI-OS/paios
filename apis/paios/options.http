@@ -1,3 +1,3 @@
-OPTIONS https://localhost:3080/api/v1/users
-Origin: https://localhost
+OPTIONS https://localhost:8443/api/v1/users
+Origin: http://localhost
 Access-Control-Request-Method: GET

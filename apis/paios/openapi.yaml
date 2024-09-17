@@ -804,6 +804,85 @@ paths:
           description: Not Found
     parameters:
       - $ref: '#/components/parameters/id'  
+  /shares:
+    get:
+      tags:
+        - Share Management
+      summary: Retrieve all share links
+      description: Get all share links.
+      parameters:
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/range'
+        - $ref: '#/components/parameters/filter'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Share'
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+    post:
+      summary: Create new share link
+      tags:
+        - Share Management
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Missing Required Information
+      description: Create a new share link.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ShareCreate'
+  '/shares/{id}':
+    get:
+      tags:
+        - Share Management
+      summary: Retrieve share link by id
+      description: Retrieve the information of the share with the specified id.
+      parameters:
+        - $ref: '#/components/parameters/shortUrlKey'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Share'
+    put:
+      tags:
+        - Share Management
+      summary: Update share link by id
+      description: Updates the share with the specified id.
+      parameters:
+        - $ref: '#/components/parameters/shortUrlKey'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Share'
+      responses:
+        '200':
+          description: OK
+    delete:
+      tags:
+        - Share Management
+      summary: Delete share link by id
+      description: Delete a share with the specified id.
+      parameters:
+        - $ref: '#/components/parameters/shortUrlKey'
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
 tags:
   - name: Abilities Management
     description: Installation and configuration of abilities
@@ -819,6 +898,8 @@ tags:
     description: Management of user accounts
   - name: Persona Management
     description: Management of personas
+  - name: Share Management
+    description: Management of share links
 components:
   securitySchemes:
     cookieAuth:
@@ -863,6 +944,13 @@ components:
         type: string
         example: api_key
         pattern: '^[a-zA-Z0-9_]+$'
+    shortUrlKey:
+      name: id
+      in: path
+      description: id of the object
+      required: true
+      schema:
+        $ref: '#/components/schemas/shortUrlKey'
     versionOptional:
       name: version
       in: query
@@ -970,6 +1058,15 @@ components:
       description: The hash type and hash of the file separated by colon
       example: 'sha256:404857e776114baada71a08ebd3bba79d721ec7fca99705e7e7b892ae8bc583f'
       pattern: ^[a-z0-9]+:[a-f0-9]{1,128}$
+    shortUrlKey:
+      type: string
+      example: abc-def-ghi
+      pattern: ^[a-z]{3}-[a-z]{3}-[a-z]{3}$
+    shortUrlKeyReadOnly:
+      type: string
+      readOnly: true
+      example: abc-def-ghi
+      pattern: ^[a-z]{3}-[a-z]{3}-[a-z]{3}$
     download:
       type: object
       properties:
@@ -1283,3 +1380,40 @@ components:
           $ref: '#/components/schemas/uuid4'
       required:        
         - name
+    Share:
+      type: object
+      title: Share
+      properties:
+        id:
+          $ref: '#/components/schemas/shortUrlKeyReadOnly'
+        resource_id:
+          $ref: '#/components/schemas/uuid4'
+        user_id:
+          type: string
+          nullable: true
+        expiration_dt:
+          type: string
+          format: date-time
+          nullable: true
+        is_revoked:
+          type: boolean
+      required:
+        - id
+        - resource_id
+    ShareCreate:
+      type: object
+      title: ShareCreate
+      description: Share without id which is server-generated.
+      properties:
+        resource_id:
+          $ref: '#/components/schemas/uuid4'
+        user_id:
+          $ref: '#/components/schemas/uuid4'
+        expiration_dt:
+          type: string
+          format: date-time
+        is_revoked:
+          type: boolean
+          example: false
+      required:        
+        - resource_id

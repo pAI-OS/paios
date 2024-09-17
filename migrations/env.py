@@ -15,7 +15,6 @@ from common.paths import db_path
 
 # import the models so SQLModel.metadata is populated
 from backend.models import SQLModelBase
-
 from alembic import context
 
 # this is the Alembic Config object, which provides
@@ -58,6 +57,7 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        include_schemas=True,
     )
 
     with context.begin_transaction():
@@ -79,7 +79,9 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection,
+            target_metadata=target_metadata,
+            include_schemas=True,
         )
 
         with context.begin_transaction():

@@ -1,3 +1,4 @@
+-r ../common/requirements.txt
 python-dotenv
 pydantic
 requests

@@ -1,4 +1,5 @@
-from pydantic import BaseModel
+from datetime import datetime
+from pydantic import BaseModel, field_serializer
 from typing import Optional
 
 
@@ -60,7 +61,8 @@ class AssetCreateSchema(AssetBaseSchema):
 
 class AssetSchema(AssetBaseSchema):
     id: str
-
+  
+ #Auth schemas
 class RegistrationOptions(BaseModel):
     email: str
 
@@ -77,3 +79,29 @@ class VerifyAuthentication(BaseModel):
     email: str
     auth_resp: dict
     challenge: str
+      
+# Share schemas
+class ShareBaseSchema(BaseModel):
+    resource_id: str
+    user_id: Optional[str] = None
+    expiration_dt: Optional[datetime] = None
+    is_revoked: Optional[bool] = False
+
+    @field_serializer('user_id')
+    def serialize_user_id(self, user_id: str, _info):
+        if user_id:
+            return user_id
+        else:
+            return ""
+
+    @field_serializer('expiration_dt', when_used='unless-none')
+    def serialize_expiration_dt(self, dt: datetime, _info):
+        if dt:
+            return dt.strftime('%Y-%m-%dT%H:%M:%SZ')
+
+
+class ShareCreateSchema(ShareBaseSchema):
+    pass
+
+class ShareSchema(ShareBaseSchema):
+    id: str

@@ -1,6 +1,6 @@
 # API testing with Visual Studio Code - REST Client Extention
 
-POST /api/v1/users
+POST https://localhost:8443/api/v1/users
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
@@ -10,7 +10,7 @@ Content-Type: application/json
 }
 
 ###
-PUT /api/v1/users/5bae4a90-ce69-4483-86ef-d723258f21e5
+PUT https://localhost:8443/api/v1/users/5bae4a90-ce69-4483-86ef-d723258f21e5
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
@@ -21,7 +21,7 @@ Content-Type: application/json
 }
 
 ###
-PUT /api/v1/users/1cbb0bc5-bae2-4b9d-9555-f2282f767047
+PUT https://localhost:8443/api/v1/users/1cbb0bc5-bae2-4b9d-9555-f2282f767047
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
@@ -33,30 +33,30 @@ Content-Type: application/json
 
 ###
 
-DELETE /api/v1/users/5bae4a90-ce69-4483-86ef-d723258f21e5
+DELETE https://localhost:8443/api/v1/users/5bae4a90-ce69-4483-86ef-d723258f21e5
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
 ###
 
-DELETE /api/v1/users/1cbb0bc5-bae2-4b9d-9555-f2282f767047
+DELETE https://localhost:8443/api/v1/users/1cbb0bc5-bae2-4b9d-9555-f2282f767047
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
 ###
 
-GET /api/v1/users/5bae4a90-ce69-4483-86ef-d723258f21e5
+GET https://localhost:8443/api/v1/users/5bae4a90-ce69-4483-86ef-d723258f21e5
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
 ###
 
-GET /api/v1/users/1cbb0bc5-bae2-4b9d-9555-f2282f767047
+GET https://localhost:8443/api/v1/users/1cbb0bc5-bae2-4b9d-9555-f2282f76704
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
 ###
 
-GET /api/v1/users
+GET https://localhost:8443/api/v1/users
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json

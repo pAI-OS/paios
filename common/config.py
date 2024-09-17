@@ -57,10 +57,19 @@ logging_config: dict[str, Any] = {
             "backupCount": 9,
             "encoding": "utf8"
         },
+        "backend.redirector": {
+            "formatter": "standard",
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": log_dir / "redirector.log",
+            "maxBytes": 52428800,
+            "backupCount": 9,
+            "encoding": "utf8"
+        },
     },
     "loggers": {
         "": {"handlers": ["default"], "level": "INFO"}, # root logger
         "connexion": {"handlers": ["connexion"], "level": "DEBUG", "propagate": False},
+        "backend.redirector": {"handlers": ["backend.redirector"], "level": "INFO", "propagate": False},
         "uvicorn": {"handlers": ["uvicorn_default"], "level": "INFO", "propagate": False},
         "uvicorn.error": {"level": "INFO"},
         "uvicorn.access": {"handlers": ["access"], "level": "INFO", "propagate": False},
