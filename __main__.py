@@ -15,6 +15,8 @@ from backend.env import check_env
 check_env()
 
 # set up logging
+from common.log import get_logger
+logger = get_logger(__name__)
 
 def handle_keyboard_interrupt(signum, frame):
     cleanup()
