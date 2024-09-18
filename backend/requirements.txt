@@ -19,3 +19,4 @@ aiofiles
 structlog
 webauthn
 greenlet
+pyjwt

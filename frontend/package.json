@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@simplewebauthn/browser": "^10.0.0",
+    "jwt-decode": "^4.0.0",
     "ra-data-json-server": "^4.16.0",
     "ra-data-simple-rest": "^4.16.17",
     "react": "^18.2.0",

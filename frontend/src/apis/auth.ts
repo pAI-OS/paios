@@ -42,7 +42,7 @@ export const login = async (email: string) => {
     if (verifyResponse.status !== 200) {
       throw new Error("Failed to register user.");
     }
-    return true
+    return await verifyResponse.json()
   } catch (error) {
     throw new Error("Failed to register user");
   }
@@ -93,7 +93,8 @@ export const register = async (email: string) => {
     if (verifyResponse.status !== 200) {
       throw new Error("Failed to register user.");
     }
-    return true
+    const tokenRes = await verifyResponse.json()
+    return tokenRes
   } catch (error) {
     if (error instanceof Error) {
       throw error;

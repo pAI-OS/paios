@@ -7,7 +7,7 @@ export const httpClient = (url: string, options: any = {}) => {
       options.headers = new Headers({ Accept: 'application/json' });
     }
     
-    const token = import.meta.env.VITE_PAIOS_BEARER_TOKEN;
+    const token = localStorage.getItem("token");
     options.headers.set('Authorization', `Bearer ${token}`);
     return fetchUtils.fetchJson(url, options);
   }
