@@ -27,6 +27,7 @@ class MessagesManager:
                 if not hasattr(self, '_initialized'):
                     self._initialized = True
                     self.max_tokens = os.environ.get('MAX_TOKENS')
+                    self.temperature = os.environ.get('TEMPERATURE')
                     
     async def __get_llm_name__(self, assistant_id) -> Tuple[Optional[str], Optional[str]]:
         async with db_session_context() as session:
@@ -65,7 +66,7 @@ class MessagesManager:
                 if error_message:
                     return None, error_message
                 
-                llm = Ollama(model=model_name, num_predict=self.max_tokens)
+                llm = Ollama(model=model_name, num_predict=self.max_tokens, temperature=self.temperature)
                 
                 assistant_id = message_data['assistant_id']
                 query = message_data['prompt']

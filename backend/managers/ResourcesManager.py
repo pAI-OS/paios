@@ -8,7 +8,7 @@ from backend.schemas import ResourceCreateSchema, ResourceSchema
 from typing import List, Tuple, Optional, Dict, Any
 
 # This is a mock of the installed models in the system
-ollama_model=[{'name': 'phi3:latest', 'model': 'phi3:latest', 'modified_at': '2024-08-24T21:57:16.6075173-06:00', 'size': 2176178913, 'digest': '4f222292793889a9a40a020799cfd28d53f3e01af25d48e06c5e708610fc47e9', 'details': {'parent_model': '', 'format': 'gguf', 'family': 'phi3', 'families': ['phi3'], 'parameter_size': '3.8B', 'quantization_level': 'Q4_0'}}]
+ollama_model=[{'name': 'llama3:latest', 'model': 'llama3:latest', 'modified_at': '2024-08-24T21:57:16.6075173-06:00', 'size': 2176178913, 'digest': '4f222292793889a9a40a020799cfd28d53f3e01af25d48e06c5e708610fc47e9', 'details': {'parent_model': '', 'format': 'gguf', 'family': 'phi3', 'families': ['phi3'], 'parameter_size': '3.8B', 'quantization_level': 'Q4_0'}}]
 
 
 class ResourcesManager:
