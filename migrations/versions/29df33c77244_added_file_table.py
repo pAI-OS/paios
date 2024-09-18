@@ -21,8 +21,9 @@ def upgrade() -> None:
     op.create_table('file',
     sa.Column('id', sqlmodel.sql.sqltypes.AutoString(), nullable=False),    
     sa.Column('name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('assistant_id', sqlmodel.sql.sqltypes.AutoString(), nullable=True),   
-    sa.Column('num_chunks', sqlmodel.sql.sqltypes.AutoString(), nullable=False),   
+    sa.Column('assistant_id', sqlmodel.sql.sqltypes.AutoString(), nullable=True),    
+    sa.Column('file_id', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('num_chunks', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
 
