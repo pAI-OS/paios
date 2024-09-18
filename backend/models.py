@@ -84,6 +84,7 @@ class File(SQLModelBase, table=True):
     name: str = Field()
     assistant_id: str | None = Field(default=None, foreign_key="resource.id")
     num_chunks = str | None = Field(default=None)
+    file_id: str = Field()
 
 class Message(SQLModelBase, table=True):
     id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
