@@ -27,9 +27,9 @@ class AuthView:
         if not token:
             return JSONResponse({"message": "Failed"}, status_code=401)
         
-        response = JSONResponse({"message": "Success"}, status_code=200)
+        response = JSONResponse({"message": "Success", "token": token}, status_code=200)
         response.set_cookie(key="challenge",value="", expires=0,secure=True, httponly=True, samesite='strict')
-        response.set_cookie(key="session_token", value=token,secure=True, httponly=True, samesite='strict')
+        
         return response
     
     async def generate_authentication_options(self, body: AuthenticationOptions):
@@ -49,9 +49,8 @@ class AuthView:
         if not token:
             return JSONResponse({"error": "Authentication failed."}, status_code=401)
          
-        response = JSONResponse({"message": "Success"}, status_code=200)
+        response = JSONResponse({"message": "Success", "token": token}, status_code=200)
         response.set_cookie(key="challenge", value="", expires=0, secure=True, httponly=True, samesite='strict')
-        response.set_cookie(key="session_token", value=token, secure=True, httponly=True, samesite='strict')
         return response
         
     async def logout(self):

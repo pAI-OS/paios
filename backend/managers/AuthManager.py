@@ -26,6 +26,8 @@ from webauthn.helpers.cose import COSEAlgorithmIdentifier
 import json
 from datetime import datetime, timedelta
 
+from backend.utils import generate_jwt
+
 class AuthManager:
     _instance = None
     _lock = Lock()
@@ -84,7 +86,7 @@ class AuthManager:
         
     async def registrationResponse(self, challenge: str, email_id: str,user_id: str, response):
         async with db_session_context() as session:
-            expected_origin = "https://localhost:3080"
+            expected_origin = "https://localhost:8443"
             expected_rpid = "localhost"
 
             res = verify_registration_response(credential=response, 
@@ -106,7 +108,7 @@ class AuthManager:
                 await session.refresh(new_user)
                 user = new_user
 
-            _, token = await self.create_session(user.id)
+            # _, token = await self.create_session(user.id)
             
             base64url_cred_id = base64.urlsafe_b64encode(res.credential_id).decode("utf-8").rstrip("=")
             base64url_public_key = base64.urlsafe_b64encode(res.credential_public_key).decode("utf-8").rstrip("=")
@@ -117,6 +119,13 @@ class AuthManager:
             session.add(new_cred)
             await session.commit()
 
+            payload = {
+                "sub": user.id,
+                "iat": datetime.utcnow(),
+                "exp": datetime.utcnow() + timedelta(days=1)
+            }
+
+            token = generate_jwt(payload)
             return token
 
     async def signinRequestOptions(self, email_id: str):
@@ -152,7 +161,7 @@ class AuthManager:
         
     async def signinResponse(self, challenge: str,email_id:str, response):
         async with db_session_context() as session:
-            expected_origin = "https://localhost:3080"
+            expected_origin = "https://localhost:8443"
             expected_rpid = "localhost"
             credential_result = await session.execute(select(PublicKeyCred).where(PublicKeyCred.id == response["id"]))
             credential = credential_result.scalar_one_or_none()
@@ -178,9 +187,15 @@ class AuthManager:
             if not res.new_sign_count != 1:
                 return None
             
-            _, session_token = await self.create_session(user.id)
+            # _, session_token = await self.create_session(user.id)
+            payload = {
+                "sub": user.id,
+                "iat": datetime.utcnow(),
+                "exp": datetime.utcnow() + timedelta(days=1)
+            }
+            token = generate_jwt(payload)
             
-            return session_token
+            return token
 
     async def create_session(self, user_id: str):
         async with db_session_context() as session:

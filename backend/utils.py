@@ -2,6 +2,7 @@ from backend.db import db_session_context
 from sqlalchemy import select
 from backend.models import Session
 from connexion.exceptions import OAuthProblem
+import jwt
 
 # Returns dict with null fields removed (e.g., for OpenAPI spec compliant
 # responses without having to set nullable: true)
@@ -32,3 +33,28 @@ async def apikey_auth(token):
                 raise OAuthProblem("Invalid token")
             
             return {"uid": session_token.user_id}
+    
+def generate_jwt(payload: dict):
+    header = {
+            "alg": "HS256",
+            "typ": "JWT"
+    }
+
+    secret = "362584ff7539d6d15cfd7e10613f30dd38fa535e264a4e252636a2e46e04d9f8"
+
+    encoded_jwt = jwt.encode(payload,secret, algorithm='HS256', headers=header)
+    return encoded_jwt
+
+def decode_token(token):
+    secret = "362584ff7539d6d15cfd7e10613f30dd38fa535e264a4e252636a2e46e04d9f8"
+
+    try:
+        decoded = jwt.decode(token, secret, algorithms=["HS256"])
+        print("DECODE...",decoded)
+        return {"uid": decoded['sub']}
+    
+    except jwt.ExpiredSignatureError:
+        raise OAuthProblem("Token expired")
+    except jwt.InvalidTokenError:
+        raise OAuthProblem("Invalid token")
+    

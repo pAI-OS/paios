@@ -18,7 +18,7 @@ paths:
   /abilities:
     get:
       security:
-        - cookieAuth: []
+        - jwt: []
       tags:
         - Abilities Management
       summary: Retrieve all abilities
@@ -42,7 +42,7 @@ paths:
   '/abilities/{id}':
     get:
       security:
-        - cookieAuth: []
+        - jwt: []
       tags:
         - Abilities Management
       summary: Retrieve ability by id
@@ -59,7 +59,7 @@ paths:
   '/abilities/{id}/install':
     post:
       security:
-        - cookieAuth: []
+        - jwt: []
       tags:
         - Abilities Management
       summary: Install ability
@@ -78,7 +78,7 @@ paths:
   '/abilities/{id}/upgrade':
     post:
       security:
-        - cookieAuth: []
+        - jwt: []
       tags:
         - Abilities Management
       summary: Upgrade ability
@@ -97,7 +97,7 @@ paths:
   '/abilities/{id}/uninstall':
     post:
       security:
-        - cookieAuth: []
+        - jwt: []
       tags:
         - Abilities Management
       summary: Uninstall ability
@@ -115,7 +115,7 @@ paths:
   '/abilities/{id}/start':
     post:
       security:
-        - cookieAuth: []
+        - jwt: []
       tags:
         - Abilities Management
       summary: Start ability
@@ -129,7 +129,7 @@ paths:
   '/abilities/{id}/stop':
     post:
       security:
-        - cookieAuth: []
+        - jwt: []
       tags:
         - Abilities Management
       summary: Stop ability
@@ -143,7 +143,7 @@ paths:
   '/abilities/{id}/dependencies/{dependency_id}/download':
     post:
       security:
-        - cookieAuth: []
+        - jwt: []
       tags:
         - Abilities Management
       summary: Start download
@@ -162,7 +162,7 @@ paths:
   '/abilities/{id}/dependencies/{dependency_id}/install':
     post:
       security:
-        - cookieAuth: []
+        - jwt: []
       tags:
         - Abilities Management
       summary: Start dependency install
@@ -182,7 +182,7 @@ paths:
   /assets:
     get:
       security:
-        - cookieAuth: []
+        - jwt: []
       tags:
         - Asset Management
       summary: Retrieve all assets
@@ -205,7 +205,7 @@ paths:
               $ref: '#/components/headers/X-Total-Count'
     post:
       security:
-        - cookieAuth: []
+        - jwt: []
       summary: Create new asset
       tags:
         - Asset Management
@@ -227,7 +227,7 @@ paths:
   '/assets/{id}':
     get:
       security:
-        - cookieAuth: []
+        - jwt: []
       tags:
         - Asset Management
       summary: Retrieve asset by id
@@ -243,7 +243,7 @@ paths:
                 $ref: '#/components/schemas/Asset'
     put:
       security:
-        - cookieAuth: []
+        - jwt: []
       summary: Update asset by id
       tags:
         - Asset Management
@@ -262,7 +262,7 @@ paths:
               $ref: '#/components/schemas/Asset'
     delete:
       security:
-        - cookieAuth: []
+        - jwt: []
       summary: Delete asset by id
       description: Deletes the asset with the given id.
       tags:
@@ -277,7 +277,7 @@ paths:
   /resources:
     get:
       security:
-        - cookieAuth: []
+        - jwt: []
       tags:
         - Resource Management
       summary: Retrieve all resources
@@ -300,7 +300,7 @@ paths:
               $ref: '#/components/headers/X-Total-Count'
     post:
       security:
-        - cookieAuth: []     
+        - jwt: []     
       summary: Create new resource
       tags:
         - Resource Management
@@ -318,7 +318,7 @@ paths:
   '/resources/{id}':
     get:
       security:
-        - cookieAuth: []
+        - jwt: []
       tags:
         - Resource Management
       summary: Retrieve resource by id
@@ -334,7 +334,7 @@ paths:
                 $ref: '#/components/schemas/Resource'
     put:
       security:
-        - cookieAuth: []
+        - jwt: []
       tags:
         - Resource Management
       summary: Update resource by key
@@ -351,7 +351,7 @@ paths:
           description: OK
     delete:
       security:
-        - cookieAuth: []
+        - jwt: []
       tags:
         - Resource Management
       summary: Delete resource by key
@@ -366,7 +366,7 @@ paths:
   '/config/{key}':
     get:
       security:
-        - cookieAuth: []
+        - jwt: []
       tags:
         - Configuration Management
       summary: Retrieve config by key
@@ -382,7 +382,7 @@ paths:
                 $ref: '#/components/schemas/Config'
     put:
       security:
-        - cookieAuth: []
+        - jwt: []
       tags:
         - Configuration Management
       summary: Update config by key
@@ -399,7 +399,7 @@ paths:
           description: OK
     delete:
       security:
-        - cookieAuth: []
+        - jwt: []
       tags:
         - Configuration Management
       summary: Delete config by key
@@ -414,7 +414,7 @@ paths:
   /downloads:
     get:
       security:
-        - cookieAuth: []
+        - jwt: []
       tags:
         - Downloads Management
       summary: Retrieve all downloads
@@ -437,7 +437,7 @@ paths:
               $ref: '#/components/headers/X-Total-Count'
     post:
       security:
-        - cookieAuth: []
+        - jwt: []
       tags:
         - Downloads Management
       summary: Start new downloads
@@ -463,7 +463,7 @@ paths:
   '/downloads/{id}':
     delete:
       security:
-        - cookieAuth: []
+        - jwt: []
       tags:
         - Downloads Management
       summary: Delete download
@@ -478,7 +478,7 @@ paths:
   '/downloads/{id}/pause':
     post:
       security:
-        - cookieAuth: []
+        - jwt: []
       tags:
         - Downloads Management
       summary: Pause download
@@ -492,7 +492,7 @@ paths:
   '/downloads/{id}/resume':
     post:
       security:
-        - cookieAuth: []
+        - jwt: []
       tags:
         - Downloads Management
       summary: Resume download
@@ -506,7 +506,7 @@ paths:
   /users:
     get:
       security:
-        - cookieAuth: []
+        - jwt: []
       tags:
         - User Management
       summary: Retrieve all users
@@ -529,7 +529,7 @@ paths:
               $ref: '#/components/headers/X-Total-Count'
     post:
       security:
-        - cookieAuth: []
+        - jwt: []
       tags:
         - User Management
       summary: Create new user
@@ -557,7 +557,7 @@ paths:
   '/users/{id}':
     get:
       security:
-        - cookieAuth: []
+        - jwt: []
       tags:
         - User Management
       summary: Retrieve user by id
@@ -575,7 +575,7 @@ paths:
           description: User Not Found
     delete:
       security:
-        - cookieAuth: []
+        - jwt: []
       tags:
         - User Management
       summary: Delete user by id
@@ -589,7 +589,7 @@ paths:
           description: Not Found
     put:
       security:
-        - cookieAuth: []
+        - jwt: []
       tags:
         - User Management
       summary: Update user
@@ -902,11 +902,11 @@ tags:
     description: Management of share links
 components:
   securitySchemes:
-    cookieAuth:
-      type: apiKey
-      in: cookie
-      name: session_token
-      x-apikeyInfoFunc: backend.utils.apikey_auth
+    jwt:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      x-bearerInfoFunc: backend.utils.decode_token
   headers:
     X-Total-Count:
       description: The total number of items
