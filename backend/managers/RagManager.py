@@ -120,19 +120,22 @@ class RagManager:
         system_prompt = (os.environ.get('SYSTEM_PROMPT') + "\n\n{context}" +
                         "\n\nHere is some information about the assistant expertise to help you answer your questions: " +
                         personality_prompt)
-        # system_prompt = (os.environ.get('SYSTEM_PROMPT') + "\n\n{context}" )
-        prompt_template = PromptTemplate(
-            input_variables=["context", "input"],
-            template=system_prompt + "\n\n{input}"
-        )
-        print(f"Prompt: {prompt_template}\n")
+        
+        prompt = ChatPromptTemplate.from_messages([
+            ("system", system_prompt),
+            ("human", "{input}")
+            ])
+        print(f"\n\nPrompt: {prompt}\n")
         vectorstore = await self.initialize_chroma(collection_name)
         retriever = vectorstore.as_retriever()
 
         # Use the LLM chain with the prompt
-        question_answer_chain = create_stuff_documents_chain(llm, prompt_template)
+        question_answer_chain = create_stuff_documents_chain(llm, prompt)
         rag_chain = create_retrieval_chain(retriever, question_answer_chain)
         
+        async for chunk in rag_chain.astream({"input": query}):
+            print("chunk:", chunk)
+        print("Query: ", query)
         # Invoke the RAG chain with query as input
         response = rag_chain.invoke({"input": query})
         return response  
