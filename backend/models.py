@@ -62,6 +62,7 @@ class File(Base):
     assistant_id = Column(String, nullable=False)
     num_chunks = Column(String, nullable=False)
     file_id = Column(String, nullable=False)
+    indexing_status = Column(String, nullable=False)
 
 class Message(Base):
     __tablename__ = "message"

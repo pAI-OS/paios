@@ -19,6 +19,8 @@ class RagIndexingView:
         return JSONResponse(status_code=200, content={"message": "Document added", "files": file_info_list})
 
     async def delete(self, resource_id: str, body: dict = Body(...)):
+        print(f"body ({resource_id}) ={body}")
+        
         file_ids = body.get("file_ids")
         success_chroma_db = await self.rm.delete_documents_from_chroma(resource_id, file_ids)
         success_db = await self.rm.delete_file_from_db(file_ids)
