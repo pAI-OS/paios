@@ -21,8 +21,16 @@ from backend.managers import ResourcesManager, PersonasManager
 from distutils.util import strtobool
 import os
 import logging
+from enum import Enum
 
 logger = logging.getLogger(__name__)
+
+class FileStatus(Enum):
+    SPLITTING = 'splitting'
+    SPLIT = 'split'
+    INDEXING = 'indexing'
+    INDEXED = 'indexed'
+    FAILED = 'failed'
 
 class RagManager:
     _instance = None
@@ -42,64 +50,109 @@ class RagManager:
                     self._initialized = True
 
     async def create_index(self, resource_id: str, path_files: List[str]) -> List[dict]:
+        # Define the text splitter
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=int(os.environ.get('CHUNK_SIZE')),
             chunk_overlap=int(os.environ.get('CHUNK_OVERLAP')),
             add_start_index=bool(strtobool(os.environ.get('ADD_START_INDEX')))
-        )        
-
-        all_docs = []
-        file_ids = []        
-        file_names = []
-        page_ids = []
+        )
+        
         file_info_list = []
+        
+        # Initialize the vector store once
+        vectorstore = await self.initialize_chroma(resource_id)
+        
+        # Iterate over all the files
         for path in path_files:
-            loader = PyPDFLoader(path)
-            docs = loader.load()
             file_id = str(uuid4())
             file_name = Path(path).name
-            for doc in docs:
-                all_docs.append([doc])
-                page_id = str(uuid4())
-                file_info_list.append({"file_id": file_id, "file_name": file_name, "page_id": page_id})
-             
-        file_ids = [item['file_id'] for item in file_info_list]
-        file_names = [item['file_name'] for item in file_info_list]
-        page_ids = [item['page_id'] for item in file_info_list]        
+            
+            try:
+                # Load the PDF
+                loader = PyPDFLoader(path)
+                docs = loader.load()  # Load all pages at once
+                
+                split_documents = []
+                split_ids = []
+                
+                # Process each page in the PDF
+                for doc in docs:
+                    page_id = str(uuid4())  # Unique ID for each page
+                    
+                    # Create a File entry in the database with status 'splitting'
+                    await self.create_file(
+                        assistant_id=resource_id,
+                        file_id=file_id,
+                        file_name=file_name,
+                        page_id=page_id,  # Unique page ID
+                        indexing_status=FileStatus.SPLITTING.value
+                    )
+                    
+                    file_info_list.append({"file_id": file_id, "file_name": file_name, "page_id": page_id})
+                    
+                    # Split the document into smaller chunks
+                    splits = text_splitter.split_documents([doc])
+                    
+                    # Update num_chunks for all File records with the current file_id
+                    await self.update_file_num_chunks(file_id, len(splits))
+                    
+                    for i, split in enumerate(splits):
+                        split.metadata["original_id"] = page_id
+                        split_documents.append(split)
+                        split_ids.append(f"{page_id}-{i}")
+                    
+                    # Update status to 'split' after splitting
+                    await self.update_file_status(file_id, FileStatus.SPLIT.value)
+
+                # Add the split documents to the vectorstore and update status to 'indexing'
+                await self.update_file_status(file_id, FileStatus.INDEXING.value)
+                vectorstore.add_documents(documents=split_documents, ids=split_ids)
+                
+                # Update status to 'indexed' once indexing is complete
+                await self.update_file_status(file_id, FileStatus.INDEXED.value)
+
+            except Exception as e:
+                # Update status to 'failed' if an error occurs
+                await self.update_file_status(file_id, FileStatus.FAILED.value)
+                raise e
         
-        print("\n\nFILE IDS: ", file_ids)
-        print("\n\nFILE NAMES: ", file_names)
-        
-        split_documents = []
-        split_ids = []
-        all_chunks = []
-        for doc, page_id in zip(all_docs, page_ids):
-            #split the document into smaller chunks
-            splits = text_splitter.split_documents(doc)
-            all_chunks.append(len(splits))
-            # Append each chunk to the split_documents list
-            for i, split in enumerate(splits):
-                split.metadata["original_id"] = page_id
-                split_documents.append(split)
-                # Create unique IDs for each split based on the original ID and chunk index
-                split_ids.append(f"{page_id}-{i}")
-        await self.create_files_for_resource(resource_id, file_ids, file_names, page_ids, all_chunks)
-        # add the split documents to the vectorstore
-        vectorstore = await self.initialize_chroma(resource_id)
-        vectorstore.add_documents(documents=split_documents, ids=split_ids)
-        print("AFTER ADDING DOCUMENTS")
-        return file_info_list    
-    
+        return file_info_list
+
+    async def update_file_num_chunks(self, file_id: str, num_chunks: int):
+        async with db_session_context() as session:
+            stmt = select(File).filter(File.file_id == file_id)
+            files = (await session.execute(stmt)).scalars().all()
+            
+            for file in files:
+                file.num_chunks = str(num_chunks)
+            
+            await session.commit()
+
+    async def update_file_status(self, file_id: str, status: str):
+        print(f"Updating status of file {file_id} to {status}")
+        async with db_session_context() as session:
+            stmt = select(File).filter(File.file_id == file_id)
+            files = (await session.execute(stmt)).scalars().all()
+            for file in files:
+                print("updated")
+                file.indexing_status = status
+                await session.commit()
        
-    async def create_files_for_resource(self, resource_id: str, file_ids:List[str], file_names: List[str], page_ids: List[str], num_chunks:List[int]):
-        print(f'file_ids: {len(file_ids)}, file_names: {len(file_names)}, page_ids: {len(page_ids)}, num_chunks: {len(num_chunks)}')
-        for file_id, file_name, page_id, chunk in zip(file_ids, file_names, page_ids, num_chunks):
-            await self.create_file(resource_id, file_id, file_name, page_id, chunk)            
+    async def create_files_for_resource(self, resource_id: str, file_info_list: List[dict]):
+        for file_info in file_info_list:
+            await self.create_file(
+                assistant_id=resource_id,
+                file_id=file_info['file_id'],
+                file_name=file_info['file_name'],
+                page_id=file_info['page_id'],
+                indexing_status=file_info.get('indexing_status', 'initializing'),
+                num_chunks=file_info.get('num_chunks', 0)  # Default to 0 if not set
+            )            
     
-    async def create_file(self, assistant_id: str, file_id: str, file_name: str, page_id: str, num_chunks: int = 0):
+    async def create_file(self, assistant_id: str, file_id: str, file_name: str, page_id: str,  indexing_status: str, num_chunks: int = 0):
         async with db_session_context() as session:
             try:
-                new_file = File(id=page_id, name=file_name, assistant_id=assistant_id, file_id=file_id, num_chunks=str(num_chunks))            
+                new_file = File(id=page_id, name=file_name, assistant_id=assistant_id, file_id=file_id, num_chunks=str(num_chunks), indexing_status=indexing_status)            
                 session.add(new_file)
                 await session.commit()
                 await session.refresh(new_file)
@@ -186,21 +239,16 @@ class RagManager:
     async def retrieve_file(self, file_id:str) -> Optional[List[FileSchema]]:
         async with db_session_context() as session:            
             result = await session.execute(select(File).filter(File.file_id == file_id))
-            #file = result.scalar_one_or_none()
             files = [FileSchema.from_orm(file) for file in result.scalars().all()]
             if files:
                 return files
-                # return FileSchema(
-                #     id=file.id,
-                #     name=file.name,
-                #     num_chunks = file.num_chunks             
-                # )
             return None
     
     async def delete_documents_from_chroma(self, resource_id: str, file_ids=List[str]):
         vectorstore = await self.initialize_chroma(resource_id)
         for file_id in file_ids:
             files = await self.retrieve_file(file_id)
+            
             if files:
                 page_ids = []
                 for file in files:
@@ -212,6 +260,8 @@ class RagManager:
                     for n in range(0, num_chunks):
                         chunk_id = f"{page_id}-{n}"
                         list_chunks_id.append(chunk_id)
+                    
+                    print(f"Deleting {len(list_chunks_id)} chunks for page {page_id}")
                     vectorstore.delete(ids=list_chunks_id)
             else:
                 return None
