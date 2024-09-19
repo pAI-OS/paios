@@ -752,6 +752,13 @@ components:
       required: true
       schema:
         $ref: '#/components/schemas/snake_id'
+    kebab-id:
+      name: id
+      in: path
+      description: id of the object
+      required: true
+      schema:
+        $ref: '#/components/schemas/kebab-id'
     kebab-snake_id:
       name: id
       in: path
@@ -818,7 +825,13 @@ components:
       type: string
       minLength: 2
       maxLength: 100
-      example: fetch_llama_cpp
+      example: bob_bot
+      pattern: ^[a-z0-9]+(_[a-z0-9]+)*$
+    kebab-id:
+      type: string
+      minLength: 2
+      maxLength: 100
+      example: bob-bot
       pattern: ^[a-z0-9]+(_[a-z0-9]+)*$
     kebab-snake_id:
       type: string
@@ -1116,6 +1129,31 @@ components:
           $ref: '#/components/schemas/bytes'
       required:
         - source_url
+    Environment:
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/kebab-id'
+        name:
+          $ref: '#/components/schemas/name'
+        description:
+          $ref: '#/components/schemas/textLong'
+        owner_id:
+          $ref: '#/components/schemas/uuid4'
+      required:
+        - id
+        - name
+    EnvironmentCreate:
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/name'
+        description:
+          $ref: '#/components/schemas/textLong'
+        owner_id:
+          $ref: '#/components/schemas/uuid4'
+      required:
+        - name
     User:
       type: object
       title: User

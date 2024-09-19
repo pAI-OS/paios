@@ -6,6 +6,12 @@ class Config(SQLModelBase, table=True):
     key: str = Field(primary_key=True)
     value: str | None = Field(default=None)
 
+class Environment(SQLModelBase, table=True):
+    id: str = Field(primary_key=True)
+    name: str = Field()
+    description: str | None = Field(default=None)
+    owner_id: str | None = Field(default=None, foreign_key="user.id")
+
 class Resource(SQLModelBase, table=True):
     id: str = Field(primary_key=True)
     name: str = Field()
