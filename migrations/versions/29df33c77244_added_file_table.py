@@ -24,6 +24,7 @@ def upgrade() -> None:
     sa.Column('assistant_id', sqlmodel.sql.sqltypes.AutoString(), nullable=True),    
     sa.Column('file_id', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('num_chunks', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('indexing_status', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
 

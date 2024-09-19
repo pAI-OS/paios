@@ -73,6 +73,12 @@ class Share(SQLModelBase, table=True):
     expiration_dt: datetime | None = Field(default=None)  # the link expiration date/time (optional)
     is_revoked: bool = Field()
 
+class File(SQLModelBase, table=True):
+    id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
+    name: str = Field()
+    assistant_id: str = Field(foreign_key="resource.id")
+    indexing_status: str = Field()
+
 class Persona(SQLModelBase, table=True):
     id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
     name: str = Field()
@@ -86,12 +92,6 @@ class Voice(SQLModelBase, table=True):
     name: str = Field()
     image_url: str | None = Field(default=None)
     sample_url: str | None = Field(default=None)
-
-class File(SQLModelBase, table=True):
-    id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
-    name: str = Field()
-    assistant_id: str = Field(foreign_key="resource.id")
-    indexing_status: str = Field()
     
 class Message(SQLModelBase, table=True):
     id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
