@@ -32,6 +32,7 @@ def upgrade() -> None:
     sa.Column('allow_edit', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
     sa.Column('kind', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
     sa.Column('icon', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
+    sa.Column('active', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###

@@ -1178,6 +1178,9 @@ components:
         icon:
           nullable: true
           $ref: '#/components/schemas/uri'
+        active:
+          nullable: true
+          $ref: '#/components/schemas/boolean_str'          
     ResourceCreate:
       type: object
       title: ResourceCreate
@@ -1210,6 +1213,9 @@ components:
           example: assistant
         icon:
           $ref: '#/components/schemas/uri' 
+        active:
+          nullable: true
+          $ref: '#/components/schemas/boolean_str'           
       required:
         - name
         - kind

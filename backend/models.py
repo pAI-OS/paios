@@ -18,6 +18,7 @@ class Resource(Base):
     allow_edit = Column(String, nullable=True)
     kind = Column(String, nullable=False)
     icon= Column(String, nullable=True)
+    active= Column(String, nullable=True)
 
 class User(Base):
     __tablename__ = "user"

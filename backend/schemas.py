@@ -23,6 +23,7 @@ class ResourceBaseSchema(BaseModel):
     allow_edit : Optional[str] = None
     kind : str
     icon : Optional[str] = None
+    active : Optional[str] = None
     class Config:
         orm_mode = True
         from_attributes = True

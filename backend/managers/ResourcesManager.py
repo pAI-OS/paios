@@ -50,7 +50,8 @@ class ResourcesManager:
                                 "uri": resource_data.get("uri"), 
                                 "description": resource_data.get("description"),
                                 "kind": kind,
-                                "icon": resource_data.get("icon")
+                                "icon": resource_data.get("icon"),
+                                "active": resource_data.get("active")
                             }
             
         async with db_session_context() as session:
@@ -114,7 +115,8 @@ class ResourcesManager:
                         uri=resource.uri, 
                         description=resource.description,
                         kind=resource.kind,
-                        icon=resource.icon)
+                        icon=resource.icon,
+                        active=resource.active)
             return None                    
 
     async def retrieve_resources(self, offset: int = 0, limit: int = 100, sort_by: Optional[str] = None, 
@@ -127,20 +129,38 @@ class ResourcesManager:
                     if key == 'name':
                         query = query.filter(Resource.name.ilike(f"%{value}%"))
                     if key == 'kind' and value == 'llm':
-                        llm_installed = self.map_llm_to_resource(ollama_model)
+                        ollama_models = await self.get_ollama_installed_models()
+                        llm_installed = self.map_llm_to_resource(ollama_models)                        
                         db_llm_query = query.filter(Resource.kind == "llm")
                         result = await session.execute(db_llm_query)
-                        db_llm = result.scalars().all()
-                        if db_llm == []:
-                            for llm in llm_installed:
-                                await self.create_resource(llm)
+                        
+                        llm_db = [ResourceSchema.from_orm(file) for file in result.scalars().all()]
+                        llm_db_names = {resource.name for resource in llm_db}
+                        
+                        # Create new resources
+                        new_resources = [llm for llm in llm_installed if llm['name'] not in llm_db_names]
+                        for resource in new_resources:
+                            await self.create_resource(resource)
+
+                        # Set active to True for items already in llm_db and present in llm_installed
+                        active_resources = [resource for resource in llm_db if resource.name in {llm['name'] for llm in llm_installed}]
+                        for resource in active_resources:
+                            stmt = update(Resource).where(Resource.id == resource.id).values(active='True')
+                            await session.execute(stmt)                                
+
+                        # Set active to False for items in llm_db but not present in llm_installed
+                        inactive_resources = [resource for resource in llm_db if resource.name not in {llm['name'] for llm in llm_installed}]                      
+                        for resource in inactive_resources:
+                            stmt = update(Resource).where(Resource.id == resource.id).values(active='False')
+                            await session.execute(stmt)       
+
                         query = query.filter(Resource.kind == value)
                     elif isinstance(value, list):  
                         query = query.filter(getattr(Resource, key).in_(value))
                     else:
                         query = query.filter(getattr(Resource, key) == value)
 
-            if sort_by and sort_by in ['id', 'name', 'uri','status','allow_edit','kind']:            
+            if sort_by and sort_by in ['id', 'name', 'uri','status','allow_edit','kind','active']:            
                 order_column = getattr(Resource, sort_by)
                 query = query.order_by(order_column.desc() if sort_order.lower() == 'desc' else order_column)
 
@@ -193,7 +213,19 @@ class ResourcesManager:
                                     "status": None,
                                     "allow_edit": None,
                                     "kind": "llm",
-                                    "icon": None
+                                    "icon": None,
+                                    "active": "True"
                                 } 
             resources_llm.append(resource_llm)                 
-        return resources_llm
+        return resources_llm    
+
+    async def get_ollama_installed_models(self) ->List:
+        async with httpx.AsyncClient() as client:
+                response = await client.get("http://localhost:11434/api/tags")
+                if response.status_code == 200:
+                    data = response.json()
+                    models = data.get("models", [])
+                    print(models)                                      
+                    return models
+                else:
+                    return []
