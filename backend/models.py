@@ -24,6 +24,7 @@ class Resource(SQLModelBase, table=True):
     allow_edit: str | None = Field(default=None)
     kind: str | None = Field(default=None)
     icon: str | None = Field(default=None)
+    active: str | None = Field(default=None)
 
 class User(SQLModelBase, table=True):
     id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
