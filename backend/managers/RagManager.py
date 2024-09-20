@@ -129,12 +129,10 @@ class RagManager:
             await session.commit()
 
     async def update_file_status(self, file_id: str, status: str):
-        print(f"Updating status of file {file_id} to {status}")
         async with db_session_context() as session:
             stmt = select(File).filter(File.file_id == file_id)
             files = (await session.execute(stmt)).scalars().all()
             for file in files:
-                print("updated")
                 file.indexing_status = status
                 await session.commit()
        
@@ -261,7 +259,6 @@ class RagManager:
                         chunk_id = f"{page_id}-{n}"
                         list_chunks_id.append(chunk_id)
                     
-                    print(f"Deleting {len(list_chunks_id)} chunks for page {page_id}")
                     vectorstore.delete(ids=list_chunks_id)
             else:
                 return None
