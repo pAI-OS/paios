@@ -29,7 +29,7 @@ class FileStatus(Enum):
     SPLITTING = 'splitting'
     SPLIT = 'split'
     INDEXING = 'indexing'
-    INDEXED = 'indexed'
+    DONE = 'done'
     FAILED = 'failed'
 
 class RagManager:
@@ -108,8 +108,8 @@ class RagManager:
                 await self.update_file_status(file_id, FileStatus.INDEXING.value)
                 vectorstore.add_documents(documents=split_documents, ids=split_ids)
                 
-                # Update status to 'indexed' once indexing is complete
-                await self.update_file_status(file_id, FileStatus.INDEXED.value)
+                # Update status to 'done' once indexing is complete
+                await self.update_file_status(file_id, FileStatus.DONE.value)
 
             except Exception as e:
                 # Update status to 'failed' if an error occurs
