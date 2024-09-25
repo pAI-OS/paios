@@ -1,13 +1,56 @@
-# API testing with Visual Studio Code - REST Client Extention
+# apis/paios/config.http
+
+### Create a new config item
+
+POST https://localhost:8443/api/v1/config
+Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
+Content-Type: application/json
+
+{
+    "key": "openapi-key",
+    "value": "abc123",
+    "environment_id": "env-123",
+    "user_id": "user-123"
+}
+
+###
+
+### Get all config items with filters
+
+GET https://localhost:8443/api/v1/config?filter={"key":"openapi-key"}
+Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
+
+###
+
+### Get a config item by key
+
+GET https://localhost:8443/api/v1/config/openapi-key
+Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
+
+###
+
+### Get a specific version of a config item
+
+GET https://localhost:8443/api/v1/config/openapi-key?version=1&environment_id=env-123&user_id=user-123
+Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
+
+###
+
+### Update a config item
 
 PUT https://localhost:8443/api/v1/config/openapi-key
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
 Content-Type: application/json
 
-"abc123"
+{
+    "value": "new-value",
+    "environment_id": "env-123",
+    "user_id": "user-123"
+}
 
 ###
 
-GET https://localhost:8443/api/v1/config/openapi-key
+### Delete a config item
+
+DELETE https://localhost:8443/api/v1/config/openapi-key?version=1&environment_id=env-123&user_id=user-123
 Authorization: Bearer {{PAIOS_BEARER_TOKEN}}
-Content-Type: application/json

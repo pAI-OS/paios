@@ -1,6 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel, field_serializer
-from typing import Optional
+from typing import Optional, Any
 
 
 # We have *Create schemas because API clients ideally don't set the id field, it's set by the server
@@ -8,10 +8,24 @@ from typing import Optional
 
 # Config schemas
 class ConfigBaseSchema(BaseModel):
-    value: Optional[str] = None
+    value: Any
+
+    class Config:
+        arbitrary_types_allowed = True
 
 class ConfigSchema(ConfigBaseSchema):
+    id: str
     key: str
+    version: int
+    environment_id: Optional[str] = None
+    user_id: Optional[str] = None
+    created_at: datetime
+    updated_at: datetime
+
+class ConfigCreateSchema(ConfigBaseSchema):
+    key: str
+    environment_id: Optional[str] = None
+    user_id: Optional[str] = None
 
 # Resource schemas
 class ChannelBaseSchema(BaseModel):

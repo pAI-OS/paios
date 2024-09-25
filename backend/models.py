@@ -1,10 +1,27 @@
 from datetime import datetime
-from sqlmodel import Field
+from uuid import uuid4
+from sqlmodel import Field, JSON
+import sqlalchemy as sa
 from backend.db import SQLModelBase
+from typing import ClassVar
 
 class Config(SQLModelBase, table=True):
-    key: str = Field(primary_key=True)
-    value: str | None = Field(default=None)
+    id: str = Field(default_factory=lambda: str(uuid4()), primary_key=True)
+    key: str = Field(index=True)
+    value: dict = Field(sa_column=sa.Column(JSON))
+    version: int = Field(default=1)
+    environment_id: str | None = Field(default=None, foreign_key="environment.id")
+    user_id: str | None = Field(default=None, foreign_key="user.id")
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+    __table_args__ = (
+        sa.UniqueConstraint('key', 'version', 'environment_id', 'user_id', name='uix_key_version_env_user'),
+    )
+
+    model_config: ClassVar = {
+        "arbitrary_types_allowed": True
+    }
 
 class Resource(SQLModelBase, table=True):
     id: str = Field(primary_key=True)

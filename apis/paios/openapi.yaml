@@ -325,14 +325,73 @@ paths:
           description: No Content
         '404':
           description: Not Found
-  '/config/{key}':
+  /config:
     get:
       tags:
         - Configuration Management
-      summary: Retrieve config by key
+      summary: Retrieve all config items
+      description: Retrieve all config items.
+      parameters:
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/range'
+        - $ref: '#/components/parameters/filter'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Config'
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+    post:
+      tags:
+        - Configuration Management
+      summary: Create new config item
+      description: Create a new config item.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ConfigCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Config'
+        '400':
+          description: Missing Required Information
+  /config/{key}:
+    get:
+      tags:
+        - Configuration Management
+      summary: Retrieve config item by key
       description: Retrieve the config item with the specified key.
       parameters:
         - $ref: '#/components/parameters/key'
+        - name: version
+          in: query
+          description: Version of the config item
+          required: false
+          schema:
+            type: integer
+        - name: environment_id
+          in: query
+          description: Environment ID of the config item
+          required: false
+          schema:
+            type: string
+        - name: user_id
+          in: query
+          description: User ID associated with the config item
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: OK
@@ -340,33 +399,59 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Config'
+        '404':
+          description: Config Item Not Found
     put:
       tags:
         - Configuration Management
-      summary: Update config by key
-      description: Set a config item with the specified key.
+      summary: Update config item by key
+      description: Update the config item with the specified key.
       parameters:
         - $ref: '#/components/parameters/key'
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Config'
+              $ref: '#/components/schemas/ConfigCreate'
       responses:
         '200':
-          description: OK
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Config'
+        '404':
+          description: Config Item Not Found
     delete:
       tags:
         - Configuration Management
-      summary: Delete config by key
-      description: Delete a config item with the specified key.
+      summary: Delete config item by key
+      description: Delete the config item with the specified key.
       parameters:
         - $ref: '#/components/parameters/key'
+        - name: version
+          in: query
+          description: Version of the config item
+          required: false
+          schema:
+            type: integer
+        - name: environment_id
+          in: query
+          description: Environment ID of the config item
+          required: false
+          schema:
+            type: string
+        - name: user_id
+          in: query
+          description: User ID associated with the config item
+          required: false
+          schema:
+            type: string
       responses:
         '204':
           description: No Content
         '404':
-          description: Not Found
+          description: Config Item Not Found
   /downloads:
     get:
       tags:
@@ -766,8 +851,8 @@ components:
       required: true
       schema:
         type: string
-        example: api_key
-        pattern: '^[a-zA-Z0-9_]+$'
+        example: api-key
+        pattern: '^[a-zA-Z0-9-]+$'
     shortUrlKey:
       name: id
       in: path
@@ -1033,29 +1118,46 @@ components:
         - name
         - uri
     Config:
-      title: Config
+      type: object
+      properties:
+        id:
+          $ref: '#/components/schemas/uuid4'
+        key:
+          type: string
+          description: Key for the config item.
+          example: openapi-key
+        value:
+          description: Value of the config item.
+        version:
+          type: integer
+          description: Version of the config item.
+        environment_id:
+          $ref: '#/components/schemas/uuid4'
+        user_id:
+          $ref: '#/components/schemas/uuid4'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - id
+        - key
+        - value
+    ConfigCreate:
       type: object
       properties:
         key:
           type: string
-          description: key for the config item.
-          example: api_key
-          pattern: '^[a-zA-Z0-9_]+$'
+          description: Key for the config item.
+          example: openapi-key
         value:
-          anyOf:
-            - type: string
-              example: api-pk-1aEN2XGPUEKxMCcTsUZXFVEUu9GbtAjTEVc16dZBVxjfHeZACKO86vTRX
-            - type: boolean
-            - type: integer
-            - type: number
-            - type: object
-            - type: array
-              items:
-                oneOf:
-                  - type: string
-                  - type: number
-                  - type: boolean
-                  - type: object
+          description: Value of the config item.
+        environment_id:
+          $ref: '#/components/schemas/uuid4'
+        user_id:
+          $ref: '#/components/schemas/uuid4'
       required:
         - key
         - value
