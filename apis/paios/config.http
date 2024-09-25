@@ -8,9 +8,7 @@ Content-Type: application/json
 
 {
     "key": "openapi-key",
-    "value": "abc123",
-    "environment_id": "env-123",
-    "user_id": "user-123"
+    "value": "abc123"
 }
 
 ###

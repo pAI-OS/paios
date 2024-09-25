@@ -34,7 +34,7 @@ class ConfigManager:
             result = await session.execute(
                 select(func.max(Config.version)).filter(
                     Config.key == key,
-                    Config.environment_id == environment_id,
+                    #Config.environment_id == environment_id,
                     Config.user_id == user_id
                 )
             )
@@ -48,10 +48,10 @@ class ConfigManager:
                 key=key,
                 value=encrypted_value,
                 version=new_version,
-                environment_id=environment_id,
+                #environment_id=environment_id,
                 user_id=user_id,
-                created_at=datetime.utcnow(),
-                updated_at=datetime.utcnow(),
+                created_at=None,
+                updated_at=None,
             )
             session.add(new_config)
             await session.commit()
@@ -60,7 +60,7 @@ class ConfigManager:
             key=key,
             value=value,
             version=new_version,
-            environment_id=environment_id,
+            #environment_id=environment_id,
             user_id=user_id,
             created_at=new_config.created_at,
             updated_at=new_config.updated_at,
@@ -86,7 +86,7 @@ class ConfigManager:
                     key=config.key,
                     value=decrypted_value,
                     version=config.version,
-                    environment_id=config.environment_id,
+                    #environment_id=config.environment_id,
                     user_id=config.user_id,
                     created_at=config.created_at,
                     updated_at=config.updated_at,
@@ -99,7 +99,7 @@ class ConfigManager:
             result = await session.execute(
                 select(func.max(Config.version)).filter(
                     Config.key == key,
-                    Config.environment_id == environment_id,
+                    #Config.environment_id == environment_id,
                     Config.user_id == user_id
                 )
             )
@@ -113,7 +113,7 @@ class ConfigManager:
                 key=key,
                 value=encrypted_value,
                 version=new_version,
-                environment_id=environment_id,
+                #environment_id=environment_id,
                 user_id=user_id,
                 created_at=datetime.utcnow(),
                 updated_at=datetime.utcnow(),
@@ -125,7 +125,7 @@ class ConfigManager:
             key=key,
             value=value,
             version=new_version,
-            environment_id=environment_id,
+            #environment_id=environment_id,
             user_id=user_id,
             created_at=new_config.created_at,
             updated_at=new_config.updated_at,
@@ -135,7 +135,7 @@ class ConfigManager:
         async with db_session_context() as session:
             query = delete(Config).filter(
                 Config.key == key,
-                Config.environment_id == environment_id,
+                #Config.environment_id == environment_id,
                 Config.user_id == user_id
             )
             if version:
@@ -158,7 +158,7 @@ class ConfigManager:
                     key=config.key,
                     value=self.encryption.decrypt_value(config.value),
                     version=config.version,
-                    environment_id=config.environment_id,
+                    #environment_id=config.environment_id,
                     user_id=config.user_id,
                     created_at=config.created_at,
                     updated_at=config.updated_at,
