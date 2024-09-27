@@ -79,20 +79,6 @@ class File(SQLModelBase, table=True):
     assistant_id: str = Field(foreign_key="resource.id")
     indexing_status: str = Field()
 
-class Persona(SQLModelBase, table=True):
-    id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
-    name: str = Field()
-    description: str | None = Field(default=None)
-    voice_id: str | None = Field(default=None)
-    face_id: str | None = Field(default=None)
-
-class Voice(SQLModelBase, table=True):
-    id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
-    xi_id: str = Field()
-    name: str = Field()
-    image_url: str | None = Field(default=None)
-    sample_url: str | None = Field(default=None)
-    
 class Message(SQLModelBase, table=True):
     id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
     assistant_id: str= Field(foreign_key="resource.id")
@@ -109,6 +95,20 @@ class Conversation(SQLModelBase, table=True):
     last_updated_timestamp: str = Field()
     archive: str = Field()
     assistant_id: str | None = Field(default=None, foreign_key="resource.id")
+    
+class Persona(SQLModelBase, table=True):
+    id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
+    name: str = Field()
+    description: str | None = Field(default=None)
+    voice_id: str | None = Field(default=None)
+    face_id: str | None = Field(default=None)
+
+class Voice(SQLModelBase, table=True):
+    id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
+    xi_id: str = Field()
+    name: str = Field()
+    image_url: str | None = Field(default=None)
+    sample_url: str | None = Field(default=None)
     
 # Resolve forward references
 User.model_rebuild()

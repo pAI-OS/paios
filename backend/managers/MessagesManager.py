@@ -73,11 +73,11 @@ class MessagesManager:
                 rm = RagManager()
                 response = await rm.retrieve_and_generate(assistant_id, query, llm)
                 chat_response = response["answer"]
-                
+
                 if conversation_id:
-                    message_data["chat_response"] = chat_response
+                    message_data['chat_response'] = chat_response
                     message_data['timestamp'] = timestamp
-                    
+
                     new_message = Message(id=str(uuid4()), **message_data)
                     session.add(new_message)
                     await session.commit()
@@ -100,7 +100,8 @@ class MessagesManager:
                     conversation_id=message.conversation_id,
                     timestamp=message.timestamp,
                     prompt=message.prompt,
-                    chat_response=message.chat_response,             
+                    chat_response=message.chat_response,
+                    voice_active=message.voice_active             
                 )
             return None
     
