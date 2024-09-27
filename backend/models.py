@@ -95,6 +95,7 @@ class Message(SQLModelBase, table=True):
     timestamp: str = Field()
     prompt: str = Field()
     chat_response: str = Field()
+    voice_active: str = Field()
 
 class Conversation(SQLModelBase, table=True):
     id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))

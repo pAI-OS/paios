@@ -32,6 +32,7 @@ def upgrade() -> None:
             sa.Column('timestamp',  sqlmodel.sql.sqltypes.AutoString(), nullable=False),
             sa.Column('prompt',  sqlmodel.sql.sqltypes.AutoString(), nullable=False),
             sa.Column('chat_response',  sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+            sa.Column('voice_active',  sqlmodel.sql.sqltypes.AutoString(), nullable=False),
             sa.PrimaryKeyConstraint('id')
         )
 
