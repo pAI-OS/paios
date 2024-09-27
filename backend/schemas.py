@@ -81,7 +81,9 @@ class VoiceBaseSchema(BaseModel):
     name: str
     text_to_speak: Optional[str] = None
     image_url: Optional[str] = None
-    sample_url: Optional[str] = None         
+    sample_url: Optional[str] = None
+    msg_id: Optional[str] = None        
+    audio_msg_path: Optional[str] = None                 
     class Config:
         orm_mode = True
         from_attributes = True
@@ -119,6 +121,7 @@ class MessageBaseSchema(BaseModel):
     timestamp: str
     prompt: str
     chat_response: str
+    voice_active: str    
     class Config:
         orm_mode = True
         from_attributes = True
@@ -136,7 +139,7 @@ class ConversationBaseSchema(BaseModel):
     last_updated_timestamp: str
     archive: str
     assistant_id: str
-    messages: Optional[List[MessageBaseSchema]] = None
+    messages: Optional[List[MessageSchema]] = None
    
     class Config:
         orm_mode = True

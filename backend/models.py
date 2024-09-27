@@ -73,6 +73,7 @@ class Message(Base):
     timestamp = Column(String, nullable=False)
     prompt = Column(String, nullable=False)
     chat_response = Column(String, nullable=False)
+    voice_active = Column(String, nullable=False)
 
 class Conversation(Base):
     __tablename__ = "conversation"

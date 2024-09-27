@@ -831,6 +831,67 @@ paths:
           headers:
             X-Total-Count:
               $ref: '#/components/headers/X-Total-Count'
+    post:
+      summary: Create new voice message.
+      description: Creates a new voice message
+      operationId: backend.api.VoicesFacesView.post
+      tags:
+        - Voice Management
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  chat_response:
+                    type: string
+                    description: The chat response message.
+          headers:
+            Content-Disposition:
+              description: Indicates that the response includes an attachment.
+              schema:
+                type: string
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VoiceMessage'
+        '206':
+          description: Partial Content (MP3 file streamed)
+          content:
+            audio/mpeg:
+              schema:
+                type: string
+                format: binary
+          headers:
+            Content-Disposition:
+              description: Indicates that the response includes an attachment.
+              schema:
+                type: string
+        '400':
+          description: Missing Required Information      
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VoiceMessageCreate'
+  '/voices/{id}':
+    delete:
+      summary: Delete voice message by id
+      description: Deletes the voice message with the given id.
+      operationId: backend.api.VoicesFacesView.delete
+      tags:
+        - Voice Management
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '204':
+          description: No Content
+        '404':
+          description: Not Found
 tags:
   - name: Abilities Management
     description: Installation and configuration of abilities
@@ -1386,7 +1447,12 @@ components:
       type: object
       title: VoiceCreate
       description: Voice without id which is server-generated.
-      properties:                  
+      properties:
+        xi_id:
+          $ref: '#/components/schemas/textShort'
+        name:
+          $ref: '#/components/schemas/textShort'
+      properties:
         xi_id:
           $ref: '#/components/schemas/textShort'
         name:
@@ -1394,14 +1460,25 @@ components:
         text_to_speak:
           type: string
           nullable: true
-        image_url:
-          $ref: '#/components/schemas/voice_image_url'
+    VoiceMessage:
+      type: object
+      title: VoiceMessage
+      properties:
+        audio_msg_path:
+          type: string
+          format: uri
           nullable: true
-        sample_url:
-          $ref: '#/components/schemas/sample_mp3_url'
-          nullable: true          
       required:
-        - id
+        - audio_msg_path
+    VoiceMessageCreate:
+      type: object
+      title: VoiceMessageCreate
+      description: Voice without id which is server-generated.
+      properties:
+        msg_id:
+          $ref: '#/components/schemas/uuid4'                     
+      required:
+        - msg_id        
     Face:
       type: object
       title: Face
@@ -1429,6 +1506,9 @@ components:
           $ref: '#/components/schemas/textLong'
         chat_response:
           type: string
+        voice_active:
+          $ref: '#/components/schemas/boolean_str'
+          nullable: true
       required:
         - assistant_id
         - conversation_id
@@ -1447,6 +1527,8 @@ components:
           nullable: true
         prompt:
           $ref: '#/components/schemas/textLong'
+        voice_active:
+          $ref: '#/components/schemas/boolean_str'
       required:        
         - assistant_id
         - prompt

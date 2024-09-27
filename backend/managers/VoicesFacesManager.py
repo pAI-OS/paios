@@ -8,6 +8,8 @@ from backend.models import Voice
 from typing import List, Tuple, Optional, Dict, Any
 from sqlalchemy import select, func
 from backend.schemas import VoiceSchema
+from pathlib import Path
+from backend.models import Resource, Persona
  
 
 class VoicesFacesManager:
@@ -112,13 +114,17 @@ class VoicesFacesManager:
 
                 return voices, total_count
             
-    
-    async def text_to_speech(self, voice_id: str, body) -> str:
+    async def text_to_speech(self, voice_id: str, body: str, assistant_id: str, msg_id: str) -> Tuple[Optional[dict], Optional[str]]:
+        voice = await self.retrieve_voice(voice_id)
         xi_api_key = os.environ.get('XI_API_KEY')
-        xi_id = body['xi_id']
-        OUTPUT_PATH = f"{xi_id}.mp3"  # Path to save the output audio file
-
-        tts_url = f"https://api.elevenlabs.io/v1/text-to-speech/{voice_id}/stream"
+        xi_id = voice.xi_id
+        temp = os.path.dirname(os.path.realpath(__file__))
+        directory = Path(os.path.join(os.path.dirname(temp), f'public/{assistant_id}'))
+        directory.mkdir(parents=True, exist_ok=True)
+        file_path = directory / f'{msg_id}.mp3'
+        audio_msg_path = str(file_path)
+        print('audio_msg_path: ', audio_msg_path)
+        tts_url = f"https://api.elevenlabs.io/v1/text-to-speech/{xi_id}/stream"
 
         headers = {
             "Accept": "application/json",
@@ -126,7 +132,7 @@ class VoicesFacesManager:
         }
 
         data = {
-            "text": "Hola" ,
+            "text": body,
             "model_id": "eleven_multilingual_v2",
             "voice_settings": {
                 "stability": 0.5,
@@ -135,16 +141,42 @@ class VoicesFacesManager:
                 "use_speaker_boost": True
             }
         }
-
-        response = requests.post(tts_url, headers=headers, json=data, stream=True)
-
-        if response.ok:
-            with open(OUTPUT_PATH, "wb") as f:
-                for chunk in response.iter_content(chunk_size=os.environ.get('XI_CHUNK_SIZE')):
-                    f.write(chunk)
-            print("Audio stream saved successfully.")
-        else:
-            print(response.text)
-            return response.text
+        try:
+            response = requests.post(tts_url, headers=headers, json=data, stream=True)
+            if response.ok:
+                with open(audio_msg_path, "wb") as f:
+                    for chunk in response.iter_content(chunk_size=int(os.environ.get('XI_CHUNK_SIZE'))):
+                        f.write(chunk)
+                print("Audio stream saved successfully.")
+                return {"message": "Audio stream saved successfully.", "audio_msg_path": audio_msg_path}, None
+            else:
+                error_message = response.text
+                print(error_message)
+                return None, error_message
+        except Exception as e:
+            error_message = str(e)
+            print(f"An error occurred: {error_message}")
+            return None, error_message
         
-    
+    async def generate_voice_response(self, assistant_id, chat_response, message_id) -> Tuple[Optional[dict], Optional[str]]:
+        try:
+            async with db_session_context() as session:                
+                resource = await session.execute(select(Resource).filter(Resource.id == assistant_id))
+                resource = resource.scalar_one_or_none()                    
+                persona_id = resource.persona_id                        
+                if persona_id:
+                    persona = await session.execute(select(Persona).filter(Persona.id == persona_id))
+                    persona = persona.scalar_one_or_none()
+                    voice_id = persona.voice_id
+                    vfm = VoicesFacesManager()                            
+                    response, error_message = await vfm.text_to_speech(voice_id, chat_response, assistant_id, message_id)
+                    if error_message:
+                        return None, error_message                   
+                    return response.get("audio_msg_path"), None
+        except Exception as e:        
+            return None, f"An unexpected error occurred while generating a voice response: {str(e)}"        
+
+    async def async_file_generator(self, file_path):
+        with open(file_path, 'rb') as audio_file:
+            while chunk := audio_file.read(1024):
+                yield chunk
