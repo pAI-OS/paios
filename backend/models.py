@@ -79,6 +79,17 @@ class File(SQLModelBase, table=True):
     assistant_id: str = Field(foreign_key="resource.id")
     indexing_status: str = Field()
 
+class Page(SQLModelBase, table=True):
+    id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
+    file_id: str= Field(foreign_key="file.id")
+    assistant_id: str= Field(foreign_key="resource.id")
+
+class Chunk(SQLModelBase, table=True):
+    id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
+    page_id: str= Field(foreign_key="page.id")
+    file_id: str= Field(foreign_key="file.id")
+    assistant_id: str= Field(foreign_key="resource.id")
+    
 class Message(SQLModelBase, table=True):
     id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
     assistant_id: str= Field(foreign_key="resource.id")
