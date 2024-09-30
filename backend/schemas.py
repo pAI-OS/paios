@@ -154,8 +154,7 @@ class ConversationSchema(ConversationBaseSchema):
 # File schemas
 class FileBaseSchema(BaseModel):
     name: str
-    num_chunks: str
-    file_id: str
+    assistant_id: str
     indexing_status: str
     class Config:
         orm_mode = True

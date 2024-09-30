@@ -61,9 +61,20 @@ class File(Base):
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False)
     assistant_id = Column(String, nullable=False)
-    num_chunks = Column(String, nullable=False)
-    file_id = Column(String, nullable=False)
     indexing_status = Column(String, nullable=False)
+
+class Page(Base):
+    __tablename__ = "page"
+    id = Column(String, primary_key=True)
+    file_id = Column(String, nullable=False)
+    assistant_id = Column(String, nullable=False)
+
+class Chunk(Base):
+    __tablename__ = "chunk"
+    id = Column(String, primary_key=True)
+    page_id = Column(String, nullable=False)
+    file_id = Column(String, nullable=False)
+    assistant_id = Column(String, nullable=False)
 
 class Message(Base):
     __tablename__ = "message"
