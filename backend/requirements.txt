@@ -25,3 +25,4 @@ langchain_chroma
 langchain_openai
 pypdf
 httpx
+langchain_ollama

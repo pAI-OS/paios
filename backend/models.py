@@ -83,14 +83,23 @@ class Share(SQLModelBase, table=True):
 class File(SQLModelBase, table=True):
     id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
     name: str = Field()
-    assistant_id: str | None = Field(default=None, foreign_key="resource.id")
-    num_chunks = str | None = Field(default=None)
-    file_id: str = Field()
+    assistant_id: str = Field(foreign_key="resource.id")
     indexing_status: str = Field()
+
+class Page(SQLModelBase, table=True):
+    id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
+    file_id: str= Field(foreign_key="file.id")
+    assistant_id: str= Field(foreign_key="resource.id")
+
+class Chunk(SQLModelBase, table=True):
+    id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
+    page_id: str= Field(foreign_key="page.id")
+    file_id: str= Field(foreign_key="file.id")
+    assistant_id: str= Field(foreign_key="resource.id")
 
 class Message(SQLModelBase, table=True):
     id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
-    assistant_id: str | None = Field(default=None, foreign_key="resource.id")
+    assistant_id: str= Field(foreign_key="resource.id")
     conversation_id: str | None = Field(default=None, foreign_key="conversation.id")
     timestamp: str = Field()
     prompt: str = Field()
