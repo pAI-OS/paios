@@ -55,3 +55,17 @@ class VoicesFacesView:
                 return streaming_response
             else:
                 return JSONResponse({"error": "File not found"}, status_code=404)
+            
+    async def delete(self, id: str):
+        print('msg_id: ', id)
+        message = await self.mm.retrieve_message(id)
+        assistant_id = message.assistant_id
+        temp = os.path.dirname(os.path.realpath(__file__))
+        directory = Path(os.path.join(os.path.dirname(temp), f'public/{assistant_id}'))
+        file_path = directory / f'{id}.mp3'        
+
+        if directory.exists():
+            shutil.rmtree(directory)
+            return JSONResponse({"success": "Directory deleted successfully"}, status_code=200)
+        else:
+            return JSONResponse({"error": "Directory not found"}, status_code=404)
