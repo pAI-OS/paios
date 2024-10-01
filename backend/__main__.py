@@ -1,3 +1,4 @@
+import os
 import sys
 import signal
 import asyncio
@@ -42,8 +43,8 @@ if __name__ == "__main__":
     app = create_app()
 
     # Define host and port
-    host = "localhost"
-    port = 8443
+    host = os.environ.get("PAIOS_HOST", "localhost")
+    port = int(os.environ.get("PAIOS_PORT", 8443))
 
     # Log connection details
     logger.info(f"You can access pAI-OS at https://{host}:{port}.")
