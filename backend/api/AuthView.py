@@ -10,7 +10,7 @@ class AuthView:
     def __init__(self):
         self.am = AuthManager()
 
-    async def generate_registration_options(self, body: RegistrationOptions):
+    async def webauthn_register_options(self, body: RegistrationOptions):
         challenge, options = await self.am.registration_options(body["email"])
 
         if not options:
@@ -21,7 +21,7 @@ class AuthView:
         return response
     
 
-    async def verify_registration(self, body: VerifyRegistration):
+    async def webauthn_register(self, body: VerifyRegistration):
         challenge = request.cookies.get("challenge")
         token = await self.am.registrationResponse(challenge, body["email"], body["user_id"], body["att_resp"])
         if not token:
@@ -32,7 +32,7 @@ class AuthView:
         
         return response
     
-    async def generate_authentication_options(self, body: AuthenticationOptions):
+    async def webauthn_login_options(self, body: AuthenticationOptions):
         challenge, options = await self.am.signinRequestOptions(body["email"])
 
         if not options:
@@ -43,7 +43,7 @@ class AuthView:
         response.set_cookie(key="challenge", value=challenge, secure=True, httponly=True, samesite='strict')
         return response
     
-    async def verify_authentication(self, body: VerifyAuthentication):
+    async def webauthn_login(self, body: VerifyAuthentication):
         token = await self.am.signinResponse(body["challenge"], body["email"], body["auth_resp"])
 
         if not token:

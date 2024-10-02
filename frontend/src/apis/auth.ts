@@ -2,11 +2,12 @@ import {
   startAuthentication,
   startRegistration,
 } from "@simplewebauthn/browser";
+import { apiBase } from "../apiBackend";
 
 export const login = async (email: string) => {
   try {
     const response = await fetch(
-      "/api/v1/auth/login/start",
+      `${apiBase}/auth/webauthn/login-options`,
       {
         method: "POST",
         headers: {
@@ -25,7 +26,7 @@ export const login = async (email: string) => {
     const authResp = await startAuthentication(options);
 
     const verifyResponse = await fetch(
-      "/api/v1/auth/login/finish",
+      `${apiBase}/auth/webauthn/login`,
       {
         method: "POST",
         headers: {
@@ -51,7 +52,7 @@ export const login = async (email: string) => {
 export const register = async (email: string) => {
   try {
     const response = await fetch(
-      "/api/v1/auth/register/start",
+      `${apiBase}/auth/webauthn/register-options`,
       {
         method: "POST",
         headers: {
@@ -75,7 +76,7 @@ export const register = async (email: string) => {
     const attResp = await startRegistration(options);
 
     const verifyResponse = await fetch(
-      "/api/v1/auth/register/finish",
+      `${apiBase}/auth/webauthn/register`,
       {
         method: "POST",
         headers: {
@@ -104,7 +105,7 @@ export const register = async (email: string) => {
 };
 
 export const logout = async () => {
-  await fetch("/api/v1/auth/logout", {
+  await fetch(`${apiBase}/auth/logout`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

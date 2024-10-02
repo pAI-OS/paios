@@ -777,11 +777,10 @@ paths:
           description: No Content
         '404':
           description: Not Found
-  /webauthn/generate-registration-options:
+  /auth/webauthn/register-options:
     post:
       summary: Generate WebAuthn registration options
       description: Generate registration options for WebAuthn.
-      operationId: backend.api.AuthView.generate_registration_options
       requestBody:
         required: true
         content:
@@ -802,7 +801,7 @@ paths:
                 type: object
         '404':
           description: User not found
-  /auth/register/finish:
+  /auth/webauthn/register:
     post:
       summary: Verify WebAuthn registration
       description: Verify the registration response for WebAuthn.
@@ -813,7 +812,6 @@ paths:
           schema:
             type: string
           description: Passkey challenge
-      operationId: backend.api.AuthView.verify_registration
       requestBody:
         required: true
         content:
@@ -829,11 +827,10 @@ paths:
                 type: object
         '404':
           description: User not found
-  /auth/login/start:
+  /auth/webauthn/login-options:
     post:
       summary: Generate WebAuthn authentication options
       description: Generate authentication options for WebAuthn.
-      operationId: backend.api.AuthView.generate_authentication_options
       requestBody:
         required: true
         content:
@@ -854,7 +851,7 @@ paths:
                 type: object
         '404':
           description: User not found
-  /auth/login/finish:
+  /auth/webauthn/login:
     post:
       summary: Verify WebAuthn authentication
       description: Verify the authentication response for WebAuthn.
@@ -877,7 +874,6 @@ paths:
   /auth/logout:
     post:
       summary: Logout user
-      operationId: backend.api.AuthView.logout
       responses:
         '200':
           description: Successfully logged out
