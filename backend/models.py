@@ -1,9 +1,12 @@
 from datetime import datetime
-from sqlmodel import Field
+from sqlmodel import Field, Relationship
 from backend.db import SQLModelBase
-from sqlalchemy.orm import relationship
-from sqlalchemy.types import DateTime
-from backend.db import SQLModelBase
+from typing import List, ForwardRef
+
+# Forward references
+UserRef = ForwardRef("User")
+CredRef = ForwardRef("Cred")
+SessionRef = ForwardRef("Session")
 
 class Config(SQLModelBase, table=True):
     key: str = Field(primary_key=True)
@@ -19,8 +22,8 @@ class User(SQLModelBase, table=True):
     name: str | None = Field(default=None)
     email: str = Field()
     passkey_user_id: str = Field()
-    creds = relationship('Cred', backref='owner')
-    sessions = relationship("Session", back_populates="user")
+    creds: List["Cred"] = Relationship(back_populates="user", sa_relationship_kwargs={"lazy": "selectin"})
+    sessions: List["Session"] = Relationship(back_populates="user", sa_relationship_kwargs={"lazy": "selectin"})
 
 class Cred(SQLModelBase, table=True):
     id: str = Field(primary_key=True)
@@ -29,14 +32,15 @@ class Cred(SQLModelBase, table=True):
     backed_up: str = Field()
     name: str | None = Field(default=None)
     transports: str = Field()
-    owner: User = relationship('User', back_populates="creds")
+    user_id: int = Field(foreign_key="user.id")
+    user: "User" = Relationship(back_populates="creds")
 
 class Session(SQLModelBase, table=True):
     id: str = Field(primary_key=True)
     user_id: str = Field(foreign_key="user.id")
     token: str = Field()
-    expires_at: DateTime = Field()
-    user = relationship("User", back_populates="sessions")
+    expires_at: datetime = Field()
+    user: User = Relationship(back_populates="sessions")
 
 class Asset(SQLModelBase, table=True):
     id: str = Field(primary_key=True)
@@ -59,3 +63,8 @@ class Share(SQLModelBase, table=True):
     user_id: str | None = Field(default=None)  # the user granted access (optional)
     expiration_dt: datetime | None = Field(default=None)  # the link expiration date/time (optional)
     is_revoked: bool = Field()
+
+# Resolve forward references
+User.model_rebuild()
+Cred.model_rebuild()
+Session.model_rebuild()
