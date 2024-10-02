@@ -781,6 +781,7 @@ paths:
     post:
       summary: Generate WebAuthn registration options
       description: Generate registration options for WebAuthn.
+      operationId: backend.api.AuthView.webauthn_register_options
       requestBody:
         required: true
         content:
@@ -805,6 +806,7 @@ paths:
     post:
       summary: Verify WebAuthn registration
       description: Verify the registration response for WebAuthn.
+      operationId: backend.api.AuthView.webauthn_register
       parameters:
         - in: cookie
           name: challenge
@@ -831,6 +833,7 @@ paths:
     post:
       summary: Generate WebAuthn authentication options
       description: Generate authentication options for WebAuthn.
+      operationId: backend.api.AuthView.webauthn_login_options
       requestBody:
         required: true
         content:
@@ -855,7 +858,7 @@ paths:
     post:
       summary: Verify WebAuthn authentication
       description: Verify the authentication response for WebAuthn.
-      operationId: backend.api.AuthView.verify_authentication
+      operationId: backend.api.AuthView.webauthn_login
       requestBody:
         required: true
         content:
@@ -874,6 +877,8 @@ paths:
   /auth/logout:
     post:
       summary: Logout user
+      description: End the current user session.
+      operationId: backend.api.AuthView.logout
       responses:
         '200':
           description: Successfully logged out

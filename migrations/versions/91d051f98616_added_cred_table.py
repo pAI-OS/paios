@@ -23,11 +23,11 @@ def upgrade() -> None:
     op.create_table('cred',
     sa.Column('id', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('public_key', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('passkey_user_id', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('webauthn_user_id', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('backed_up', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('name', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
     sa.Column('transports', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
-    sa.ForeignKeyConstraint(['passkey_user_id'], ['user.passkey_user_id'], ),
+    sa.ForeignKeyConstraint(['webauthn_user_id'], ['user.webauthn_user_id'], ),
     sa.PrimaryKeyConstraint('id')
     )
 

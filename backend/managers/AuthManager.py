@@ -24,7 +24,7 @@ from webauthn.helpers.structs import (
 )
 from webauthn.helpers.cose import COSEAlgorithmIdentifier
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from backend.utils import generate_jwt
 
@@ -49,12 +49,12 @@ class AuthManager:
         async with db_session_context() as session:
             result = await session.execute(select(User).where(User.email == email_id))
             user = result.scalar_one_or_none()
-            user_id = base64url_to_bytes(user.passkey_user_id) if user else os.urandom(32)
+            user_id = base64url_to_bytes(user.webauthn_user_id) if user else os.urandom(32)
 
             exclude_credentials = []
 
             if user:
-                creds_result = await session.execute(select(Cred).filter(Cred.passkey_user_id == user.passkey_user_id))
+                creds_result = await session.execute(select(Cred).filter(Cred.webauthn_user_id == user.webauthn_user_id))
                 creds = creds_result.scalars().all()
 
                 for cred in creds:
@@ -102,7 +102,7 @@ class AuthManager:
             user = user_result.scalar_one_or_none()
         
             if not user:
-                new_user = User(id=str(uuid4()), name=email_id, email=email_id, passkey_user_id=user_id)
+                new_user = User(id=str(uuid4()), name=email_id, email=email_id, webauthn_user_id=user_id)
                 session.add(new_user)
                 await session.commit()
                 await session.refresh(new_user)
@@ -115,14 +115,14 @@ class AuthManager:
 
 
             transports = json.dumps(response["response"]["transports"])
-            new_cred = Cred(id=base64_cred_id, public_key=base64_public_key, passkey_user_id=user.passkey_user_id, backed_up=res.credential_backed_up, name=email_id, transports=transports)
+            new_cred = Cred(id=base64url_cred_id, public_key=base64url_public_key, webauthn_user_id=user.webauthn_user_id, backed_up=res.credential_backed_up, name=email_id, transports=transports)
             session.add(new_cred)
             await session.commit()
 
             payload = {
                 "sub": user.id,
-                "iat": datetime.utcnow(),
-                "exp": datetime.utcnow() + timedelta(days=1)
+                "iat": datetime.now(timezone.utc),
+                "exp": datetime.now(timezone.utc) + timedelta(days=1)
             }
 
             token = generate_jwt(payload)
@@ -138,7 +138,7 @@ class AuthManager:
             
             allow_credentials = []
 
-            creds_result = await session.execute(select(PublicKeyCred).filter(PublicKeyCred.passkey_user_id == user.passkey_user_id))
+            creds_result = await session.execute(select(Cred).filter(Cred.webauthn_user_id == user.webauthn_user_id))
             creds = creds_result.scalars().all()
 
             for cred in creds:
@@ -163,7 +163,7 @@ class AuthManager:
         async with db_session_context() as session:
             expected_origin = "https://localhost:8443"
             expected_rpid = "localhost"
-            credential_result = await session.execute(select(PublicKeyCred).where(PublicKeyCred.id == response["id"]))
+            credential_result = await session.execute(select(Cred).where(Cred.id == response["id"]))
             credential = credential_result.scalar_one_or_none()
 
             if not credential:

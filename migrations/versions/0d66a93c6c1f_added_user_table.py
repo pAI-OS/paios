@@ -22,6 +22,7 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     op.create_table('user',
     sa.Column('id', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('webauthn_user_id', sqlmodel.sql.sqltypes.AutoString(), nullable=False, unique=True),
     sa.Column('name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('email', sqlmodel.sql.sqltypes.AutoString(), nullable=False, unique=True),
     sa.PrimaryKeyConstraint('id')
