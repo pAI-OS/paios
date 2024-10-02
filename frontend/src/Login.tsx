@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import logo from './assets/kwaai.png';
+import logo from './assets/paios.png';
 import './Login.css';
 import { useLogin, useNotify } from "react-admin"
 
@@ -46,7 +46,7 @@ const Login: React.FC = () => {
     return (
         <div className="auth-container">
             <h1 className="paios-heading">pAI-OS</h1>
-            <img src={logo} alt="Kwaai Logo" className="logo" />
+            <img src={logo} alt="pAI-OS Logo" className="logo" />
             <h2>{isRegistering ? "Register" : "Login"}</h2>
             <form onSubmit={handleUser}>
                 <input type="email" id="email" placeholder="Email" className="input-field" onChange={handleChange} value={email} />
