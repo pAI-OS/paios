@@ -32,7 +32,7 @@ class Persona(SQLModelBase, table=True):
     face_id: str | None = Field(default=None)
 
 class Share(SQLModelBase, table=True):
-    id: str = Field(primary_key=True)  # the short URL tag, eg abc-def-ghi
+    id: str = Field(primary_key=True)  # the short URL tag, eg abcd-efgh-ijkl
     resource_id: str = Field(foreign_key="resource.id")  # the bot ID
     user_id: str | None = Field(default=None)  # the user granted access (optional)
     expiration_dt: datetime | None = Field(default=None)  # the link expiration date/time (optional)
