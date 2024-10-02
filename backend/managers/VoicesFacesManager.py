@@ -11,6 +11,7 @@ from backend.schemas import VoiceSchema
 from pathlib import Path
 from backend.models import Resource, Persona
  
+XI_API_KEY = os.environ.get('XI_API_KEY')
 
 class VoicesFacesManager:
     _instance = None
@@ -31,7 +32,7 @@ class VoicesFacesManager:
         
     async def map_xi_to_voice(self):
         xi_voices = []
-        xi_api_key = os.environ.get('XI_API_KEY')
+        xi_api_key = XI_API_KEY
         xi_url = "https://api.elevenlabs.io/v1/voices"
         headers = {
                     "Accept": "application/json",
@@ -98,7 +99,9 @@ class VoicesFacesManager:
                 result = await session.execute(query)
                 voices = [VoiceSchema.from_orm(voice) for voice in result.scalars().all()]
 
-                # Get total count
+                if not voices:
+                    return [], 0
+
                 count_query = select(func.count()).select_from(Voice)
                 if filters:
                     for key, value in filters.items():
@@ -116,7 +119,7 @@ class VoicesFacesManager:
             
     async def text_to_speech(self, voice_id: str, body: str, assistant_id: str, msg_id: str) -> Tuple[Optional[dict], Optional[str]]:
         voice = await self.retrieve_voice(voice_id)
-        xi_api_key = os.environ.get('XI_API_KEY')
+        xi_api_key = XI_API_KEY
         xi_id = voice.xi_id
         temp = os.path.dirname(os.path.realpath(__file__))
         directory = Path(os.path.join(os.path.dirname(temp), f'public/{assistant_id}'))
