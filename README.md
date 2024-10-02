@@ -41,7 +41,7 @@ Update backend/models.py then run:
 
 `alembic revision --autogenerate -m "added asset table"`
 
-** NOTE: If you get an error about an already existing table, you can drop the table and run 'alembic upgrade head' again. This is a known issue for the user and the public_key_cred tables. **
+** NOTE: If you get an error about an already existing table, you may want to drop the table and run 'alembic upgrade head' again. **
 
 _POSIX (Linux/macOS/etc.)_
 
