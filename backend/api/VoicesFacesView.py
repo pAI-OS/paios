@@ -22,14 +22,20 @@ class VoicesFacesView:
             return result
 
         offset, limit, sort_by, sort_order, filters = result
-
-        voices, total_count = await self.vfm.retrieve_voices(
-            limit=limit,
-            offset=offset,
-            sort_by=sort_by,
-            sort_order=sort_order,
-            filters=filters
-        )
+        try:
+            voices, total_count = await self.vfm.retrieve_voices(
+                limit=limit,
+                offset=offset,
+                sort_by=sort_by,
+                sort_order=sort_order,
+                filters=filters
+            )            
+            if voices == [] and total_count == 0:
+                return JSONResponse({"error": "No voices found"}, status_code=404)
+            
+        except Exception as e:
+            return JSONResponse({"error": str(e)}, status_code=500)
+        
         headers = {
             'X-Total-Count': str(total_count),
             'Content-Range': f'voices {offset}-{offset + len(voices) - 1}/{total_count}'
