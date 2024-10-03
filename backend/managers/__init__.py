@@ -1,5 +1,5 @@
 from .AbilitiesManager import AbilitiesManager
-from .AssetsManager import AssetsManager
+from .CollectionsManager import CollectionsManager
 from .ResourcesManager import ResourcesManager
 from .ConfigManager import ConfigManager
 from .DownloadsManager import DownloadsManager
@@ -10,7 +10,7 @@ from .AuthManager import AuthManager
 # List of manager classes
 manager_classes = [
     AbilitiesManager,
-    AssetsManager,
+    CollectionsManager,
     ResourcesManager,
     ConfigManager,
     DownloadsManager,

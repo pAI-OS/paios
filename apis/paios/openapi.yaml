@@ -179,14 +179,15 @@ paths:
         required: true
         schema:
           $ref: '#/components/schemas/kebab-snake_id'
-  /assets:
+  /collections:
     get:
       security:
         - jwt: []
       tags:
-        - Asset Management
-      summary: Retrieve all assets
-      description: Retrieve the information of all assets.
+        - Collection Management
+      summary: Retrieve all collections
+      description: Retrieve the information of all collections.
+      operationId: backend.api.CollectionsView.list_collections
       parameters:
         - $ref: '#/components/parameters/sort'
         - $ref: '#/components/parameters/range'
@@ -199,39 +200,39 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Asset'
+                  $ref: '#/components/schemas/Collection'
           headers:
             X-Total-Count:
               $ref: '#/components/headers/X-Total-Count'
     post:
       security:
         - jwt: []
-      summary: Create new asset
       tags:
-        - Asset Management
+        - Collection Management
+      summary: Create new collection
+      description: Creates a new collection.
+      operationId: backend.api.CollectionsView.create_collection
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CollectionCreate'
       responses:
         '201':
           description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Asset'
-        '400':
-          description: Missing Required Information
-      description: Creates a new asset.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AssetCreate'
-  '/assets/{id}':
+                $ref: '#/components/schemas/Collection'
+  '/collections/{id}':
     get:
       security:
         - jwt: []
       tags:
-        - Asset Management
-      summary: Retrieve asset by id
-      description: Retrieve the information of the asset with the matching asset ID.
+        - Collection Management
+      summary: Retrieve collection by id
+      description: Retrieve the information of the collection with the matching ID.
+      operationId: backend.api.CollectionsView.get_collection
       parameters:
         - $ref: '#/components/parameters/id'
       responses:
@@ -240,40 +241,117 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Asset'
+                $ref: '#/components/schemas/Collection'
     put:
       security:
         - jwt: []
-      summary: Update asset by id
       tags:
-        - Asset Management
+        - Collection Management
+      summary: Update collection by id
+      description: Update the information of the collection with the matching ID.
+      operationId: backend.api.CollectionsView.update_collection
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CollectionCreate'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Asset'
-      description: Updates the asset with the given id.
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Asset'
+                $ref: '#/components/schemas/Collection'
     delete:
       security:
         - jwt: []
-      summary: Delete asset by id
-      description: Deletes the asset with the given id.
       tags:
-        - Asset Management
+        - Collection Management
+      summary: Delete collection by id
+      description: Delete the collection with the matching ID.
+      operationId: backend.api.CollectionsView.delete_collection
+      parameters:
+        - $ref: '#/components/parameters/id'
       responses:
         '204':
           description: No Content
         '404':
           description: Not Found
-    parameters:
-      - $ref: '#/components/parameters/id'
+  '/collections/{id}/process':
+    post:
+      security:
+        - jwt: []
+      tags:
+        - Collection Management
+      summary: Process collection
+      description: Start processing the collection with the matching ID.
+      operationId: backend.api.CollectionsView.process_collection
+      parameters:
+        - $ref: '#/components/parameters/id'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text_splitter:
+                  type: string
+                embedder:
+                  type: string
+                vector_store:
+                  type: string
+              required:
+                - text_splitter
+                - embedder
+                - vector_store
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  '/collections/{id}/search':
+    get:
+      security:
+        - jwt: []
+      tags:
+        - Collection Management
+      summary: Search within a collection
+      description: Search for content within the specified collection.
+      operationId: backend.api.CollectionsView.search_collection
+      parameters:
+        - $ref: '#/components/parameters/id'
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    content:
+                      type: string
+                    metadata:
+                      type: object
   /resources:
     get:
       security:
@@ -887,8 +965,8 @@ paths:
 tags:
   - name: Abilities Management
     description: Installation and configuration of abilities
-  - name: Asset Management
-    description: Management of assets
+  - name: Collection Management
+    description: Management of collections
   - name: Resource Management
     description: Discovery and configuration of input/output interfaces/resources
   - name: Configuration Management
@@ -1146,42 +1224,33 @@ components:
               version:
                 type: string
                 example: '>=2.8'
-    Asset:
+    Collection:
       type: object
-      title: Asset
       properties:
         id:
           $ref: '#/components/schemas/uuid4ReadOnly'
-        user_id:
-          $ref: '#/components/schemas/uuid4'
-        title:
-          $ref: '#/components/schemas/textShort'
-        creator:
+        name:
           $ref: '#/components/schemas/name'
-        subject:
-          $ref: '#/components/schemas/textShort'
         description:
           $ref: '#/components/schemas/textLong'
+        processor_config:
+          type: object
+          additionalProperties: true
       required:
         - id
-        - title
-    AssetCreate:
+        - name
+    CollectionCreate:
       type: object
-      title: AssetCreate
-      description: Asset without id which is server-generated.
       properties:
-        user_id:
-          $ref: '#/components/schemas/uuid4'
-        title:
-          $ref: '#/components/schemas/textShort'
-        creator:
+        name:
           $ref: '#/components/schemas/name'
-        subject:
-          $ref: '#/components/schemas/textShort'
         description:
-          $ref: '#/components/schemas/textShort'
+          $ref: '#/components/schemas/textLong'
+        processor_config:
+          type: object
+          additionalProperties: true
       required:
-        - title
+        - name
     Resource:
       type: object
       title: Resource

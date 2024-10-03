@@ -36,7 +36,7 @@ Alembic is used to manage database versioning using migrations.
 
 Update backend/models.py then run:
 
-`alembic revision --autogenerate -m "added asset table"`
+`alembic revision --autogenerate -m "added collection table"`
 
 ** NOTE: If you get an error about an already existing table, you may want to drop the table and run 'alembic upgrade head' again. **
 

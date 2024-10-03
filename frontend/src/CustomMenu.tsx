@@ -8,7 +8,7 @@ import { apiBase } from './apiBackend';
 export const CustomMenu = () => (
   <Menu>
     <Menu.DashboardItem />
-    <Menu.ResourceItem name="assets" />
+    <Menu.ResourceItem name="collections" />
     <Menu.ResourceItem name="users" />
     <Menu.ResourceItem name="abilities" />
     <Menu.ResourceItem name="resources" />

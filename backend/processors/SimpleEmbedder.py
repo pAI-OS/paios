@@ -8,3 +8,6 @@ class SimpleEmbedder(BaseProcessor):
 
     async def process(self, chunks: List[str]) -> List[List[float]]:
         return [[random.random() for _ in range(100)] for _ in chunks]
+
+    async def embed_query(self, query: str) -> List[float]:
+        return [random.random() for _ in range(100)]

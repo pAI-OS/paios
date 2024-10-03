@@ -1,8 +1,8 @@
 from uuid import uuid4
 from datetime import datetime
-from sqlmodel import Field, Relationship
+from sqlmodel import Field, Relationship, Column, JSON
 from backend.db import SQLModelBase
-from typing import List, Optional, ForwardRef
+from typing import List, Optional, ForwardRef, Dict, Any
 
 # Forward references
 UserRef = ForwardRef("User")
@@ -43,23 +43,6 @@ class Session(SQLModelBase, table=True):
     expires_at: datetime = Field()
     user: User = Relationship(back_populates="sessions")
 
-class AssetCollection(SQLModelBase, table=True):
-    id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
-    name: str = Field()
-    description: Optional[str] = Field(default=None)
-    track_individual_assets: bool = Field(default=True)
-    assets: List["Asset"] = Relationship(back_populates="collection")
-
-class Asset(SQLModelBase, table=True):
-    id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
-    collection_id: str = Field(foreign_key="assetcollection.id")
-    title: str = Field()
-    content: str = Field(default="")
-    creator: Optional[str] = Field(default=None)
-    subject: Optional[str] = Field(default=None)
-    description: Optional[str] = Field(default=None)
-    collection: AssetCollection = Relationship(back_populates="assets")
-
 class Persona(SQLModelBase, table=True):
     id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
     name: str = Field()
@@ -74,9 +57,13 @@ class Share(SQLModelBase, table=True):
     expiration_dt: datetime | None = Field(default=None)  # the link expiration date/time (optional)
     is_revoked: bool = Field()
 
+class Collection(SQLModelBase, table=True):
+    id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
+    name: str = Field()
+    description: Optional[str] = Field(default=None)
+    processor_config: Optional[Dict[str, Any]] = Field(default=None, sa_column=Column(JSON))
+
 # Resolve forward references
 User.model_rebuild()
 Cred.model_rebuild()
 Session.model_rebuild()
-Asset.model_rebuild()
-AssetCollection.model_rebuild()

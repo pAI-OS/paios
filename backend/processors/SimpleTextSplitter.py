@@ -7,4 +7,3 @@ class SimpleTextSplitter(BaseProcessor):
 
     async def process(self, content: str) -> List[str]:
         return [content[i:i+1000] for i in range(0, len(content), 1000)]
-    

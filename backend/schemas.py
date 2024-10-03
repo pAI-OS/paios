@@ -1,6 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel, field_serializer
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 
 
 # We have *Create schemas because API clients ideally don't set the id field, it's set by the server
@@ -48,19 +48,16 @@ class UserCreateSchema(UserBaseSchema):
 class UserSchema(UserBaseSchema):
     id: str
 
-# Asset schemas
-class AssetBaseSchema(BaseModel):
-    title: str
-    user_id: Optional[str] = None
-    creator: Optional[str] = None
-    subject: Optional[str] = None
+# Collection schemas
+class CollectionBase(BaseModel):
+    name: str
     description: Optional[str] = None
-    collection_id: str
+    processor_config: Optional[Dict[str, Any]] = None
 
-class AssetCreateSchema(AssetBaseSchema):
+class CollectionCreate(CollectionBase):
     pass
 
-class AssetSchema(AssetBaseSchema):
+class Collection(CollectionBase):
     id: str
 
 # Share schemas
@@ -105,15 +102,3 @@ class VerifyAuthentication(BaseModel):
     email: str
     auth_resp: dict
     challenge: str
-
-# Asset Collection schemas
-class AssetCollectionBaseSchema(BaseModel):
-    name: str
-    description: Optional[str] = None
-    track_individual_assets: bool = True
-
-class AssetCollectionCreateSchema(AssetCollectionBaseSchema):
-    pass
-
-class AssetCollectionSchema(AssetCollectionBaseSchema):
-    id: str
