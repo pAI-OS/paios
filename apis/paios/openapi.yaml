@@ -1363,6 +1363,7 @@ components:
           $ref: '#/components/schemas/uuid4'
         user_id:
           type: string
+          format: uuid
           nullable: true
         expiration_dt:
           type: string
