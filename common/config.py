@@ -68,7 +68,7 @@ logging_config: dict[str, Any] = {
     },
     "loggers": {
         "": {"handlers": ["default"], "level": "INFO"}, # root logger
-        "connexion": {"handlers": ["connexion"], "level": "DEBUG", "propagate": False},
+        "connexion": {"handlers": ["connexion"], "level": "INFO", "propagate": False},
         "backend.redirector": {"handlers": ["backend.redirector"], "level": "INFO", "propagate": False},
         "uvicorn": {"handlers": ["uvicorn_default"], "level": "INFO", "propagate": False},
         "uvicorn.error": {"level": "INFO"},

@@ -55,8 +55,13 @@ def decode_jwt(token):
         return {"uid": decoded['sub']}
     
     except jwt.ExpiredSignatureError:
+        logger.warning("Token expired")
         raise Unauthorized("Token expired")
-    except jwt.InvalidTokenError:
+    except jwt.InvalidTokenError as e:
+        logger.warning(f"Invalid token: {str(e)}")
+        raise Unauthorized("Invalid token")
+    except Exception as e:
+        logger.error(f"Unexpected error decoding token: {str(e)}")
         raise Unauthorized("Invalid token")
 
 
