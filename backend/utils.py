@@ -4,9 +4,22 @@ from backend.models import Session
 from connexion.exceptions import OAuthProblem
 import jwt
 import os
-from dotenv import load_dotenv
+from dotenv import set_key
+from common.paths import base_dir
 
-load_dotenv()
+def get_env_key(key_name, default=None):
+    value = os.environ.get(key_name)
+    if not value:
+        # If default is a function, call it to get the value, otherwise use it as the value
+        if default is not None:
+            if callable(default):
+                value = default()
+            else:
+                value = str(default)
+        else:
+            raise ValueError(f"{key_name} is not set in the environment variables")
+        set_key(base_dir / '.env', key_name, value)
+    return value
 
 # Returns dict with null fields removed (e.g., for OpenAPI spec compliant
 # responses without having to set nullable: true)

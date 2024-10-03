@@ -1,6 +1,10 @@
 # backend package
 import os
 from common import paths
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv(paths.base_dir / '.env')
 
 # List of directories to ensure exist
 required_directories = [
