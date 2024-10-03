@@ -1,17 +1,22 @@
+import os
+import json
+import base64
+import jwt
+import secrets
 from threading import Lock
+from datetime import datetime, timedelta, timezone
+from sqlalchemy import select, update, delete
+from backend.models import User, Cred, Session
+from backend.db import db_session_context
+from uuid import uuid4
 from webauthn import (
     verify_registration_response,
     verify_authentication_response, 
     generate_authentication_options, 
     generate_registration_options, 
     options_to_json,
-    base64url_to_bytes)
-from sqlalchemy import select, update, delete
-from backend.models import User, Cred, Session
-from backend.db import db_session_context
-import os
-import base64
-from uuid import uuid4
+    base64url_to_bytes
+)
 from webauthn.helpers.structs import (
     AttestationConveyancePreference,
     AuthenticatorAttachment,
@@ -23,10 +28,37 @@ from webauthn.helpers.structs import (
     UserVerificationRequirement
 )
 from webauthn.helpers.cose import COSEAlgorithmIdentifier
-import json
-from datetime import datetime, timedelta, timezone
+from connexion.exceptions import Unauthorized
+from backend.utils import get_env_key
 
-from backend.utils import generate_jwt
+# set up logging
+from common.log import get_logger
+logger = get_logger(__name__)
+
+def generate_jwt(payload: dict):
+    header = {
+        "alg": "HS256",
+        "typ": "JWT"
+    }
+
+    jwt_secret = get_env_key('PAIOS_JWT_SECRET', lambda: secrets.token_urlsafe(32))
+
+    encoded_jwt = jwt.encode(payload, jwt_secret, algorithm='HS256', headers=header)
+    return encoded_jwt
+
+def decode_jwt(token):
+    jwt_secret = get_env_key('PAIOS_JWT_SECRET', lambda: secrets.token_urlsafe(32))
+
+    try:
+        decoded = jwt.decode(token, jwt_secret, algorithms=["HS256"])
+        logger.debug("Decoded JWT: %s", decoded)
+        return {"uid": decoded['sub']}
+    
+    except jwt.ExpiredSignatureError:
+        raise Unauthorized("Token expired")
+    except jwt.InvalidTokenError:
+        raise Unauthorized("Invalid token")
+
 
 class AuthManager:
     _instance = None

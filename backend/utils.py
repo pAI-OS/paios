@@ -1,9 +1,3 @@
-from backend.db import db_session_context
-from sqlalchemy import select
-from backend.models import Session
-from connexion.exceptions import OAuthProblem
-import jwt
-import secrets
 import os
 from dotenv import set_key
 from common.paths import base_dir
@@ -45,37 +39,3 @@ def filter_dict(data, keys_to_include):
 # ["x", "y"], [1, 2] -> { "x": 1, "y": 2})
 def zip_fields(fields, result):
     return {field: result[i] for i, field in enumerate(fields)}
-
-async def apikey_auth(token):
-    async with db_session_context() as session:
-            session_token_res = await session.execute(select(Session).where(Session.token == token))
-            session_token = session_token_res.scalar_one_or_none()
-
-            if not session_token:
-                raise OAuthProblem("Invalid token")
-            
-            return {"uid": session_token.user_id}
-    
-def generate_jwt(payload: dict):
-    header = {
-        "alg": "HS256",
-        "typ": "JWT"
-    }
-
-    jwt_secret = get_env_key('PAIOS_JWT_SECRET', lambda: secrets.token_urlsafe(32))
-
-    encoded_jwt = jwt.encode(payload, jwt_secret, algorithm='HS256', headers=header)
-    return encoded_jwt
-
-def decode_jwt(token):
-    jwt_secret = get_env_key('PAIOS_JWT_SECRET', lambda: secrets.token_urlsafe(32))
-
-    try:
-        decoded = jwt.decode(token, jwt_secret, algorithms=["HS256"])
-        logger.debug("Decoded JWT: %s", decoded)
-        return {"uid": decoded['sub']}
-    
-    except jwt.ExpiredSignatureError:
-        raise OAuthProblem("Token expired")
-    except jwt.InvalidTokenError:
-        raise OAuthProblem("Invalid token")
