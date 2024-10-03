@@ -43,13 +43,22 @@ class Session(SQLModelBase, table=True):
     expires_at: datetime = Field()
     user: User = Relationship(back_populates="sessions")
 
+class AssetCollection(SQLModelBase, table=True):
+    id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
+    name: str = Field()
+    description: Optional[str] = Field(default=None)
+    track_individual_assets: bool = Field(default=True)
+    assets: List["Asset"] = Relationship(back_populates="collection")
+
 class Asset(SQLModelBase, table=True):
     id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
-    user_id: str | None = Field(default=None, foreign_key="user.id")
+    collection_id: str = Field(foreign_key="assetcollection.id")
     title: str = Field()
-    creator: str | None = Field(default=None)
-    subject: str | None = Field(default=None)
-    description: str | None = Field(default=None)
+    content: str = Field(default="")
+    creator: Optional[str] = Field(default=None)
+    subject: Optional[str] = Field(default=None)
+    description: Optional[str] = Field(default=None)
+    collection: AssetCollection = Relationship(back_populates="assets")
 
 class Persona(SQLModelBase, table=True):
     id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
@@ -69,3 +78,5 @@ class Share(SQLModelBase, table=True):
 User.model_rebuild()
 Cred.model_rebuild()
 Session.model_rebuild()
+Asset.model_rebuild()
+AssetCollection.model_rebuild()
