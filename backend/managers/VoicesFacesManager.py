@@ -126,7 +126,6 @@ class VoicesFacesManager:
         directory.mkdir(parents=True, exist_ok=True)
         file_path = directory / f'{msg_id}.mp3'
         audio_msg_path = str(file_path)
-        print('audio_msg_path: ', audio_msg_path)
         tts_url = f"https://api.elevenlabs.io/v1/text-to-speech/{xi_id}/stream"
 
         headers = {
