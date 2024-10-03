@@ -907,7 +907,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      x-bearerInfoFunc: backend.utils.decode_token
+      x-bearerInfoFunc: backend.utils.decode_jwt
   headers:
     X-Total-Count:
       description: The total number of items

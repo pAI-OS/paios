@@ -3,9 +3,14 @@ from sqlalchemy import select
 from backend.models import Session
 from connexion.exceptions import OAuthProblem
 import jwt
+import secrets
 import os
 from dotenv import set_key
 from common.paths import base_dir
+
+# set up logging
+from common.log import get_logger
+logger = get_logger(__name__)
 
 def get_env_key(key_name, default=None):
     value = os.environ.get(key_name)
@@ -57,25 +62,20 @@ def generate_jwt(payload: dict):
         "typ": "JWT"
     }
 
-    secret = os.getenv('JWT_SECRET')
-    if not secret:
-        raise ValueError("JWT_SECRET is not set in the environment variables")
+    jwt_secret = get_env_key('PAIOS_JWT_SECRET', lambda: secrets.token_urlsafe(32))
 
-    encoded_jwt = jwt.encode(payload, secret, algorithm='HS256', headers=header)
+    encoded_jwt = jwt.encode(payload, jwt_secret, algorithm='HS256', headers=header)
     return encoded_jwt
 
-def decode_token(token):
-    secret = os.getenv('JWT_SECRET')
-    if not secret:
-        raise ValueError("JWT_SECRET is not set in the environment variables")
+def decode_jwt(token):
+    jwt_secret = get_env_key('PAIOS_JWT_SECRET', lambda: secrets.token_urlsafe(32))
 
     try:
-        decoded = jwt.decode(token, secret, algorithms=["HS256"])
-        print("DECODE...", decoded)
+        decoded = jwt.decode(token, jwt_secret, algorithms=["HS256"])
+        logger.debug("Decoded JWT: %s", decoded)
         return {"uid": decoded['sub']}
     
     except jwt.ExpiredSignatureError:
         raise OAuthProblem("Token expired")
     except jwt.InvalidTokenError:
         raise OAuthProblem("Invalid token")
-
