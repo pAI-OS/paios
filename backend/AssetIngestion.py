@@ -5,7 +5,9 @@ from llama_index.core.node_parser import SentenceSplitter
 from llama_index.core.schema import TextNode
 import pymupdf
 from llama_index.core import Document, VectorStoreIndex
-from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+#from llama_index.embeddings.huggingface import HuggingFaceEmbedding
+from langchain.embeddings import HuggingFaceEmbeddings
+from llama_index.embeddings.langchain import LangchainEmbedding
 # build index
 # index = VectorStoreIndex.from_documents(documents)
 
@@ -94,7 +96,9 @@ def compute_child_nodes_similarity(nodes):
 
 
 if __name__ == "__main__":
-    embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
+    #embed_model = HuggingFaceEmbedding(model_name="BAAI/bge-small-en-v1.5")
+    lc_embed_model  = HuggingFaceEmbeddings(model_name="BAAI/bge-small-en-v1.5")
+    embed_model = LangchainEmbedding(lc_embed_model)
     text_chunks, doc_idx, documents = chunk_pdf()
     nodes = create_nodes(text_chunks,documents,doc_idx)
     nodes = get_nodes_embedding(nodes)
