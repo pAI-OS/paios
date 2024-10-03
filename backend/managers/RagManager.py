@@ -165,9 +165,12 @@ class RagManager:
         persona = await personas_m.retrieve_persona(persona_id)
         personality_prompt = persona.description
         # Combine the system prompt and context        
-        system_prompt = (os.environ.get('SYSTEM_PROMPT') + "\n\n{context}" +
-                        "\n\nHere is some information about the assistant expertise to help you answer your questions: " +
-                        personality_prompt)
+        system_prompt = (os.environ.get('SYSTEM_PROMPT') + 
+                         "\n\n{context}" +
+                        "\n\nHere is some information about the assistant expertise to help you answer your questions: " + personality_prompt + 
+                        ".\n\nIf the user asks you a question about the assistant information, example: 'What can you tell me about the assistant?', 'What is the name of the assistant?', 'Who is the assistant?', etc." +
+                        "\n\nPlease answer the question using the following information:\n\n" + personality_prompt
+                        )
         
         prompt = ChatPromptTemplate.from_messages([
             ("system", system_prompt),
