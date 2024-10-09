@@ -1,6 +1,9 @@
 from starlette.responses import JSONResponse, Response
 from common.paths import api_base_url
 from backend.managers.ResourcesManager import ResourcesManager
+from backend.managers.RagManager import RagManager
+from backend.managers.MessagesManager import MessagesManager
+from backend.managers.ConversationsManager import ConversationsManager
 from backend.pagination import parse_pagination_params
 from backend.schemas import ResourceCreateSchema
 from typing import List
@@ -35,9 +38,24 @@ class ResourcesView:
         return JSONResponse(updated_resource.dict(), status_code=200)        
 
     async def delete(self, id: str):
-        success = await self.rm.delete_resource(id)
-        if not success:
-            return JSONResponse({"error": "Resource not found"}, status_code=404)
+        ragm = RagManager()
+        cm = ConversationsManager()
+        msgm = MessagesManager()
+        file_ids = await self.rm.retrieve_resource_files(id)
+        conversations_ids = await self.rm.retrieve_resource_conversations(id)
+
+        if file_ids:
+            await ragm.delete_documents_from_chroma(id, file_ids)
+            await ragm.delete_file_from_db(file_ids)     
+              
+        if conversations_ids:
+            for conversation_id in conversations_ids:
+                await cm.delete_conversation(conversation_id)
+                await msgm.delete_messages_from_conversation(conversation_id)
+
+        success_resource = await self.rm.delete_resource(id)        
+        if not success_resource:
+            return JSONResponse({"error": "Resource not found "}, status_code=404)
         return Response(status_code=204)
 
     async def search(self, filter: str = None, range: str = None, sort: str = None):

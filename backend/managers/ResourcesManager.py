@@ -2,7 +2,7 @@ from uuid import uuid4
 from threading import Lock
 import httpx
 from sqlalchemy import select, update, delete, func
-from backend.models import Resource
+from backend.models import Resource, File, Conversation
 from backend.db import db_session_context
 from backend.schemas import ResourceCreateSchema, ResourceSchema
 from typing import List, Tuple, Optional, Dict, Any
@@ -228,3 +228,24 @@ class ResourcesManager:
                     return models
                 else:
                     return []
+                
+    async def retrieve_resource_files(self, resource_id: str) -> bool:
+        async with db_session_context() as session:
+            result_files = await session.execute(select(File).filter(File.assistant_id == resource_id))
+            files = result_files.scalars().all()
+            if not files: 
+                return None                  
+            file_ids = [file.id for file in files]
+            print("file ids: ", file_ids)            
+            return file_ids
+        
+    async def retrieve_resource_conversations(self, resource_id: str) -> bool:
+        async with db_session_context() as session:
+            result_conversations = await session.execute(select(Conversation).filter(Conversation.assistant_id == resource_id))
+            conversations = result_conversations.scalars().all()
+            if not conversations: 
+                return None                  
+            conversations_ids = [conversation.id for conversation in conversations]
+            print("conversations_ids: ", conversations_ids)
+            return conversations_ids
+            
