@@ -29,7 +29,7 @@ from webauthn.helpers.structs import (
 )
 from webauthn.helpers.cose import COSEAlgorithmIdentifier
 from connexion.exceptions import Unauthorized
-from backend.utils import get_env_key
+from common.utils import get_env_key
 
 # set up logging
 from common.log import get_logger

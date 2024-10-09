@@ -10,7 +10,7 @@ from enum import Enum
 from pathlib import Path
 from urllib.parse import urlparse
 from common.paths import data_dir, downloads_dir
-from backend.utils import filter_dict, remove_null_fields
+from common.utils import filter_dict, remove_null_fields
 from threading import Lock
 
 class DownloadStatus(Enum):

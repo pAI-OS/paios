@@ -10,6 +10,7 @@ if base_dir not in sys.path:
     sys.path.append(str(base_dir))
 from common.paths import backend_dir, venv_dir, cert_dir
 from common.config import logging_config
+from backend.utils import get_env_key
 
 # check environment
 from backend.env import check_env
@@ -43,8 +44,8 @@ if __name__ == "__main__":
     app = create_app()
 
     # Define host and port
-    host = os.environ.get("PAIOS_HOST", "localhost")
-    port = int(os.environ.get("PAIOS_PORT", 8443))
+    host = get_env_key("PAIOS_HOST", "localhost")
+    port = int(get_env_key("PAIOS_PORT", 8443))
 
     # Log connection details
     logger.info(f"You can access pAI-OS at https://{host}:{port}.")

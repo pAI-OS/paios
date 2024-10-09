@@ -1,6 +1,6 @@
 import json
 from cryptography.fernet import Fernet
-from backend.utils import get_env_key
+from common.utils import get_env_key
 
 class Encryption:
     _instance = None

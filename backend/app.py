@@ -5,6 +5,7 @@ from connexion.resolver import MethodResolver
 from connexion.middleware import MiddlewarePosition
 from starlette.middleware.cors import CORSMiddleware
 from backend.db import init_db
+from backend.utils import get_env_key
 
 def create_backend_app():
     # Initialize the database
@@ -19,9 +20,9 @@ def create_backend_app():
     ]
 
     # Add PAIOS server URL if environment variables are set
-    paios_scheme = os.environ.get('PAIOS_SCHEME', 'https')
-    paios_host = os.environ.get('PAIOS_HOST', 'localhost')
-    paios_port = os.environ.get('PAIOS_PORT', '8443')
+    paios_scheme = get_env_key('PAIOS_SCHEME', 'https')
+    paios_host = get_env_key('PAIOS_HOST', 'localhost')
+    paios_port = get_env_key('PAIOS_PORT', '8443')
 
     if paios_host:
         paios_url = f"{paios_scheme}://{paios_host}"
