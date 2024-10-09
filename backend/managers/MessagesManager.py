@@ -1,6 +1,6 @@
 from uuid import uuid4
 from threading import Lock
-from sqlalchemy import select
+from sqlalchemy import select, delete
 from backend.models import Message, Conversation, Resource
 from backend.db import db_session_context
 from backend.schemas import MessageSchema, MessageCreateSchema
@@ -93,7 +93,7 @@ class MessagesManager:
                     return chat_response, None
         
         except Exception as e:
-            return None, f"An unexpected error occurred: {str(e)}"
+            return None, f"An unexpected error occurred while creating a message: {str(e)}"
 
     async def retrieve_message(self, id:str) -> Optional[MessageSchema]:
         async with db_session_context() as session:            
@@ -115,3 +115,22 @@ class MessagesManager:
         # Extract the last part of the URI after the last "/"
         model_name = uri.split('/')[-1] 
         return model_name
+        
+    async def delete_messages_from_conversation(self, conversation_id):
+        async with db_session_context() as session:
+            stmt = select(Message).filter(Message.conversation_id == conversation_id) 
+            result = await session.execute(stmt)
+            msgs = result.scalars().all()
+            msgs = [MessageSchema.from_orm(msg) for msg in msgs]
+            print("msgs: ", msgs)
+            for msg in msgs:
+                if not await self._delete_message(msg.id):
+                    return False
+            return True
+
+    async def _delete_message(self, id: str) -> bool:
+        async with db_session_context() as session:
+            stmt = delete(Message).where(Message.id == id)
+            result = await session.execute(stmt)
+            await session.commit()
+            return result.rowcount > 0
