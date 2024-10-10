@@ -10,6 +10,8 @@ from sqlalchemy import select, func
 from backend.schemas import VoiceSchema
 from pathlib import Path
 from backend.models import Resource, Persona
+from dotenv import load_dotenv, set_key
+from common.paths import base_dir
  
 XI_API_KEY = os.environ.get('XI_API_KEY')
 
@@ -24,11 +26,21 @@ class VoicesFacesManager:
                     cls._instance = super(VoicesFacesManager, cls).__new__(cls, *args, **kwargs)
         return cls._instance
 
-    def __init__(self):
+    def __init__(self, xi_chunk_size=None):
         if not hasattr(self, '_initialized'):
             with self._lock:
                 if not hasattr(self, '_initialized'):
-                    self._initialized = True        
+                    self._initialized = True
+                    load_dotenv(base_dir / '.env')
+                    self.xi_chunk_size = xi_chunk_size if xi_chunk_size else self.get_xi_labs_params('XI_CHUNK_SIZE')
+
+    def get_xi_labs_params(self, param_name: str):
+        if param_name == 'XI_CHUNK_SIZE':
+            xi_chunk_size=os.environ.get('XI_CHUNK_SIZE')       
+            if not xi_chunk_size:                 
+                xi_chunk_size = 1024
+            set_key(base_dir / '.env', 'XI_CHUNK_SIZE', str(xi_chunk_size))
+            return xi_chunk_size
         
     async def map_xi_to_voice(self):
         xi_voices = []
@@ -51,7 +63,6 @@ class VoicesFacesManager:
                 }
             xi_voices.append(voice_data)
         return xi_voices
-    
 
     async def create_voice(self, voice_data: VoiceCreateSchema) -> str:
         async with db_session_context() as session:
