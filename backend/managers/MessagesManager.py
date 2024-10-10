@@ -9,6 +9,8 @@ from backend.utils import get_current_timestamp
 from backend.managers.RagManager import RagManager
 from langchain_community.llms import Ollama
 import os
+from dotenv import load_dotenv, set_key
+from common.paths import base_dir
 
 class MessagesManager:
     _instance = None
@@ -21,16 +23,47 @@ class MessagesManager:
                     cls._instance = super(MessagesManager, cls).__new__(cls, *args, **kwargs)
         return cls._instance
 
-    def __init__(self):
+    def __init__(self, max_tokens=None, temperature=None, top_k=None, top_p=None):
         if not hasattr(self, '_initialized'):
             with self._lock:
                 if not hasattr(self, '_initialized'):
                     self._initialized = True
-                    self.max_tokens = int(os.environ.get('MAX_TOKENS'))
-                    self.temperature = float(os.environ.get('TEMPERATURE'))
-                    self.top_k = int(os.environ.get('TOP_K'))
-                    self.top_p = float(os.environ.get('TOP_P'))
+                    load_dotenv(base_dir / '.env')
+                    self.max_tokens = max_tokens if max_tokens else self.get_model_params('MAX_TOKENS')
+                    self.temperature = temperature if temperature else self.get_model_params('TEMPERATURE')
+                    self.top_k = top_k if top_k else self.get_model_params('TOP_K')
+                    self.top_p = top_p if top_p else self.get_model_params('TOP_P')
                     
+    def get_model_params(self, param_name: str):
+        if param_name == 'MAX_TOKENS':
+            max_tokens=os.environ.get('MAX_TOKENS')       
+            if not max_tokens:                 
+                max_tokens = 1000000
+            set_key(base_dir / '.env', 'MAX_TOKENS', str(max_tokens))            
+            return max_tokens
+        
+        if param_name == 'TEMPERATURE':            
+            temperature=os.environ.get('TEMPERATURE')
+            if not temperature:
+                temperature = 0.2
+            set_key(base_dir / '.env', 'TEMPERATURE', str(temperature))
+            return temperature
+        
+        if param_name == 'TOP_K':
+            top_k=os.environ.get('TOP_K')
+            if not top_k:                
+                top_k = 10              
+            set_key(base_dir / '.env', 'TOP_K', str(top_k))        
+            return top_k
+        
+        if param_name == 'TOP_P':
+            top_p=os.environ.get('TOP_P')
+            if not top_p:                
+                top_p = 0.5
+                print("top_p", str(top_p))
+            set_key(base_dir / '.env', 'TOP_P', str(top_p))        
+            return top_p
+                        
     async def __get_llm_name__(self, assistant_id) -> Tuple[Optional[str], Optional[str]]:
         async with db_session_context() as session:
             result = await session.execute(select(Resource).filter(Resource.id == assistant_id))
@@ -43,7 +76,6 @@ class MessagesManager:
             llm = result.scalar_one_or_none()
             if not llm:
                 return None, "LLM resource not found"
-            
             return self.extract_names_from_uri(llm.uri.split('/')[-1]), None
         
     def set_max_tokens(self, max_tokens: int):
@@ -69,10 +101,10 @@ class MessagesManager:
                     return None, error_message
                 
                 llm = Ollama(model=model_name, 
-                             num_predict=self.max_tokens, 
-                             temperature=self.temperature, 
-                             top_k=self.top_k, 
-                             top_p=self.top_p)
+                             num_predict=int(self.max_tokens), 
+                             temperature=float(self.temperature), 
+                             top_k=int(self.top_k), 
+                             top_p=float(self.top_p))
                 
                 assistant_id = message_data['assistant_id']
                 query = message_data['prompt']

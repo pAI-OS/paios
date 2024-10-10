@@ -24,6 +24,8 @@ import logging
 from enum import Enum
 import aiofiles
 import asyncio
+from dotenv import load_dotenv, set_key
+from common.paths import base_dir
 
 logger = logging.getLogger(__name__)
 
@@ -47,22 +49,59 @@ class RagManager:
                     cls._instance = super(RagManager, cls).__new__(cls, *args, **kwargs)
         return cls._instance
 
-    def __init__(self):
+    def __init__(self, chunk_size=None, chunk_overlap=None, add_start_index=None, embedder_model=None, system_prompt=None):
         if not hasattr(self, '_initialized'):
             with self._lock:
                 if not hasattr(self, '_initialized'):
                     self._initialized = True
+                    load_dotenv(base_dir / '.env')
+                    self.chunk_size = chunk_size if chunk_size else self.get_params('CHUNK_SIZE')
+                    self.chunk_overlap = chunk_overlap if chunk_overlap else self.get_params('CHUNK_OVERLAP')
+                    self.add_start_index = add_start_index if add_start_index else self.get_params('ADD_START_INDEX')
+                    self.embedder_model = embedder_model if embedder_model else self.get_params('EMBEDDER_MODEL')
+                    self.system_prompt = system_prompt if system_prompt else self.get_params('SYSTEM_PROMPT')            
+                    
+    def get_params(self, param_name: str):
+        if param_name == 'CHUNK_SIZE':
+            chunk_size=os.environ.get('CHUNK_SIZE')
+            if not chunk_size:
+                chunk_size = 10000
+            set_key(base_dir / '.env', 'CHUNK_SIZE', str(chunk_size))
+            return chunk_size
+        if param_name == 'CHUNK_OVERLAP':            
+            chunk_overlap=os.environ.get('CHUNK_OVERLAP')
+            if not chunk_overlap:
+                chunk_overlap = 200 
+            set_key(base_dir / '.env', 'CHUNK_OVERLAP', str(chunk_overlap))
+            return chunk_overlap
+        if param_name == 'ADD_START_INDEX':
+            add_start_index=os.environ.get('ADD_START_INDEX')
+            if not add_start_index:                
+                add_start_index = 'True'
+            set_key(base_dir / '.env', 'ADD_START_INDEX', str(add_start_index))        
+            return add_start_index
+        if param_name == 'EMBEDDER_MODEL':
+            embedder_model=os.environ.get('EMBEDDER_MODEL')
+            if not embedder_model:                
+                embedder_model = 'llama3:latest'
+            set_key(base_dir / '.env', 'EMBEDDER_MODEL', str(embedder_model))        
+            return embedder_model
+        if param_name == 'SYSTEM_PROMPT':
+            system_prompt=os.environ.get('SYSTEM_PROMPT')
+            if not system_prompt:                
+                system_prompt = "You are an assistant for question-answering tasks.Use the following pieces of retrieved context to answer the question. If you don't know the answer, say that you don't know."
+            set_key(base_dir / '.env', 'SYSTEM_PROMPT', str(system_prompt))        
+            return system_prompt 
 
     async def create_index(self, resource_id: str, path_files: List[str], files_ids:List[str]) -> List[dict]:
         loop = asyncio.get_running_loop()
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size=int(os.environ.get('CHUNK_SIZE')),
-            chunk_overlap=int(os.environ.get('CHUNK_OVERLAP')),
-            add_start_index=bool(strtobool(os.environ.get('ADD_START_INDEX')))
+            chunk_size=int(self.chunk_size),
+            chunk_overlap=int(self.chunk_overlap),
+            add_start_index=bool(strtobool(self.add_start_index))
         )
-        
         file_info_list = []
-        vectorstore = await self.initialize_chroma(resource_id)
+        vectorstore = await self.initialize_chroma(resource_id) 
         
         for path, file_id in zip(path_files, files_ids):
             file_name = Path(path).name
@@ -149,7 +188,7 @@ class RagManager:
 
             
     async def initialize_chroma(self, collection_name: str):
-        embed = OllamaEmbeddings(model=os.environ.get('EMBEDDER_MODEL'))
+        embed = OllamaEmbeddings(model=self.embedder_model)
         
         path = Path(chroma_db_path)
         vectorstore = Chroma(persist_directory=str(path),
@@ -166,10 +205,10 @@ class RagManager:
         personality_prompt = persona.description
         # Combine the system prompt and context        
                 # Combine the system prompt and context  
-        system_prompt = (os.environ.get('SYSTEM_PROMPT') + "\n\n{context}" +
+        system_prompt = (self.system_prompt + "\n\n{context}" +
                         "\n\nHere is some information about the assistant expertise to help you answer your questions: " +
                         personality_prompt)      
-        # system_prompt = (os.environ.get('SYSTEM_PROMPT') + 
+        # system_prompt = (self.system_prompt + 
         #                  "\n\n{context}" +
         #                 "\n\nHere is some information about the assistant expertise to help you answer your questions: " + personality_prompt + 
         #                 ".\n\nIf the user asks you a question about the assistant information, example: 'What can you tell me about the assistant?', 'What is the name of the assistant?', 'Who is the assistant?'. "+                        
