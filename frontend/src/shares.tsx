@@ -11,6 +11,9 @@ const shareFilters = [
     <ReferenceInput source="resource_id" label="Resource" reference="resources">
         <SelectInput optionText="name" />
     </ReferenceInput>,
+    <ReferenceInput source="user_id" label="User" reference="users">
+        <SelectInput optionText="email" />
+    </ReferenceInput>,
 ];
 
 export const ShareList = () => (
@@ -19,6 +22,9 @@ export const ShareList = () => (
             <TextField source="id" />
             <ReferenceField source="resource_id" reference="resources" link="show">
                 <TextField source="name" />
+            </ReferenceField>
+            <ReferenceField source="user_id" reference="users" link="show">
+                <TextField source="email" />
             </ReferenceField>
             <BooleanField source="is_revoked" />
         </Datagrid>
@@ -32,6 +38,9 @@ export const ShareShow = () => (
             <ReferenceField source="resource_id" reference="resources" link="show">
                 <TextField source="name" />
             </ReferenceField>
+            <ReferenceField source="user_id" reference="users" link="show">
+                <TextField source="email" />
+            </ReferenceField>
             <DateField source="expiration_dt" label="Expires On" showTime locales="UTC" />
             <BooleanField source="is_revoked" />
         </SimpleShowLayout>
@@ -44,6 +53,9 @@ export const ShareEdit = () => (
             <ReferenceInput source="resource_id" label="Resource" reference="resources">
                 <SelectInput optionText="name" />
             </ReferenceInput>
+            <ReferenceInput source="user_id" label="User" reference="users">
+                <SelectInput optionText="email" />
+            </ReferenceInput>
             <DateTimeInput source="expiration_dt" label="Expires On (Optional)" />
             <BooleanInput source="is_revoked" />
         </SimpleForm>
@@ -55,6 +67,9 @@ export const ShareCreate = () => (
         <SimpleForm>
             <ReferenceInput source="resource_id" label="Resource" reference="resources">
                 <SelectInput optionText="name" />
+            </ReferenceInput>
+            <ReferenceInput source="user_id" label="User" reference="users">
+                <SelectInput optionText="email" />
             </ReferenceInput>
             <DateTimeInput source="expiration_dt" label="Expires On (Optional)" />
         </SimpleForm>
