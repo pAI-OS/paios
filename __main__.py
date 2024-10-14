@@ -3,7 +3,6 @@ import os
 import sys
 import signal
 from pathlib import Path
-
 # Ensure the parent directory is in sys.path so relative imports work.
 base_dir = Path(__file__).parent
 if base_dir not in sys.path:
@@ -11,6 +10,7 @@ if base_dir not in sys.path:
 from common.paths import backend_dir, venv_dir, cert_dir
 from common.config import logging_config
 from backend.utils import get_env_key
+from common.mail import send
 
 # check environment
 from backend.env import check_env
@@ -48,6 +48,7 @@ if __name__ == "__main__":
 
     # Log connection details
     logger.info(f"You can access pAI-OS at https://{host}:{port}.")
+    #asyncio.run(send("samj@samj.net", "pAI-OS started up", f"You can access pAI-OS at https://{host}:{port}."))
     logger.info("Bypass certificate warnings if using self-signed certificates.")
 
     # Run the app
