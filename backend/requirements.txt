@@ -20,3 +20,4 @@ structlog
 webauthn
 greenlet
 pyjwt
+casbin

@@ -30,6 +30,9 @@ from webauthn.helpers.structs import (
 from webauthn.helpers.cose import COSEAlgorithmIdentifier
 from connexion.exceptions import Unauthorized
 from common.utils import get_env_key
+import casbin
+import os
+from pathlib import Path
 
 # set up logging
 from common.log import get_logger
@@ -81,6 +84,21 @@ class AuthManager:
             with self._lock:
                 if not hasattr(self, '_initialized'):
                     self._initialized = True
+                    self._load_rbac_model()
+
+    def _load_rbac_model(self):
+        model_path = Path(__file__).parent.parent / 'rbac_model.conf'
+        policy_path = Path(__file__).parent.parent / 'rbac_policy.csv'
+        self.enforcer = casbin.Enforcer(str(model_path), str(policy_path))
+
+    def check_permission(self, sub, obj, act):
+        return self.enforcer.enforce(sub, obj, act)
+
+    def add_role_for_user(self, user, role):
+        self.enforcer.add_grouping_policy(user, role)
+
+    def get_roles_for_user(self, user):
+        return self.enforcer.get_roles_for_user(user)
 
     async def webauthn_register_options(self, email_id: str):
         async with db_session_context() as session:
@@ -146,6 +164,9 @@ class AuthManager:
                 await session.commit()
                 await session.refresh(new_user)
                 user = new_user
+                
+                # Add default role for new user
+                self.add_role_for_user(str(user.id), 'user')
 
             base64url_cred_id = base64.urlsafe_b64encode(res.credential_id).decode("utf-8").rstrip("=")
             base64url_public_key = base64.urlsafe_b64encode(res.credential_public_key).decode("utf-8").rstrip("=")
@@ -158,7 +179,8 @@ class AuthManager:
             payload = {
                 "sub": user.id,
                 "iat": datetime.now(timezone.utc),
-                "exp": datetime.now(timezone.utc) + timedelta(days=1)
+                "exp": datetime.now(timezone.utc) + timedelta(days=1),
+                "roles": self.get_roles_for_user(str(user.id))  # Include roles in the token
             }
 
             token = generate_jwt(payload)

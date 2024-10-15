@@ -2,6 +2,11 @@ import { AuthProvider } from "react-admin";
 import { login, register, logout } from "./apis/auth";
 import { jwtDecode } from "jwt-decode";
 
+interface CustomJwtPayload {
+    roles: string[];
+    exp?: number;
+}
+
 export const authProvider: AuthProvider = {
     // called when the user attempts to log in
     login: async ({ email, isRegistering }) => {
@@ -51,5 +56,11 @@ export const authProvider: AuthProvider = {
         return Promise.reject()
     },
     // called when the user navigates to a new location, to check for permissions / roles
-    getPermissions: () => Promise.resolve(),
+    getPermissions: () => {
+        const token = localStorage.getItem("token");
+        if (!token) return Promise.reject();
+
+        const decodedToken = jwtDecode<CustomJwtPayload>(token);
+        return Promise.resolve(decodedToken.roles);
+    },
 };
