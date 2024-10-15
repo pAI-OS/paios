@@ -121,10 +121,12 @@ class AuthManager:
 
             return challenge, options_to_json(options)
         
-    async def registrationResponse(self, challenge: str, email_id: str,user_id: str, response):
+    async def registrationResponse(self, challenge: str, email_id: str, user_id: str, response):
         async with db_session_context() as session:
-            expected_origin = "https://localhost:8443"
-            expected_rpid = "localhost"
+            host = get_env_key('PAIOS_HOST', 'localhost')
+            port = get_env_key('PAIOS_PORT', '8443')
+            expected_origin = f"https://{host}:{port}"
+            expected_rpid = host
 
             res = verify_registration_response(credential=response, 
                                                expected_challenge=base64url_to_bytes(challenge),
@@ -196,10 +198,13 @@ class AuthManager:
             challenge = base64.urlsafe_b64encode(options.challenge).decode("utf-8").rstrip("=")
             return challenge, options_to_json(options)
         
-    async def signinResponse(self, challenge: str,email_id:str, response):
+    async def signinResponse(self, challenge: str, email_id:str, response):
         async with db_session_context() as session:
-            expected_origin = "https://localhost:8443"
-            expected_rpid = "localhost"
+            host = get_env_key('PAIOS_HOST', 'localhost')
+            port = get_env_key('PAIOS_PORT', '8443')
+            expected_origin = f"https://{host}:{port}"
+            expected_rpid = host
+
             credential_result = await session.execute(select(Cred).where(Cred.id == response["id"]))
             credential = credential_result.scalar_one_or_none()
 
