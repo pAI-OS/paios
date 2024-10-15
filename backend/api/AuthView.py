@@ -11,7 +11,7 @@ class AuthView:
         self.am = AuthManager()
 
     async def webauthn_register_options(self, body: RegistrationOptions):
-        challenge, options = await self.am.registration_options(body["email"])
+        challenge, options = await self.am.webauthn_register_options(body["email"])
 
         if not options:
             return JSONResponse({"error": "Something went wrong"}, status_code=500)
@@ -20,10 +20,9 @@ class AuthView:
         response.set_cookie(key="challenge",value=challenge, secure=True, httponly=True, samesite='strict')
         return response
     
-
     async def webauthn_register(self, body: VerifyRegistration):
         challenge = request.cookies.get("challenge")
-        token = await self.am.registrationResponse(challenge, body["email"], body["user_id"], body["att_resp"])
+        token = await self.am.webauthn_register(challenge, body["email"], body["user_id"], body["att_resp"])
         if not token:
             return JSONResponse({"message": "Failed"}, status_code=401)
         
@@ -33,24 +32,24 @@ class AuthView:
         return response
     
     async def webauthn_login_options(self, body: AuthenticationOptions):
-        challenge, options = await self.am.signinRequestOptions(body["email"])
+        challenge, options = await self.am.webauthn_login_options(body["email"])
 
         if not options:
             return JSONResponse({"error": "Something went wrong"}, status_code=500)
          
-     
         response = JSONResponse({"options": options}, status_code=200)
         response.set_cookie(key="challenge", value=challenge, secure=True, httponly=True, samesite='strict')
         return response
-    
-    async def webauthn_login(self, body: VerifyAuthentication):
-        token = await self.am.signinResponse(body["challenge"], body["email"], body["auth_resp"])
 
+    async def webauthn_login(self, body: VerifyAuthentication):
+        challenge = request.cookies.get("challenge")
+        token = await self.am.webauthn_login(challenge, body["email"], body["auth_resp"])
         if not token:
-            return JSONResponse({"error": "Authentication failed."}, status_code=401)
-         
+            return JSONResponse({"message": "Failed"}, status_code=401)
+        
         response = JSONResponse({"message": "Success", "token": token}, status_code=200)
-        response.set_cookie(key="challenge", value="", expires=0, secure=True, httponly=True, samesite='strict')
+        response.set_cookie(key="challenge",value="", expires=0,secure=True, httponly=True, samesite='strict')
+        
         return response
         
     async def logout(self):

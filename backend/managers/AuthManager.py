@@ -82,7 +82,7 @@ class AuthManager:
                 if not hasattr(self, '_initialized'):
                     self._initialized = True
 
-    async def registration_options(self, email_id: str):
+    async def webauthn_register_options(self, email_id: str):
         async with db_session_context() as session:
             result = await session.execute(select(User).where(User.email == email_id))
             user = result.scalar_one_or_none()
@@ -121,7 +121,7 @@ class AuthManager:
 
             return challenge, options_to_json(options)
         
-    async def registrationResponse(self, challenge: str, email_id: str, user_id: str, response):
+    async def webauthn_register(self, challenge: str, email_id: str, user_id: str, response):
         async with db_session_context() as session:
             host = get_env_key('PAIOS_HOST', 'localhost')
             port = get_env_key('PAIOS_PORT', '8443')
@@ -147,11 +147,8 @@ class AuthManager:
                 await session.refresh(new_user)
                 user = new_user
 
-            # _, token = await self.create_session(user.id)
-            
             base64url_cred_id = base64.urlsafe_b64encode(res.credential_id).decode("utf-8").rstrip("=")
             base64url_public_key = base64.urlsafe_b64encode(res.credential_public_key).decode("utf-8").rstrip("=")
-
 
             transports = json.dumps(response["response"]["transports"])
             new_cred = Cred(id=base64url_cred_id, public_key=base64url_public_key, webauthn_user_id=user.webauthn_user_id, backed_up=res.credential_backed_up, name=email_id, transports=transports)
@@ -167,7 +164,7 @@ class AuthManager:
             token = generate_jwt(payload)
             return token
 
-    async def signinRequestOptions(self, email_id: str):
+    async def webauthn_login_options(self, email_id: str):
         async with db_session_context() as session:
             user_result = await session.execute(select(User).where(User.email == email_id))
             user = user_result.scalar_one_or_none()
@@ -198,7 +195,7 @@ class AuthManager:
             challenge = base64.urlsafe_b64encode(options.challenge).decode("utf-8").rstrip("=")
             return challenge, options_to_json(options)
         
-    async def signinResponse(self, challenge: str, email_id:str, response):
+    async def webauthn_login(self, challenge: str, email_id:str, response):
         async with db_session_context() as session:
             host = get_env_key('PAIOS_HOST', 'localhost')
             port = get_env_key('PAIOS_PORT', '8443')
@@ -229,7 +226,6 @@ class AuthManager:
             if not res.new_sign_count != 1:
                 return None
             
-            # _, session_token = await self.create_session(user.id)
             payload = {
                 "sub": user.id,
                 "iat": datetime.utcnow(),
