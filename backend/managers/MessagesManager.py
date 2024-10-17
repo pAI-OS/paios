@@ -38,7 +38,7 @@ class MessagesManager:
         if param_name == 'MAX_TOKENS':
             max_tokens=os.environ.get('MAX_TOKENS')       
             if not max_tokens:                 
-                max_tokens = 1000000
+                max_tokens = 200
             set_key(base_dir / '.env', 'MAX_TOKENS', str(max_tokens))            
             return max_tokens
         
@@ -52,14 +52,14 @@ class MessagesManager:
         if param_name == 'TOP_K':
             top_k=os.environ.get('TOP_K')
             if not top_k:                
-                top_k = 10              
+                top_k = 40              
             set_key(base_dir / '.env', 'TOP_K', str(top_k))        
             return top_k
         
         if param_name == 'TOP_P':
             top_p=os.environ.get('TOP_P')
             if not top_p:                
-                top_p = 0.5
+                top_p = 0.9
                 print("top_p", str(top_p))
             set_key(base_dir / '.env', 'TOP_P', str(top_p))        
             return top_p

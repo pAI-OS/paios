@@ -6,9 +6,9 @@ from langchain_chroma import Chroma
 from langchain_ollama import OllamaEmbeddings
 from common.paths import chroma_db_path
 from pathlib import Path
-from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain.chains.combine_documents import create_stuff_documents_chain
-from langchain.chains import create_retrieval_chain
+from langchain.chains import create_retrieval_chain, create_history_aware_retriever
 import shutil
 from starlette.datastructures import UploadFile
 from uuid import uuid4
@@ -26,6 +26,9 @@ import aiofiles
 import asyncio
 from dotenv import load_dotenv, set_key
 from common.paths import base_dir
+from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain_core.chat_history import BaseChatMessageHistory
+from langchain_core.runnables.history import RunnableWithMessageHistory
 
 logger = logging.getLogger(__name__)
 
@@ -59,19 +62,20 @@ class RagManager:
                     self.chunk_overlap = chunk_overlap if chunk_overlap else self.get_params('CHUNK_OVERLAP')
                     self.add_start_index = add_start_index if add_start_index else self.get_params('ADD_START_INDEX')
                     self.embedder_model = embedder_model if embedder_model else self.get_params('EMBEDDER_MODEL')
-                    self.system_prompt = system_prompt if system_prompt else self.get_params('SYSTEM_PROMPT')            
+                    self.system_prompt = system_prompt if system_prompt else self.get_params('SYSTEM_PROMPT')
+                    print("params:::", self.chunk_size, self.chunk_overlap, self.add_start_index, self.embedder_model, self.system_prompt)           
                     
     def get_params(self, param_name: str):
         if param_name == 'CHUNK_SIZE':
             chunk_size=os.environ.get('CHUNK_SIZE')
             if not chunk_size:
-                chunk_size = 10000
+                chunk_size = 2000
             set_key(base_dir / '.env', 'CHUNK_SIZE', str(chunk_size))
             return chunk_size
         if param_name == 'CHUNK_OVERLAP':            
             chunk_overlap=os.environ.get('CHUNK_OVERLAP')
             if not chunk_overlap:
-                chunk_overlap = 200 
+                chunk_overlap = 400 
             set_key(base_dir / '.env', 'CHUNK_OVERLAP', str(chunk_overlap))
             return chunk_overlap
         if param_name == 'ADD_START_INDEX':
@@ -89,12 +93,12 @@ class RagManager:
         if param_name == 'SYSTEM_PROMPT':
             system_prompt=os.environ.get('SYSTEM_PROMPT')
             if not system_prompt:                
-                system_prompt = "You are an assistant for question-answering tasks.Use the following pieces of retrieved context to answer the question. If you don't know the answer, say that you don't know."
+                system_prompt = "You are a helpful assistant for students' learning needs."
             set_key(base_dir / '.env', 'SYSTEM_PROMPT', str(system_prompt))        
             return system_prompt 
 
     async def create_index(self, resource_id: str, path_files: List[str], files_ids:List[str]) -> List[dict]:
-        loop = asyncio.get_running_loop()
+        loop = asyncio.get_running_loop()        
         text_splitter = RecursiveCharacterTextSplitter(
             chunk_size=int(self.chunk_size),
             chunk_overlap=int(self.chunk_overlap),
@@ -172,7 +176,7 @@ class RagManager:
                 new_page = Page(id=page_id, file_id=file_id, assistant_id=assistant_id)            
                 session.add(new_page)
                 await session.commit()
-                await session.refresh(new_page)
+                await session.refresh(new_page) 
             except Exception as e:                
                 print(f"An error occurred creating a page: {e}")
     
@@ -194,44 +198,42 @@ class RagManager:
         vectorstore = Chroma(persist_directory=str(path),
                              collection_name=collection_name,
                              embedding_function=embed)
-        return vectorstore
+        return vectorstore    
     
     async def retrieve_and_generate(self, collection_name, query, llm) -> str:
         resources_m = ResourcesManager()
         personas_m = PersonasManager()
+
         resource = await resources_m.retrieve_resource(collection_name)        
         persona_id = resource.persona_id
-        persona = await personas_m.retrieve_persona(persona_id)
-        personality_prompt = persona.description
-        # Combine the system prompt and context        
-                # Combine the system prompt and context  
-        system_prompt = (self.system_prompt + "\n\n{context}" +
-                        "\n\nHere is some information about the assistant expertise to help you answer your questions: " +
-                        personality_prompt)      
-        # system_prompt = (self.system_prompt + 
-        #                  "\n\n{context}" +
-        #                 "\n\nHere is some information about the assistant expertise to help you answer your questions: " + personality_prompt + 
-        #                 ".\n\nIf the user asks you a question about the assistant information, example: 'What can you tell me about the assistant?', 'What is the name of the assistant?', 'Who is the assistant?'. "+                        
-        #                 "\n\nPlease answer the question using the following information:\n\n" + personality_prompt + "."
-        #                 "\n\nAlthough if the user asks about who is other person which is not the assistant, please look into the context {context} to answer."
-        #                 )
-        
+        persona = await personas_m.retrieve_persona(persona_id)        
+        expertise = persona.description
+        name= persona.name
+
+        system_prompt = self.system_prompt + """
+                    \n-First, you greet them with your name ```{persona_name}``` and with no more than 30 words explain very briefly your capabilities and expertise using the description: ```{persona_expertise}```.      
+                    \n-Then focus solely on answering their questions without repeating your introduction.
+                    \nYou are expected to answer questions about the following context: \'{context}\'                                                                                   
+                    """
+        system_prompt = system_prompt.format(persona_name=name, persona_expertise= expertise, context="{context}")        
+
         prompt = ChatPromptTemplate.from_messages([
-            ("system", system_prompt),
-            ("human", "{input}")
-            ])
+                    ("system", system_prompt),                   
+                    ("human", "{input}"),
+                ])        
         print(f"\n\nPrompt: {prompt}\n")
+
         vectorstore = await self.initialize_chroma(collection_name)
         retriever = vectorstore.as_retriever()
 
-        # Use the LLM chain with the prompt
         question_answer_chain = create_stuff_documents_chain(llm, prompt)
+        
         rag_chain = create_retrieval_chain(retriever, question_answer_chain)
         
         async for chunk in rag_chain.astream({"input": query}):
             print("chunk:", chunk)
         print("Query: ", query)
-        # Invoke the RAG chain with query as input
+
         response = rag_chain.invoke({"input": query})
         return response
     

@@ -92,10 +92,10 @@ If you want to explore the API Docs visit [http://localhost:3080/api/v1/ui/](htt
 Example of ```.env```:
 
 ```
-CHUNK_SIZE=10000
+CHUNK_SIZE=2000
 CHUNK_OVERLAP=200
 ADD_START_INDEX=True
-MAX_TOKENS=1000000
+MAX_TOKENS=500
 SYSTEM_PROMPT="You are an assistant for question-answering tasks.Use the following pieces of retrieved context to answer the question. If you don't know the answer, say that you don't know."
 TEMPERATURE=0.2
 EMBEDDER_MODEL="llama3:latest"
