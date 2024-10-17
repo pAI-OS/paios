@@ -88,6 +88,14 @@ class ShareCreateSchema(ShareBaseSchema):
 class ShareSchema(ShareBaseSchema):
     id: str
 
+class LlmSchema(BaseModel):
+    id: str
+    name: str
+    llm_name: str
+    provider: str
+    api_base: Optional[str] = None
+    is_active: bool
+
 class RegistrationOptions(BaseModel):
     email: str
 
