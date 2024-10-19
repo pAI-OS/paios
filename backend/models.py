@@ -26,6 +26,7 @@ class User(SQLModelBase, table=True):
     webauthn_user_id: str = Field()
     creds: List["Cred"] = Relationship(back_populates="user")
     sessions: List["Session"] = Relationship(back_populates="user")
+    emailVerified: bool = Field(default=False)
 
 class Cred(SQLModelBase, table=True):
     id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))

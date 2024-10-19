@@ -777,6 +777,31 @@ paths:
           description: No Content
         '404':
           description: Not Found
+  /auth/webauthn/options:
+    post:
+      summary: Generate WebAuthn options
+      description: Generate options for WebAuthn.
+      operationId: backend.api.AuthView.auth_options
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationOptions'
+      responses:
+        '200':
+          description: WebAuthn options generated
+          headers:
+            Set-Cookie:
+              description: A cookie that contains the passkey challenge
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:        
+                type: object
+        '404':
+          description: User not found
   /auth/webauthn/register-options:
     post:
       summary: Generate WebAuthn registration options

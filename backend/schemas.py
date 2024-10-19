@@ -91,6 +91,9 @@ class ShareSchema(ShareBaseSchema):
 class RegistrationOptions(BaseModel):
     email: str
 
+class AuthOptionsRequest(BaseModel):
+    email: str
+
 class VerifyRegistration(BaseModel):
     email: str
     att_resp: dict
