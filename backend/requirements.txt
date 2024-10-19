@@ -21,3 +21,5 @@ webauthn
 greenlet
 pyjwt
 casbin
+itsdangerous
+casbin_sqlalchemy_adapter

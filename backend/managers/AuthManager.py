@@ -33,6 +33,9 @@ from common.utils import get_env_key
 import casbin
 import os
 from pathlib import Path
+from common.mail import send
+from flask import render_template
+from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 
 # set up logging
 from common.log import get_logger
@@ -48,6 +51,32 @@ def generate_jwt(payload: dict):
 
     encoded_jwt = jwt.encode(payload, jwt_secret, algorithm='HS256', headers=header)
     return encoded_jwt
+
+def generate_verification_token(email: str):
+    SECRET_KEY = get_env_key('PAIOS_JWT_SECRET', lambda: secrets.token_urlsafe(32))
+    SALT = "email-confirmation-salt"
+    serializer = URLSafeTimedSerializer(SECRET_KEY)
+    return serializer.dumps(email, salt=SALT)
+
+def verify_email_token(token):
+    SECRET_KEY = get_env_key('PAIOS_JWT_SECRET', lambda: secrets.token_urlsafe(32))
+    SALT = "email-confirmation-salt"
+    serializer = URLSafeTimedSerializer(SECRET_KEY)
+    try:
+        email = serializer.loads(token, salt=SALT, max_age=900)
+    except SignatureExpired:
+        return None 
+    except BadSignature:
+        return None
+    return email
+
+def send_verification_email(email_id):
+    token = generate_verification_token(email_id)
+    verification_url = f"https://localhost:3080/verify-email?token={token}"
+    html_content = render_template(Path(__file__).parent.parent / 'templates' / 'email_verification_template.html', verification_url=verification_url)
+            
+    send(email_id,"Verify Email","",html_content)
+    
 
 def decode_jwt(token):
     jwt_secret = get_env_key('PAIOS_JWT_SECRET', lambda: secrets.token_urlsafe(32))
@@ -99,45 +128,54 @@ class AuthManager:
 
     def get_roles_for_user(self, user):
         return self.enforcer.get_roles_for_user(user)
-
-    async def webauthn_register_options(self, email_id: str):
+    
+    async def auth_options(self, email_id: str):
         async with db_session_context() as session:
             result = await session.execute(select(User).where(User.email == email_id))
             user = result.scalar_one_or_none()
-            user_id = base64url_to_bytes(user.webauthn_user_id) if user else os.urandom(32)
 
-            exclude_credentials = []
+            if not user.emailVerified:
+                return self.webauthn_register_options(email_id, user)
+            
+            return await self.webauthn_login_options(user)
 
-            if user:
-                creds_result = await session.execute(select(Cred).filter(Cred.webauthn_user_id == user.webauthn_user_id))
-                creds = creds_result.scalars().all()
+    def webauthn_register_options(self, email_id, user):
+        # result = await session.execute(select(User).where(User.email == email_id))
+        # user = result.scalar_one_or_none()
+        user_id = base64url_to_bytes(user.webauthn_user_id) if user else os.urandom(32)
 
-                for cred in creds:
-                    transports = [AuthenticatorTransport[transport.upper()] for transport in json.loads(cred.transports)]
-                    exclude_credentials.append(PublicKeyCredentialDescriptor(
-                        id=base64url_to_bytes(cred.id),
-                        type=PublicKeyCredentialType.PUBLIC_KEY,
-                        transports=transports
-                    ))
+        exclude_credentials = []
 
-            options = generate_registration_options(
-                rp_name="pAI-OS",
-                rp_id="localhost",
-                user_name=email_id,
-                user_id=user_id,
-                attestation=AttestationConveyancePreference.DIRECT,
-                authenticator_selection=AuthenticatorSelectionCriteria(
-                    authenticator_attachment=AuthenticatorAttachment.CROSS_PLATFORM,
-                    resident_key=ResidentKeyRequirement.REQUIRED
-                ),
-                supported_pub_key_algs=[COSEAlgorithmIdentifier.ECDSA_SHA_256],
-                timeout=12000,
-                exclude_credentials=exclude_credentials
-            )
+        # if user:
+        #     creds_result = await session.execute(select(Cred).filter(Cred.webauthn_user_id == user.webauthn_user_id))
+        #     creds = creds_result.scalars().all()
 
-            challenge = base64.urlsafe_b64encode(options.challenge).decode("utf-8").rstrip("=")
+        #     for cred in creds:
+        #         transports = [AuthenticatorTransport[transport.upper()] for transport in json.loads(cred.transports)]
+        #         exclude_credentials.append(PublicKeyCredentialDescriptor(
+        #             id=base64url_to_bytes(cred.id),
+        #             type=PublicKeyCredentialType.PUBLIC_KEY,
+        #             transports=transports
+        #         ))
 
-            return challenge, options_to_json(options)
+        options = generate_registration_options(
+            rp_name="pAI-OS",
+            rp_id="localhost",
+            user_name=email_id,
+            user_id=user_id,
+            attestation=AttestationConveyancePreference.DIRECT,
+            authenticator_selection=AuthenticatorSelectionCriteria(
+                authenticator_attachment=AuthenticatorAttachment.CROSS_PLATFORM,
+                resident_key=ResidentKeyRequirement.REQUIRED
+            ),
+            supported_pub_key_algs=[COSEAlgorithmIdentifier.ECDSA_SHA_256],
+            timeout=12000,
+            exclude_credentials=exclude_credentials
+        )
+
+        challenge = base64.urlsafe_b64encode(options.challenge).decode("utf-8").rstrip("=")
+
+        return challenge, options_to_json(options), "REGISTER"
         
     async def webauthn_register(self, challenge: str, email_id: str, user_id: str, response):
         async with db_session_context() as session:
@@ -157,16 +195,18 @@ class AuthManager:
             
             user_result = await session.execute(select(User).where(User.email == email_id))
             user = user_result.scalar_one_or_none()
-        
-            if not user:
+            
+            if not user:    
                 new_user = User(id=str(uuid4()), name=email_id, email=email_id, webauthn_user_id=user_id)
                 session.add(new_user)
                 await session.commit()
                 await session.refresh(new_user)
                 user = new_user
-                
+            else:
+                await session.execute(delete(Cred).where(Cred.webauthn_user_id == user.webauthn_user_id))
+                await session.commit()
                 # Add default role for new user
-                self.add_role_for_user(str(user.id), 'user')
+                # self.add_role_for_user(str(user.id), 'user')
 
             base64url_cred_id = base64.urlsafe_b64encode(res.credential_id).decode("utf-8").rstrip("=")
             base64url_public_key = base64.urlsafe_b64encode(res.credential_public_key).decode("utf-8").rstrip("=")
@@ -175,24 +215,25 @@ class AuthManager:
             new_cred = Cred(id=base64url_cred_id, public_key=base64url_public_key, webauthn_user_id=user.webauthn_user_id, backed_up=res.credential_backed_up, name=email_id, transports=transports)
             session.add(new_cred)
             await session.commit()
+            send_verification_email(email_id)
+            # payload = {
+            #     "sub": user.id,
+            #     "iat": datetime.now(timezone.utc),
+            #     "exp": datetime.now(timezone.utc) + timedelta(days=1),
+            #     "roles": self.get_roles_for_user(str(user.id))  # Include roles in the token
+            # }
 
-            payload = {
-                "sub": user.id,
-                "iat": datetime.now(timezone.utc),
-                "exp": datetime.now(timezone.utc) + timedelta(days=1),
-                "roles": self.get_roles_for_user(str(user.id))  # Include roles in the token
-            }
+            # token = generate_jwt(payload)
+            
+            return True
 
-            token = generate_jwt(payload)
-            return token
-
-    async def webauthn_login_options(self, email_id: str):
+    async def webauthn_login_options(self, user):
         async with db_session_context() as session:
-            user_result = await session.execute(select(User).where(User.email == email_id))
-            user = user_result.scalar_one_or_none()
+            # user_result = await session.execute(select(User).where(User.email == email_id))
+            # user = user_result.scalar_one_or_none()
 
-            if not user:
-                return None, None
+            # if not user:
+            #     return None, None
             
             allow_credentials = []
 
@@ -215,7 +256,7 @@ class AuthManager:
             )
 
             challenge = base64.urlsafe_b64encode(options.challenge).decode("utf-8").rstrip("=")
-            return challenge, options_to_json(options)
+            return challenge, options_to_json(options), "LOGIN"
         
     async def webauthn_login(self, challenge: str, email_id:str, response):
         async with db_session_context() as session:
@@ -223,17 +264,17 @@ class AuthManager:
             port = get_env_key('PAIOS_PORT', '8443')
             expected_origin = f"https://{host}:{port}"
             expected_rpid = host
+            
+            user_result = await session.execute(select(User).where(User.email == email_id, User.emailVerified == True))
+            user = user_result.scalar_one_or_none()
 
+            if not user:
+                return None
+            
             credential_result = await session.execute(select(Cred).where(Cred.id == response["id"]))
             credential = credential_result.scalar_one_or_none()
 
             if not credential:
-                return None
-            
-            user_result = await session.execute(select(User).where(User.email == email_id))
-            user = user_result.scalar_one_or_none()
-
-            if not user:
                 return None
             
             res = verify_authentication_response(credential=response,
