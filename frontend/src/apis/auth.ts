@@ -4,10 +4,10 @@ import {
 } from "@simplewebauthn/browser";
 import { apiBase } from "../apiBackend";
 
-export const login = async (email: string) => {
+export const authentication = async (email: string)=> {
   try {
     const response = await fetch(
-      `${apiBase}/auth/webauthn/login-options`,
+      `${apiBase}/auth/webauthn/options`,
       {
         method: "POST",
         headers: {
@@ -18,11 +18,20 @@ export const login = async (email: string) => {
     );
 
     if (response.status !== 200) {
-      throw new Error("Failed to generate Login options");
+      throw new Error("Something went wrong");
     }
 
     const res = await response.json();
-    const options = JSON.parse(res?.options);
+    const options = JSON.parse(res.options)
+    if(res.flow === "REGISTER") return await register(email,options)
+    else if(res.flow === "LOGIN") return await login(email, options)
+  } catch (error) {
+    throw new Error("Failed to register user");
+  }
+}
+
+export const login = async (email: string, options: any) => {
+  try {
     const authResp = await startAuthentication(options);
 
     const verifyResponse = await fetch(
@@ -43,36 +52,15 @@ export const login = async (email: string) => {
     if (verifyResponse.status !== 200) {
       throw new Error("Failed to register user.");
     }
+    
     return await verifyResponse.json()
   } catch (error) {
     throw new Error("Failed to register user");
   }
 };
 
-export const register = async (email: string) => {
+export const register = async (email: string, options: any) => {
   try {
-    const response = await fetch(
-      `${apiBase}/auth/webauthn/register-options`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
-      }
-    );
-
-    if (response.status === 409) {
-      throw new Error("User already exists");
-    }
-
-    if (response.status !== 200) {
-      throw new Error("Failed to generate registration options");
-    }
-
-    const res = await response.json();
-    const options = JSON.parse(res?.options);
-
     const attResp = await startRegistration(options);
 
     const verifyResponse = await fetch(

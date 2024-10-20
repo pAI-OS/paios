@@ -134,7 +134,7 @@ class AuthManager:
             result = await session.execute(select(User).where(User.email == email_id))
             user = result.scalar_one_or_none()
 
-            if not user.emailVerified:
+            if not user or not user.emailVerified:
                 return self.webauthn_register_options(email_id, user)
             
             return await self.webauthn_login_options(user)

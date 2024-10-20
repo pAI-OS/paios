@@ -5,16 +5,9 @@ import { useLogin, useNotify } from "react-admin"
 
 const Login: React.FC = () => {
     const [email, setEmail] = useState('');
-    const [isRegistering, setIsRegistering] = useState(true);
 
     const login = useLogin()
     const notify = useNotify()
-
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        event.preventDefault()
-        setIsRegistering((prev) => !prev)
-        setEmail("")
-    }
 
     const handleUser = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault()
@@ -24,7 +17,7 @@ const Login: React.FC = () => {
         }
 
         try {
-            await login({ email, isRegistering });
+            await login(email);
         } catch (e) {
             console.error('Debug: Error in handleUser:', e);
             if (e instanceof Error) {
@@ -50,9 +43,8 @@ const Login: React.FC = () => {
             <h2>{isRegistering ? "Register" : "Login"}</h2>
             <form onSubmit={handleUser}>
                 <input type="email" id="email" placeholder="Email" className="input-field" onChange={handleChange} value={email} />
-                <button type="submit" className="auth-button">{isRegistering ? "Register" : "Login"}</button>
+                <button type="submit" className="auth-button">SIGNUP / SIGNIN</button>
             </form>
-            <p className="auth-link">{isRegistering ? "Already have an account?" : "Don't have an account?"} <button onClick={handleClick}>{isRegistering ? "Login here" : "Register here"}</button></p>
         </div>
     );
 };
