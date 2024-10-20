@@ -16,7 +16,7 @@ class AuthView:
         if not options:
             return JSONResponse({"error": "Something went wrong"}, status_code=500)
 
-        response = JSONResponse({"options": options, "options_type": type}, status_code=200)
+        response = JSONResponse({"options": options, "flow": type}, status_code=200)
         response.set_cookie(key="challenge",value=challenge, secure=True, httponly=True, samesite='strict')
         return response
 
@@ -32,11 +32,11 @@ class AuthView:
     
     async def webauthn_register(self, body: VerifyRegistration):
         challenge = request.cookies.get("challenge")
-        token = await self.am.webauthn_register(challenge, body["email"], body["user_id"], body["att_resp"])
-        if not token:
-            return JSONResponse({"message": "Failed"}, status_code=401)
+        res = await self.am.webauthn_register(challenge, body["email"], body["user_id"], body["att_resp"])
+        if not res:
+            return JSONResponse({"message": "Something went wrong"}, status_code=401)
         
-        response = JSONResponse({"message": "Success", "token": token}, status_code=200)
+        response = JSONResponse({"message": "Success"}, status_code=200)
         response.set_cookie(key="challenge",value="", expires=0,secure=True, httponly=True, samesite='strict')
         
         return response

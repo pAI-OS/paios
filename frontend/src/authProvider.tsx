@@ -1,5 +1,5 @@
-import { AuthProvider } from "react-admin";
-import { login, register, logout } from "./apis/auth";
+import { AuthProvider, useNotify } from "react-admin";
+import { authentication, logout } from "./apis/auth";
 import { jwtDecode } from "jwt-decode";
 
 interface CustomJwtPayload {
@@ -9,20 +9,16 @@ interface CustomJwtPayload {
 
 export const authProvider: AuthProvider = {
     // called when the user attempts to log in
-    login: async ({ email, isRegistering }) => {
-        let response
+    login: async (email: string) => {
+        const notify = useNotify()
         try {
-            if (isRegistering) {
-                response = await register(email)
+            const res = await authentication(email)
+            if (res.token) {
+                localStorage.setItem("token", res.token)
+                return Promise.resolve()
             } else {
-                response = await login(email)
+                notify('Verify your email address.', { type: 'success' });
             }
-            if (response) {
-                localStorage.setItem("token", response.token)
-            } else {
-                return Promise.reject()
-            }
-            return Promise.resolve()
         } catch (e) {
             return Promise.reject(e)
         }
