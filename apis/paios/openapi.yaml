@@ -886,7 +886,6 @@ paths:
           description: Successfully logged out
         '401':
           description: Unauthorized
-      - $ref: '#/components/parameters/id'
   '/rag-indexing/{resource_id}':
     delete:
       tags:

@@ -106,13 +106,6 @@ class Conversation(SQLModelBase, table=True):
     last_updated_timestamp: str = Field()
     archive: str = Field()
     assistant_id: str | None = Field(default=None, foreign_key="resource.id")
-    
-class Persona(SQLModelBase, table=True):
-    id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
-    name: str = Field()
-    description: str | None = Field(default=None)
-    voice_id: str | None = Field(default=None)
-    face_id: str | None = Field(default=None)
 
 class Voice(SQLModelBase, table=True):
     id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
