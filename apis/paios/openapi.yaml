@@ -1829,7 +1829,6 @@ components:
           $ref: '#/components/schemas/textShort'
       required:
         - id
-        - name    
         - name
     Message:
       type: object
