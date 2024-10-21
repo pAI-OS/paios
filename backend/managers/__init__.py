@@ -19,9 +19,8 @@ manager_classes = [
     ConfigManager,
     DownloadsManager,
     UsersManager,
-    AuthManager,
-    PersonasManager
     PersonasManager,
+    AuthManager,
     RagManager,
     MessagesManager,
     ConversationsManager,
