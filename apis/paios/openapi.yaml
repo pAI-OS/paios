@@ -615,6 +615,8 @@ paths:
           description: Email Already Taken
   /personas:
     get:
+      security:
+        - jwt: []
       tags:
         - Persona Management
       summary: Retrieve all personas
@@ -636,6 +638,8 @@ paths:
             X-Total-Count:
               $ref: '#/components/headers/X-Total-Count'
     post:
+      security:
+        - jwt: []
       summary: Create new persona
       tags:
         - Persona Management
@@ -656,6 +660,8 @@ paths:
               $ref: '#/components/schemas/PersonaCreate'
   '/personas/{id}':
     get:
+      security:
+        - jwt: []
       tags:
         - Persona Management
       summary: Retrieve persona by id
@@ -670,6 +676,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Persona'
     put:
+      security:
+        - jwt: []
       summary: Update persona by id
       tags:
         - Persona Management
@@ -687,6 +695,8 @@ paths:
             schema:
               $ref: '#/components/schemas/Persona'
     delete:
+      security:
+        - jwt: []
       summary: Delete persona by id
       description: Deletes the persona with the given id.
       tags:
@@ -702,6 +712,8 @@ paths:
       - $ref: '#/components/parameters/id'  
   /shares:
     get:
+      security:
+        - jwt: []
       tags:
         - Share Management
       summary: Retrieve all share links
@@ -723,6 +735,8 @@ paths:
             X-Total-Count:
               $ref: '#/components/headers/X-Total-Count'
     post:
+      security:
+        - jwt: []
       summary: Create new share link
       tags:
         - Share Management
@@ -739,6 +753,8 @@ paths:
               $ref: '#/components/schemas/ShareCreate'
   '/shares/{id}':
     get:
+      security:
+        - jwt: []
       tags:
         - Share Management
       summary: Retrieve share link by id
@@ -753,6 +769,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Share'
     put:
+      security:
+        - jwt: []
       tags:
         - Share Management
       summary: Update share link by id
@@ -768,6 +786,8 @@ paths:
         '200':
           description: OK
     delete:
+      security:
+        - jwt: []
       tags:
         - Share Management
       summary: Delete share link by id
@@ -779,8 +799,10 @@ paths:
           description: No Content
         '404':
           description: Not Found
-  /auth/webauthn/register-options:
+  /auth/webauthn/register-options:    
     post:
+      tags:
+        - Auth Management
       summary: Generate WebAuthn registration options
       description: Generate registration options for WebAuthn.
       operationId: backend.api.AuthView.webauthn_register_options
@@ -806,6 +828,8 @@ paths:
           description: User not found
   /auth/webauthn/register:
     post:
+      tags:
+        - Auth Management
       summary: Verify WebAuthn registration
       description: Verify the registration response for WebAuthn.
       operationId: backend.api.AuthView.webauthn_register
@@ -833,6 +857,8 @@ paths:
           description: User not found
   /auth/webauthn/login-options:
     post:
+      tags:
+        - Auth Management
       summary: Generate WebAuthn authentication options
       description: Generate authentication options for WebAuthn.
       operationId: backend.api.AuthView.webauthn_login_options
@@ -858,6 +884,8 @@ paths:
           description: User not found
   /auth/webauthn/login:
     post:
+      tags:
+        - Auth Management
       summary: Verify WebAuthn authentication
       description: Verify the authentication response for WebAuthn.
       operationId: backend.api.AuthView.webauthn_login
@@ -878,6 +906,8 @@ paths:
           description: User not found
   /auth/logout:
     post:
+      tags:
+        - Auth Management
       summary: Logout user
       description: End the current user session.
       operationId: backend.api.AuthView.logout
@@ -888,6 +918,8 @@ paths:
           description: Unauthorized
   '/rag-indexing/{resource_id}':
     delete:
+      security:
+        - jwt: []
       tags:
         - Files Management
       summary: Delete all files by assistant id
@@ -906,6 +938,8 @@ paths:
         '404':
           description: Not Found
     get:
+      security:
+        - jwt: []
       tags:
         - Files Management
       summary: Retrieve all files by assistant id
@@ -926,6 +960,8 @@ paths:
             X-Total-Count:
               $ref: '#/components/headers/X-Total-Count'
     post:
+      security:
+        - jwt: []
       tags:
         - Files Management
       summary: Create new rag-indexing
@@ -945,6 +981,8 @@ paths:
           description: Missing Required Information        
   /messages:
     post:
+      security:
+        - jwt: []
       summary: Create new message
       tags:
         - Message Management
@@ -964,7 +1002,9 @@ paths:
             schema:
               $ref: '#/components/schemas/MessageCreate'
   /conversations:
-    get:      
+    get:
+      security:
+        - jwt: []  
       tags:
         - Conversation Management
       summary: Retrieve all conversations.
@@ -988,6 +1028,8 @@ paths:
               $ref: '#/components/headers/X-Total-Count'
   '/conversations/{id}':
     get:
+      security:
+        - jwt: []
       tags:
         - Conversation Management
       summary: Retrieve conversation by id
@@ -1003,6 +1045,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Conversation'
     put:
+      security:
+        - jwt: []
       summary: Update conversation by id
       tags:
         - Conversation Management
@@ -1023,6 +1067,8 @@ paths:
             schema:
               $ref: '#/components/schemas/ConversationUpdate'
     delete:
+      security:
+        - jwt: []
       summary: Delete conversation by id
       description: Deletes the conversation with the given id.
       operationId: backend.api.ConversationsView.delete
@@ -1037,6 +1083,8 @@ paths:
           description: Not Found
   '/conversations/{resource_id}':
     post:
+      security:
+        - jwt: []
       summary: Create new conversation
       tags:
         - Conversation Management
@@ -1060,6 +1108,8 @@ paths:
               $ref: '#/components/schemas/ConversationCreate'
   /voices:
     get:
+      security:
+        - jwt: []
       summary: Retrieve all the xi_labs voices
       tags:
         - Voice Management
@@ -1082,6 +1132,8 @@ paths:
             X-Total-Count:
               $ref: '#/components/headers/X-Total-Count'
     post:
+      security:
+        - jwt: []
       summary: Create new voice message.
       description: Creates a new voice message
       operationId: backend.api.VoicesFacesView.post
@@ -1130,6 +1182,8 @@ paths:
               $ref: '#/components/schemas/VoiceMessageCreate'
   '/voices/{id}':
     delete:
+      security:
+        - jwt: []
       summary: Delete voice message by id
       description: Deletes the voice message with the given id.
       operationId: backend.api.VoicesFacesView.delete
@@ -1159,7 +1213,6 @@ tags:
     description: Management of personas
   - name: Share Management
     description: Management of share links
-  - name: RAG Management
   - name: Files Management
     description: Management of RAG indexing
   - name: Message Management
@@ -1168,6 +1221,8 @@ tags:
     description: Management of conversations
   - name: Voice Management
     description: Management of voices
+  - name: Auth Management
+    description: Authentication
 components:
   securitySchemes:
     jwt:

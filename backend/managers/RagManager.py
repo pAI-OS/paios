@@ -93,7 +93,7 @@ class RagManager:
         if param_name == 'SYSTEM_PROMPT':
             system_prompt=os.environ.get('SYSTEM_PROMPT')
             if not system_prompt:                
-                system_prompt = "You are a helpful assistant for students' learning needs."
+                system_prompt = "You are a helpful assistant for students learning needs."
             set_key(base_dir / '.env', 'SYSTEM_PROMPT', str(system_prompt))        
             return system_prompt 
 
