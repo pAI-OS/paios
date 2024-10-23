@@ -34,8 +34,8 @@ import casbin
 import os
 from pathlib import Path
 from common.mail import send
-from flask import render_template
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
+from jinja2 import Environment, FileSystemLoader
 
 # set up logging
 from common.log import get_logger
@@ -73,8 +73,10 @@ def verify_email_token(token):
 def send_verification_email(email_id):
     token = generate_verification_token(email_id)
     verification_url = f"https://localhost:3080/verify-email?token={token}"
-    html_content = render_template(Path(__file__).parent.parent / 'templates' / 'email_verification_template.html', verification_url=verification_url)
-            
+    template_path = Path(__file__).parent.parent / 'templates'
+    env = Environment(loader=FileSystemLoader(template_path))
+    template = env.get_template('email_verification_template.html')
+    html_content = template.render(verification_url=verification_url)
     send(email_id,"Verify Email","",html_content)
     
 
@@ -113,12 +115,12 @@ class AuthManager:
             with self._lock:
                 if not hasattr(self, '_initialized'):
                     self._initialized = True
-                    self._load_rbac_model()
+                    # self._load_rbac_model()
 
-    def _load_rbac_model(self):
-        model_path = Path(__file__).parent.parent / 'rbac_model.conf'
-        policy_path = Path(__file__).parent.parent / 'rbac_policy.csv'
-        self.enforcer = casbin.Enforcer(str(model_path), str(policy_path))
+    # def _load_rbac_model(self):
+    #     model_path = Path(__file__).parent.parent / 'rbac_model.conf'
+    #     policy_path = Path(__file__).parent.parent / 'rbac_policy.csv'
+    #     self.enforcer = casbin.Enforcer(str(model_path), str(policy_path))
 
     def check_permission(self, sub, obj, act):
         return self.enforcer.enforce(sub, obj, act)
