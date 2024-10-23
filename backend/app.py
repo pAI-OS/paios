@@ -17,6 +17,10 @@ def create_backend_app():
     allow_origins = [
         'http://localhost:5173',  # Default Vite dev server
         'https://localhost:8443',  # Secure port for local development
+        'http://localhost',
+        'http://localhost:3080',
+        'http://localhost:5173',
+        'http://localhost:3000'
     ]
 
     # Add PAIOS server URL if environment variables are set
