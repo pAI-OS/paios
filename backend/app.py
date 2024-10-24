@@ -46,7 +46,7 @@ def create_backend_app():
        allow_origins=allow_origins,
        allow_credentials=True,
        allow_methods=["GET","POST","PUT","DELETE","PATCH","HEAD","OPTIONS"],
-       allow_headers=["Content-Range", "X-Total-Count"],
+       allow_headers=["Authorization", "Content-Type", "Content-Range", "X-Total-Count"],
        expose_headers=["Content-Range", "X-Total-Count"],
     )
 
