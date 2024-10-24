@@ -17,7 +17,11 @@ const Login: React.FC = () => {
         }
 
         try {
-            await login(email);
+            const result = await login({ email });
+            if (result?.stayOnLogin) {
+                notify('Email verification sent! Please check your inbox.', { type: 'info' });
+            }
+
         } catch (e) {
             console.error('Debug: Error in handleUser:', e);
             if (e instanceof Error) {

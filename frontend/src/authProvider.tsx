@@ -9,16 +9,16 @@ interface CustomJwtPayload {
 
 export const authProvider: AuthProvider = {
     // called when the user attempts to log in
-    login: async (email: string) => {
-        const notify = useNotify()
+    login: async ({ email }: { email: string }) => {
         try {
             const res = await authentication(email)
             if (res.token) {
                 localStorage.setItem("token", res.token)
                 return Promise.resolve()
             } else {
-                notify('Verify your email address.', { type: 'success' });
+                return { redirectTo: false, stayOnLogin: true };
             }
+
         } catch (e) {
             return Promise.reject(e)
         }
