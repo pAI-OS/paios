@@ -276,8 +276,6 @@ paths:
       - $ref: '#/components/parameters/id'
   /resources:
     get:
-      security:
-        - jwt: []
       tags:
         - Resource Management
       summary: Retrieve all resources
@@ -299,8 +297,6 @@ paths:
             X-Total-Count:
               $ref: '#/components/headers/X-Total-Count'
     post:
-      security:
-        - jwt: []     
       summary: Create new resource
       tags:
         - Resource Management
@@ -317,8 +313,6 @@ paths:
               $ref: '#/components/schemas/ResourceCreate'
   '/resources/{id}':
     get:
-      security:
-        - jwt: []
       tags:
         - Resource Management
       summary: Retrieve resource by id
@@ -333,8 +327,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Resource'
     put:
-      security:
-        - jwt: []
       tags:
         - Resource Management
       summary: Update resource by key
@@ -350,8 +342,6 @@ paths:
         '200':
           description: OK
     delete:
-      security:
-        - jwt: []
       tags:
         - Resource Management
       summary: Delete resource by key
@@ -615,8 +605,6 @@ paths:
           description: Email Already Taken
   /personas:
     get:
-      security:
-        - jwt: []
       tags:
         - Persona Management
       summary: Retrieve all personas
@@ -638,8 +626,6 @@ paths:
             X-Total-Count:
               $ref: '#/components/headers/X-Total-Count'
     post:
-      security:
-        - jwt: []
       summary: Create new persona
       tags:
         - Persona Management
@@ -660,8 +646,6 @@ paths:
               $ref: '#/components/schemas/PersonaCreate'
   '/personas/{id}':
     get:
-      security:
-        - jwt: []
       tags:
         - Persona Management
       summary: Retrieve persona by id
@@ -676,8 +660,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Persona'
     put:
-      security:
-        - jwt: []
       summary: Update persona by id
       tags:
         - Persona Management
@@ -695,8 +677,6 @@ paths:
             schema:
               $ref: '#/components/schemas/Persona'
     delete:
-      security:
-        - jwt: []
       summary: Delete persona by id
       description: Deletes the persona with the given id.
       tags:
@@ -918,8 +898,6 @@ paths:
           description: Unauthorized
   '/rag-indexing/{resource_id}':
     delete:
-      security:
-        - jwt: []
       tags:
         - Files Management
       summary: Delete all files by assistant id
@@ -938,8 +916,6 @@ paths:
         '404':
           description: Not Found
     get:
-      security:
-        - jwt: []
       tags:
         - Files Management
       summary: Retrieve all files by assistant id
@@ -960,8 +936,6 @@ paths:
             X-Total-Count:
               $ref: '#/components/headers/X-Total-Count'
     post:
-      security:
-        - jwt: []
       tags:
         - Files Management
       summary: Create new rag-indexing
@@ -981,8 +955,6 @@ paths:
           description: Missing Required Information        
   /messages:
     post:
-      security:
-        - jwt: []
       summary: Create new message
       tags:
         - Message Management
@@ -1003,8 +975,6 @@ paths:
               $ref: '#/components/schemas/MessageCreate'
   /conversations:
     get:
-      security:
-        - jwt: []  
       tags:
         - Conversation Management
       summary: Retrieve all conversations.
@@ -1028,8 +998,6 @@ paths:
               $ref: '#/components/headers/X-Total-Count'
   '/conversations/{id}':
     get:
-      security:
-        - jwt: []
       tags:
         - Conversation Management
       summary: Retrieve conversation by id
@@ -1045,8 +1013,6 @@ paths:
               schema:
                 $ref: '#/components/schemas/Conversation'
     put:
-      security:
-        - jwt: []
       summary: Update conversation by id
       tags:
         - Conversation Management
@@ -1067,8 +1033,6 @@ paths:
             schema:
               $ref: '#/components/schemas/ConversationUpdate'
     delete:
-      security:
-        - jwt: []
       summary: Delete conversation by id
       description: Deletes the conversation with the given id.
       operationId: backend.api.ConversationsView.delete
@@ -1083,8 +1047,6 @@ paths:
           description: Not Found
   '/conversations/{resource_id}':
     post:
-      security:
-        - jwt: []
       summary: Create new conversation
       tags:
         - Conversation Management
@@ -1108,8 +1070,6 @@ paths:
               $ref: '#/components/schemas/ConversationCreate'
   /voices:
     get:
-      security:
-        - jwt: []
       summary: Retrieve all the xi_labs voices
       tags:
         - Voice Management
@@ -1132,8 +1092,6 @@ paths:
             X-Total-Count:
               $ref: '#/components/headers/X-Total-Count'
     post:
-      security:
-        - jwt: []
       summary: Create new voice message.
       description: Creates a new voice message
       operationId: backend.api.VoicesFacesView.post
@@ -1182,8 +1140,6 @@ paths:
               $ref: '#/components/schemas/VoiceMessageCreate'
   '/voices/{id}':
     delete:
-      security:
-        - jwt: []
       summary: Delete voice message by id
       description: Deletes the voice message with the given id.
       operationId: backend.api.VoicesFacesView.delete

@@ -81,7 +81,9 @@ class ConversationsManager:
     async def delete_conversation(self, id) -> bool:
         async with db_session_context() as session:
             stmt = delete(Conversation).where(Conversation.id == id)
+            query_msg = delete(Message).where(Message.conversation_id == id)
             result = await session.execute(stmt)
+            await session.execute(query_msg)
             await session.commit()
             return result.rowcount > 0
  

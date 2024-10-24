@@ -7,7 +7,7 @@ from backend.schemas import MessageSchema, MessageCreateSchema
 from typing import Tuple, Optional
 from backend.utils import get_current_timestamp
 from backend.managers.RagManager import RagManager
-from langchain_community.llms import Ollama
+from langchain_ollama import OllamaLLM
 import os
 from dotenv import load_dotenv, set_key
 from common.paths import base_dir
@@ -100,7 +100,7 @@ class MessagesManager:
                 if error_message:
                     return None, error_message
                 
-                llm = Ollama(model=model_name, 
+                llm = OllamaLLM(model=model_name, 
                              num_predict=int(self.max_tokens), 
                              temperature=float(self.temperature), 
                              top_k=int(self.top_k), 
@@ -108,20 +108,20 @@ class MessagesManager:
                 
                 assistant_id = message_data['assistant_id']
                 query = message_data['prompt']
-                rm = RagManager()
-                response = await rm.retrieve_and_generate(assistant_id, query, llm)
-                chat_response = response["answer"]
+                rm = RagManager()                
 
                 if conversation_id:
+                    response = await rm.retrieve_and_generate_chat_context(assistant_id, query, llm, conversation_id)
+                    chat_response = response["answer"]
+ 
                     message_data['chat_response'] = chat_response
                     message_data['timestamp'] = timestamp
-
-                    new_message = Message(id=str(uuid4()), **message_data)
-                    session.add(new_message)
-                    await session.commit()
-                    await session.refresh(new_message)
-                    return new_message.id, None
+ 
+                    msg_id, msg_error = await self.save_message(message_data)
+                    return msg_id, msg_error
                 else:
+                    response = await rm.retrieve_and_generate_chat_context(assistant_id, query, llm, "testing_session")
+                    chat_response = response["answer"]                    
                     return chat_response, None
         
         except Exception as e:
@@ -166,3 +166,11 @@ class MessagesManager:
             result = await session.execute(stmt)
             await session.commit()
             return result.rowcount > 0
+    
+    async def save_message(self, message_data: Message):
+        async with db_session_context() as session:
+            new_message = Message(id=str(uuid4()), **message_data)
+            session.add(new_message)
+            await session.commit()
+            await session.refresh(new_message)
+            return new_message.id, None

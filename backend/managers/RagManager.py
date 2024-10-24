@@ -198,7 +198,81 @@ class RagManager:
         vectorstore = Chroma(persist_directory=str(path),
                              collection_name=collection_name,
                              embedding_function=embed)
-        return vectorstore    
+        return vectorstore
+
+    def create_history_aware_retriever(self, llm, retriever):
+        contextualize_q_system_prompt = """Given a chat history and the latest user question \
+        which might reference context in the chat history, formulate a standalone question \
+        which can be understood without the chat history. Do NOT answer the question, \
+        just reformulate it if needed and otherwise return it as is."""
+
+        contextualize_q_prompt = ChatPromptTemplate.from_messages([
+                                    ("system", contextualize_q_system_prompt),
+                                    MessagesPlaceholder("chat_history"),
+                                    ("human", "{input}"),
+                                ])
+        return create_history_aware_retriever(llm, retriever, contextualize_q_prompt)
+
+    async def create_question_answer_chain(self, llm, name=None, expertise=None):
+
+        qa_system_prompt = """You are a helpful assistant for students' learning needs. \
+                        Your name is```{persona_name}``` your capabilities and expertise are: ```{persona_expertise}```. \
+                        Focus solely on answering their questions without repeating your greeting. \
+                        Use the following pieces of retrieved context to answer the question. \
+                        If you don't know the answer, just say that you don't know. \
+                        You are expected to answer questions about the following context: '{context}'"""
+        qa_system_prompt = qa_system_prompt.format(persona_name=name, persona_expertise= expertise, context="{context}")
+        qa_prompt = ChatPromptTemplate.from_messages([
+            ("system", qa_system_prompt),
+            MessagesPlaceholder("chat_history"),
+            ("human", "{input}"),
+        ])        
+        return create_stuff_documents_chain(llm, qa_prompt)
+    
+    def create_conversational_chain(self,rag_chain, get_session_history):
+        return RunnableWithMessageHistory(
+            rag_chain,
+            get_session_history,
+            input_messages_key="input",
+            history_messages_key="chat_history",
+            output_messages_key="answer",
+        )
+    
+    def get_session_history(self,store, session_id: str):
+        if session_id not in store:
+            store[session_id] = ChatMessageHistory()
+        return store[session_id]
+    
+
+    async def retrieve_and_generate_chat_context(self, collection_name, query, llm, session_id =None) -> str:
+        resources_m = ResourcesManager()
+        personas_m = PersonasManager()
+
+        resource = await resources_m.retrieve_resource(collection_name)
+        persona_id = resource.persona_id
+        persona = await personas_m.retrieve_persona(persona_id)        
+        expertise = persona.description
+        name= persona.name
+        
+        vectorstore = await self.initialize_chroma(collection_name)
+        retriever = vectorstore.as_retriever()
+
+        history_aware_retriever = self.create_history_aware_retriever(llm, retriever)
+        question_answer_chain = await self.create_question_answer_chain(llm, name, expertise)
+
+        rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)
+        
+        store = {}
+        conversational_rag_chain = self.create_conversational_chain(rag_chain, lambda session_id: self.get_session_history(store, session_id))
+
+        response = conversational_rag_chain.invoke({
+            "input": query},
+            config={
+                "configurable": {
+                    "session_id": session_id}},
+                    )
+        print("Response: ", response)
+        return response    
     
     async def retrieve_and_generate(self, collection_name, query, llm) -> str:
         resources_m = ResourcesManager()
@@ -258,8 +332,6 @@ class RagManager:
                 indexing_status=FileStatus.WAITING.value
             )
             all_files_ids.append(file_id)
-        
-        
         try:
             
             for file, file_id in zip(files, all_files_ids):
