@@ -63,16 +63,16 @@ def verify_email_token(token):
     SALT = "email-confirmation-salt"
     serializer = URLSafeTimedSerializer(SECRET_KEY)
     try:
-        email = serializer.loads(token, salt=SALT, max_age=900)
+        user_id = serializer.loads(token, salt=SALT, max_age=900)
     except SignatureExpired:
         return None 
     except BadSignature:
         return None
-    return email
+    return user_id
 
-def send_verification_email(email_id):
-    token = generate_verification_token(email_id)
-    verification_url = f"https://localhost:3080/verify-email?token={token}"
+def send_verification_email(user_id, email_id):
+    token = generate_verification_token(user_id)
+    verification_url = f"https://localhost:8443/#/verify-email/{token}"
     template_path = Path(__file__).parent.parent / 'templates'
     env = Environment(loader=FileSystemLoader(template_path))
     template = env.get_template('email_verification_template.html')
@@ -217,7 +217,7 @@ class AuthManager:
             new_cred = Cred(id=base64url_cred_id, public_key=base64url_public_key, webauthn_user_id=user.webauthn_user_id, backed_up=res.credential_backed_up, name=email_id, transports=transports)
             session.add(new_cred)
             await session.commit()
-            send_verification_email(email_id)
+            send_verification_email(user.id, email_id)
             # payload = {
             #     "sub": user.id,
             #     "iat": datetime.now(timezone.utc),
@@ -299,6 +299,23 @@ class AuthManager:
             token = generate_jwt(payload)
             
             return token
+    async def verify_email(self, token: str):
+        async with db_session_context() as session:
+            user_id = verify_email_token(token)
+
+            if not user_id:
+                return None
+            
+            user_result = await session.execute(select(User).where(User.id == user_id))
+            user = user_result.scalar_one_or_none()
+            if not user or user.emailVerified:
+                return None
+
+            user.emailVerified = True
+            await session.commit()
+            
+            return True
+
 
     async def create_session(self, user_id: str):
         async with db_session_context() as session:
