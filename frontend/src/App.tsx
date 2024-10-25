@@ -1,5 +1,6 @@
 import React from 'react';
-import { Admin, Resource } from 'react-admin';
+import { Admin, CustomRoutes, Resource } from 'react-admin';
+import { Route } from 'react-router-dom';
 import { UserList, UserCreate, UserEdit, UserShow } from "./users";
 import { AbilityList, AbilityShow } from "./abilities";
 import { AssetList, AssetCreate, AssetEdit, AssetShow } from "./assets";
@@ -16,6 +17,7 @@ import { Dashboard } from "./Dashboard";
 import { authProvider } from "./authProvider";
 import { CustomLayout } from './CustomLayout';
 import Login from './Login';
+import { VerifyEmail } from './VerifyEmail';
 
 export const App = () => (
   <Admin
@@ -31,5 +33,8 @@ export const App = () => (
     <Resource name="resources" list={ChannelList} show={ChannelShow} recordRepresentation='id' icon={SyncAltIcon} />
     <Resource name="downloads" list={DownloadsList} />
     <Resource name="shares" list={ShareList} create={ShareCreate} edit={ShareEdit} show={ShareShow} recordRepresentation='id' icon={LinkIcon} />
+    <CustomRoutes noLayout>
+      <Route path='/verify-email/:token' element={<VerifyEmail />} />
+    </CustomRoutes>
   </Admin>
 );

@@ -777,6 +777,26 @@ paths:
           description: No Content
         '404':
           description: Not Found
+  /auth/verify-email:
+    post:
+      summary: Verify user's email ID
+      description: Verify user's email ID.
+      operationId: backend.api.AuthView.verify_email
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyEmail'
+      responses:
+        '200':
+          description: Email verification status
+          content:
+            application/json:
+              schema:        
+                type: object
+        '400':
+          description: Token validation failed
   /auth/webauthn/options:
     post:
       summary: Generate WebAuthn options
@@ -1419,6 +1439,11 @@ components:
       type: object
       properties:
         email:
+          type: string
+    VerifyEmail:
+      type: object
+      properties:
+        token:
           type: string
     VerifyRegistration:
       type: object

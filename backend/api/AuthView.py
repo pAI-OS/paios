@@ -61,6 +61,14 @@ class AuthView:
         response.set_cookie(key="challenge",value="", expires=0,secure=True, httponly=True, samesite='strict')
         
         return response
+    
+    async def verify_email(self, body):
+        isValid = await self.am.verify_email(body["token"])
+
+        if not isValid:
+            return JSONResponse({"message": "Email validation failed."}, status_code=400)
+        
+        return JSONResponse({"message": "Success"}, status_code=200)
         
     async def logout(self):
         session_token = request.cookies.get("session_token")
