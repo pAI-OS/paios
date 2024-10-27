@@ -2,7 +2,7 @@
 
 ## Overview
 
-The pAI-OS API allows management interfaces to communicate with the backend services for functionality like enumerating, configuring, and activiating plugins ("abilities").
+The pAI-OS API allows management interfaces to communicate with the backend services for functionality like enumerating, configuring, and activating plugins ("abilities").
 
 ## Editing
 
