@@ -1499,7 +1499,7 @@ components:
           type: string
         name:
           type: string
-        llm_name:
+        full_name:
           type: string
         provider:
           type: string
@@ -1511,6 +1511,7 @@ components:
       required:
         - id
         - name
+        - full_name
         - provider
         - is_active
     RegistrationOptions:

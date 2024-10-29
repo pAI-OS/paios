@@ -1,6 +1,7 @@
 from starlette.responses import JSONResponse
 from backend.managers.LlmsManager import LlmsManager
 from backend.pagination import parse_pagination_params
+from backend.schemas import LlmSchema
 
 class LlmsView:
     def __init__(self):
@@ -10,7 +11,9 @@ class LlmsView:
         llm = await self.llmm.get_llm(id)
         if llm is None:
             return JSONResponse(headers={"error": "LLM not found"}, status_code=404)
-        return JSONResponse(llm.model_dump(), status_code=200)
+        llm_schema = LlmSchema(id=llm.id, name=llm.name, full_name=f"{llm.provider}/{llm.name}",
+                               provider=llm.provider, api_base=llm.api_base, is_active=llm.is_active)
+        return JSONResponse(llm_schema.model_dump(), status_code=200)
 
     async def search(self, filter: str = None, range: str = None, sort: str = None):
         result = parse_pagination_params(filter, range, sort)
@@ -20,11 +23,15 @@ class LlmsView:
         offset, limit, sort_by, sort_order, filters = result
 
         llms, total_count = await self.llmm.retrieve_llms(limit=limit, offset=offset, sort_by=sort_by, sort_order=sort_order, filters=filters)
+        results = [LlmSchema(id=llm.id, name=llm.name, full_name=f"{llm.provider}/{llm.name}",
+                             provider=llm.provider, api_base=llm.api_base,
+                             is_active=llm.is_active)
+                    for llm in llms]
         headers = {
             'X-Total-Count': str(total_count),
             'Content-Range': f'shares {offset}-{offset + len(llms) - 1}/{total_count}'
         }
-        return JSONResponse([llm.model_dump() for llm in llms], status_code=200, headers=headers)
+        return JSONResponse([llm.model_dump() for llm in results], status_code=200, headers=headers)
 
     async def completion(self, id: str, body: dict):
         print("completion.  body: {}".format(body))

@@ -4,7 +4,6 @@ from threading import Lock
 from sqlalchemy import select, insert, update, delete, func
 from backend.models import Llm
 from backend.db import db_session_context
-from backend.schemas import LlmSchema
 from backend.utils import get_env_key
 from typing import List, Tuple, Optional, Dict, Any, Union
 from litellm import Router
@@ -37,22 +36,29 @@ class LlmsManager:
         try:
             # load models
             ollama_task = asyncio.create_task(self._load_ollama_models())
-            await asyncio.gather(ollama_task, return_exceptions=True)
+            openai_task = asyncio.create_task(self._load_openai_models())
+            await asyncio.gather(ollama_task,
+                                 openai_task,
+                                 return_exceptions=True)
             # collect the available LLMs
             llms, total_llms = await self.retrieve_llms()
             # configure router
             model_list = []
             for llm in llms:
+                model_name = f"{llm.provider}/{llm.name}"
                 params = {}
                 params["model"] = llm.llm_name
                 if llm.provider == "ollama":
                     params["api_base"] = llm.api_base
+                if llm.provider == "openai":
+                    params["api_key"] = get_env_key("OPENAI_API_KEY")
                 model = {
-                    "model_name": llm.llm_name,
+                    "model_name": model_name,
                     "litellm_params": params,
                 }
                 model_list.append(model)
-            print(model_list)
+            #import pprint
+            #pprint.pprint(model_list)
             self.router = Router(model_list=model_list)
         except Exception as e:
             logger.exception(e)
@@ -84,8 +90,7 @@ class LlmsManager:
                 name = model.removesuffix(":latest")
                 llm_name = "{}/{}".format(provider,name)  # what LiteLLM expects
                 safe_name = llm_name.replace("/", "-").replace(":", "-")
-                result = await session.execute(select(Llm).filter(Llm.id == safe_name))
-                llm = result.scalar_one_or_none()
+                llm = self.get_llm(safe_name)
                 if llm:
                     stmt = update(Llm).where(Llm.id == safe_name).values(name=name,
                                                                          llm_name=llm_name,
@@ -102,17 +107,75 @@ class LlmsManager:
                     session.add(new_llm)
                     await session.commit()
 
-    async def get_llm(self, id: str) -> Optional[LlmSchema]:
+    async def _load_openai_models(self):
+        try:
+            openai_key = get_env_key("OPENAI_API_KEY")
+        except ValueError:
+            print("No OpenAI API key specified.  Skipping.")
+            return  # no OpenAI API key specified
+        # retrieve list of installed models
+        async with httpx.AsyncClient() as client:
+            openai_urlroot = get_env_key("OPENAI_URLROOT", "https://api.openai.com")
+            headers = {
+                "Authorization": f"Bearer {openai_key}"
+            }
+            response = await client.get(f"{openai_urlroot}/v1/models", headers=headers)
+            print(vars(response))
+            if response.status_code == 200:
+                data = response.json()
+                import json
+                pretty_json = json.dumps(data, indent=4)
+                print(pretty_json)
+                available_models = [model_data['id'] for model_data in data.get("data", [])]
+                print(available_models)      
+            else:
+                print(f"Error: {response.status_code} - {response.text}")  # FIX
+        # create / update OpenAI family Llm objects
+        provider = "openai"
+        async with db_session_context() as session:
+            # mark existing models as inactive
+            stmt = update(Llm).where(Llm.provider == provider).values(is_active=False)
+            result = await session.execute(stmt)
+            if result.rowcount > 0:
+                await session.commit()
+            # insert / update models
+            for model in available_models:
+                llm_provider = None
+                if any(substring in model for substring in {"gpt","o1","chatgpt"}):
+                    llm_provider = "openai"
+                if any(substring in model for substring in {"ada","babbage","curie","davinci","instruct"}):
+                    llm_provider = "text-completion-openai"
+                if llm_provider:
+                    name = model
+                    llm_name = "{}/{}".format(llm_provider,name)  # what LiteLLM expects
+                    safe_name = f"{provider}/{name}".replace("/", "-").replace(":", "-")
+                    llm = self.get_llm(safe_name)
+                    if llm:
+                        stmt = update(Llm).where(Llm.id == safe_name).values(name=name,
+                                                                            llm_name=llm_name,
+                                                                            provider=provider,
+                                                                            api_base=openai_urlroot,
+                                                                            is_active=True)
+                        result = await session.execute(stmt)
+                        if result.rowcount > 0:
+                            await session.commit()
+                    else:
+                        new_llm = Llm(id=safe_name, name=name, llm_name=llm_name,
+                                    provider=provider, api_base=openai_urlroot,
+                                    is_active=True)
+                        session.add(new_llm)
+                        await session.commit()
+
+    async def get_llm(self, id: str) -> Optional[Llm]:
         async with db_session_context() as session:
             result = await session.execute(select(Llm).filter(Llm.id == id))
             llm = result.scalar_one_or_none()
             if llm:
-                return LlmSchema(id=llm.id, name=llm.name, llm_name=llm.llm_name,
-                                 provider=llm.provider, api_base=llm.api_base, is_active=llm.is_active)
+                return llm
             return None
 
     async def retrieve_llms(self, offset: int = 0, limit: int = 100, sort_by: Optional[str] = None,
-                            sort_order: str = 'asc', filters: Optional[Dict[str, Any]] = None) -> Tuple[List[LlmSchema], int]:
+                            sort_order: str = 'asc', filters: Optional[Dict[str, Any]] = None) -> Tuple[List[Llm], int]:
         async with db_session_context() as session:
             query = select(Llm).filter(Llm.is_active == True)
 
@@ -123,17 +186,14 @@ class LlmsManager:
                     else:
                         query = query.filter(getattr(Llm, key) == value)
 
-            if sort_by and sort_by in ['id', 'name', 'llm_name', 'provider', 'api_base', 'is_active']:
+            if sort_by and sort_by in ['id', 'name', 'provider', 'api_base', 'is_active']:
                 order_column = getattr(Llm, sort_by)
                 query = query.order_by(order_column.desc() if sort_order.lower() == 'desc' else order_column)
 
             query = query.offset(offset).limit(limit)
 
             result = await session.execute(query)
-            llms = [LlmSchema(id=llm.id, name=llm.name, llm_name=llm.llm_name,
-                              provider=llm.provider, api_base=llm.api_base,
-                              is_active=llm.is_active) 
-                        for llm in result.scalars().all()]
+            llms = result.scalars().all()
 
             # Get total count
             count_query = select(func.count()).select_from(Llm).filter(Llm.is_active == True)
@@ -151,17 +211,13 @@ class LlmsManager:
 
     def completion(self, llm, messages, **optional_params) -> Union[ModelResponse, CustomStreamWrapper]:
         response = self.router.completion(model=llm.llm_name,
-                                          messages=messages,
-                                          kwargs=optional_params)
+                                          messages=messages)
         print("completion response: {}".format(response))
-        #message = response.choices[0].message.content
-        #return message
         return response
 
     async def acompletion(self, llm, messages, **optional_params) -> Union[CustomStreamWrapper, ModelResponse]:
         response = await self.router.acompletion(model=llm.llm_name,
-                                                 messages=messages,
-                                                 kwargs=optional_params)
+                                                 messages=messages)
         print("acompletion response: {}".format(response))
         return response
     
