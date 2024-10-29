@@ -1,7 +1,7 @@
 from uuid import uuid4
 from threading import Lock
 from sqlalchemy import select, update, delete, func
-from backend.models import Conversation, Resource, Message
+from backend.models import Conversation, Resource, Message, User
 from backend.db import db_session_context
 from backend.schemas import ConversationSchema, ConversationCreateSchema, MessageSchema
 from typing import List, Tuple, Optional, Dict, Any
@@ -24,18 +24,18 @@ class ConversationsManager:
                 if not hasattr(self, '_initialized'):
                     self._initialized = True
     
-    async def create_conversation(self, resource_id: str, conversation_data: ConversationCreateSchema) -> Optional[str]:
+    async def create_conversation(self, resource_id: str, user_id: str, conversation_data: ConversationCreateSchema) -> Optional[str]:
         async with db_session_context() as session:
             
-            if not await self.validate_assistant_id(resource_id):
+            if not await self.validate_assistant_user_id(resource_id, user_id):
                 return None
             
             timestamp = get_current_timestamp()            
             conversation_data['created_timestamp'] = timestamp
             conversation_data['last_updated_timestamp'] = timestamp            
             conversation_data['archive'] = "False"
-            conversation_data['assistant_id'] = resource_id                      
- 
+            conversation_data['assistant_id'] = resource_id
+            conversation_data['user_id'] = user_id
             new_conversation = Conversation(id=str(uuid4()), **conversation_data)
             session.add(new_conversation)
             await session.commit()
@@ -113,7 +113,8 @@ class ConversationsManager:
                     last_updated_timestamp=conversation.last_updated_timestamp,
                     archive=conversation.archive,
                     assistant_id=conversation.assistant_id,
-                    messages=messages_list
+                    messages=messages_list,
+                    user_id=conversation.user_id
                 )
             return None
 
@@ -155,10 +156,13 @@ class ConversationsManager:
         count_query = self._apply_filters(count_query, filters)
         total_count = await session.execute(count_query)
         return total_count.scalar()
-
     
-        
-    async def validate_assistant_id(self, assistant_id: str) -> bool:
+    
+    async def validate_assistant_user_id(self, assistant_id: str, user_id: str) -> bool:
         async with db_session_context() as session:
-            result = await session.execute(select(Resource).filter(Resource.id == assistant_id))
-            return result.scalar_one_or_none() is not None
+            assistant = await session.execute(select(Resource).filter(Resource.id == assistant_id))
+            user = await session.execute(select(User).filter(User.id == user_id))
+            if not assistant.scalar_one_or_none() or not user.scalar_one_or_none():
+                return False
+            return True
+    

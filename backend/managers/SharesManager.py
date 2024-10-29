@@ -2,7 +2,7 @@ import secrets
 import string
 from threading import Lock
 from sqlalchemy import select, insert, update, delete, func
-from backend.models import Share
+from backend.models import Share, Resource, User
 from backend.db import db_session_context
 from backend.schemas import ShareCreateSchema, ShareSchema
 from typing import List, Tuple, Optional, Dict, Any
@@ -114,3 +114,13 @@ class SharesManager:
             total_count = total_count.scalar()
 
             return shares, total_count
+        
+    async def validate_assistant_user_id(self, assistant_id: str, user_id: str) -> Optional[str]:
+        async with db_session_context() as session:
+            assistant = await session.execute(select(Resource).filter(Resource.id == assistant_id))
+            user = await session.execute(select(User).filter(User.id == user_id))
+            if not assistant.scalar_one_or_none():
+               return "Not a valid resource_id"
+            if not user.scalar_one_or_none():
+                return "Not a valid user_id"
+            return None

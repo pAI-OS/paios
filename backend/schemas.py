@@ -25,6 +25,7 @@ class ResourceBaseSchema(BaseModel):
     kind : str
     icon : Optional[str] = None
     active : Optional[str] = None
+    user_id: Optional[str] = None
     class Config:
         orm_mode = True
         from_attributes = True
@@ -183,6 +184,7 @@ class ConversationBaseSchema(BaseModel):
     archive: str
     assistant_id: str
     messages: Optional[List[MessageSchema]] = None
+    user_id: str
    
     class Config:
         orm_mode = True

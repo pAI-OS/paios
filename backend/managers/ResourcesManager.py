@@ -2,10 +2,11 @@ from uuid import uuid4
 from threading import Lock
 import httpx
 from sqlalchemy import select, update, delete, func
-from backend.models import Resource, File, Conversation
+from backend.models import Resource, File, Conversation, Share
 from backend.db import db_session_context
 from backend.schemas import ResourceCreateSchema, ResourceSchema
 from typing import List, Tuple, Optional, Dict, Any
+from backend.managers.UsersManager import UsersManager
 
 # This is a mock of the installed models in the system
 ollama_model=[{'name': 'llama3:latest', 'model': 'llama3:latest', 'modified_at': '2024-08-24T21:57:16.6075173-06:00', 'size': 2176178913, 'digest': '4f222292793889a9a40a020799cfd28d53f3e01af25d48e06c5e708610fc47e9', 'details': {'parent_model': '', 'format': 'gguf', 'family': 'phi3', 'families': ['phi3'], 'parameter_size': '3.8B', 'quantization_level': 'Q4_0'}}]
@@ -42,7 +43,8 @@ class ResourcesManager:
                                 "persona_id": resource_data.get("persona_id"),
                                 "status": resource_data.get("status"),
                                 "allow_edit": resource_data.get("allow_edit"),
-                                "kind": kind
+                                "kind": kind,
+                                "user_id": resource_data.get("user_id")
                             }
         else:
             resource_data_table={  
@@ -107,7 +109,8 @@ class ResourcesManager:
                         persona_id=resource.persona_id,
                         status=resource.status,
                         allow_edit=resource.allow_edit,
-                        kind=resource.kind)
+                        kind=resource.kind,
+                        user_id=resource.user_id)
                 else :
                     return ResourceSchema(
                         id=resource.id, 
@@ -160,7 +163,7 @@ class ResourcesManager:
                     else:
                         query = query.filter(getattr(Resource, key) == value)
 
-            if sort_by and sort_by in ['id', 'name', 'uri','status','allow_edit','kind','active']:            
+            if sort_by and sort_by in ['id', 'name', 'uri','status','allow_edit','kind','active','user_id']:            
                 order_column = getattr(Resource, sort_by)
                 query = query.order_by(order_column.desc() if sort_order.lower() == 'desc' else order_column)
 
@@ -189,13 +192,16 @@ class ResourcesManager:
 
     async def validate_resource_data(self, resource_data: ResourceCreateSchema ) -> Optional[str]:
         kind = resource_data["kind"]
-        if kind not in ["llm", "assistant"]: 
+        if kind not in ["llm", "assistant"]:
             return "Not a valid kind"
-        if kind == 'assistant':    
+        um = UsersManager()
+        if kind == 'assistant':
             if not resource_data.get("resource_llm_id"):
                 return "It is mandatory to provide a resource_llm_id for an assistant"
             if not await self.retrieve_resource(resource_data.get("resource_llm_id")):
                 return "Not a valid resource_llm_id"
+            if not await um.retrieve_user(resource_data.get("user_id")):
+                return "Not a valid user_id"
         return None
 
 
@@ -248,4 +254,15 @@ class ResourcesManager:
             conversations_ids = [conversation.id for conversation in conversations]
             print("conversations_ids: ", conversations_ids)
             return conversations_ids
+
+    async def retrieve_shared_resources(self, user_id: str) -> List[ResourceSchema]:
+        async with db_session_context() as session:            
+            result = await session.execute(select(Share).filter(Share.user_id == user_id))
+            shares = result.scalars().all()            
+            resource_ids = [share.resource_id for share in shares]
+            query = select(Resource).filter(Resource.id.in_(resource_ids))
+            result = await session.execute(query)
+            resources = result.scalars().all()
             
+            resources = [ResourceSchema.from_orm(resource) for resource in resources]
+            return resources

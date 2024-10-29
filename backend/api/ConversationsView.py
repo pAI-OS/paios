@@ -17,8 +17,8 @@ class ConversationsView:
             return NOT_FOUND_RESPONSE
         return JSONResponse(conversation.dict(), status_code=200)
  
-    async def post(self, resource_id: str, body: ConversationCreateSchema):        
-        conversation_id = await self.cm.create_conversation(resource_id, body)
+    async def post(self, resource_id: str, user_id: str, body: ConversationCreateSchema):        
+        conversation_id = await self.cm.create_conversation(resource_id, user_id, body)
         conversation = await self.cm.retrieve_conversation(conversation_id)
         if conversation is None:
             return JSONResponse({"error": "Assistant not found"}, status_code=404)

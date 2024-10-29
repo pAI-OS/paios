@@ -28,6 +28,8 @@ def upgrade() -> None:
     sa.Column('last_updated_timestamp', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('archive', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('assistant_id', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('user_id', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     # ### end Alembic commands ###

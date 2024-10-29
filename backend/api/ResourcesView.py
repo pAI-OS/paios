@@ -6,7 +6,6 @@ from backend.managers.MessagesManager import MessagesManager
 from backend.managers.ConversationsManager import ConversationsManager
 from backend.pagination import parse_pagination_params
 from backend.schemas import ResourceCreateSchema
-from typing import List
 
 class ResourcesView:
     def __init__(self):
@@ -71,3 +70,12 @@ class ResourcesView:
             'Content-Range': f'resources {offset}-{offset + len(resources) - 1}/{total_count}'
         }
         return JSONResponse([resource.dict() for resource in resources], status_code=200, headers=headers)
+
+    async def shared(self, user_id: str = None):
+        print("user_id: ", user_id)
+        resources = await self.rm.retrieve_shared_resources(user_id)
+        if resources is None:
+            return JSONResponse({"error": "Shared resources not found"}, status_code=404)
+        return JSONResponse([resource.dict() for resource in resources], status_code=200)
+
+   

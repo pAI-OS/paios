@@ -363,6 +363,26 @@ paths:
           description: No Content
         '404':
           description: Not Found
+  '/resources/{user_id}/shared':
+    get:
+      security:
+        - jwt: []
+      tags:
+        - Resource Management
+      summary: Retrieve resource by user id
+      operationId: backend.api.ResourcesView.shared
+      description: Retrieve the information of the resource with the specified user ID.
+      parameters:
+        - $ref: '#/components/parameters/user_id'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Resource'
   '/config/{key}':
     get:
       security:
@@ -1081,7 +1101,7 @@ paths:
           description: No Content
         '404':
           description: Not Found
-  '/conversations/{resource_id}':
+  '/conversations/{resource_id}/{user_id}':
     post:
       security:
         - jwt: []
@@ -1090,7 +1110,8 @@ paths:
         - Conversation Management
       operationId: backend.api.ConversationsView.post
       parameters:
-        - $ref: '#/components/parameters/resource_id'            
+        - $ref: '#/components/parameters/resource_id'
+        - $ref: '#/components/parameters/user_id'
       responses:
         '201':
           description: Created
@@ -1316,6 +1337,13 @@ components:
       name: resource_id
       in: path
       description: this refers to the assitant id for the resource
+      required: true
+      schema:
+        $ref: '#/components/schemas/uuid4'
+    user_id:
+      name: user_id
+      in: path
+      description: this refers to the user id
       required: true
       schema:
         $ref: '#/components/schemas/uuid4'    
@@ -1571,7 +1599,10 @@ components:
           $ref: '#/components/schemas/uri'
         active:
           nullable: true
-          $ref: '#/components/schemas/boolean_str'          
+          $ref: '#/components/schemas/boolean_str'
+        user_id:
+          $ref: '#/components/schemas/uuid4'
+          nullable: true
     ResourceCreate:
       type: object
       title: ResourceCreate
@@ -1606,7 +1637,10 @@ components:
           $ref: '#/components/schemas/uri' 
         active:
           nullable: true
-          $ref: '#/components/schemas/boolean_str'           
+          $ref: '#/components/schemas/boolean_str'
+        user_id:
+          $ref: '#/components/schemas/uuid4'
+          nullable: true
       required:
         - name
         - kind
@@ -1958,6 +1992,8 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Message'
+        user_id:
+          $ref: '#/components/schemas/uuid4'
       required:        
         - name        
         - archive

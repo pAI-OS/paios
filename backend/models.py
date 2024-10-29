@@ -25,6 +25,7 @@ class Resource(SQLModelBase, table=True):
     kind: str | None = Field(default=None)
     icon: str | None = Field(default=None)
     active: str | None = Field(default=None)
+    user_id: str | None = Field(default=None)
 
 class User(SQLModelBase, table=True):
     id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
@@ -106,6 +107,7 @@ class Conversation(SQLModelBase, table=True):
     last_updated_timestamp: str = Field()
     archive: str = Field()
     assistant_id: str | None = Field(default=None, foreign_key="resource.id")
+    user_id: str | None = Field(default=None, foreign_key="user.id")
 
 class Voice(SQLModelBase, table=True):
     id: str = Field(primary_key=True, default_factory=lambda: str(uuid4()))
