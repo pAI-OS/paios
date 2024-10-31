@@ -6,7 +6,7 @@ from backend.models import Llm
 from backend.db import db_session_context
 from backend.utils import get_env_key
 from typing import List, Tuple, Optional, Dict, Any, Union
-from litellm import Router
+from litellm import Router, completion
 from litellm.utils import CustomStreamWrapper, ModelResponse
 
 import logging
@@ -74,7 +74,7 @@ class LlmsManager:
             if response.status_code == 200:
                 data = response.json()
                 available_models = [model_data['model'] for model_data in data.get("models", [])]
-                print(available_models)      
+                #print(available_models)      
             else:
                 pass # FIX
         # create / update Ollama family Llm objects
@@ -90,7 +90,7 @@ class LlmsManager:
                 name = model.removesuffix(":latest")
                 llm_name = "{}/{}".format(provider,name)  # what LiteLLM expects
                 safe_name = llm_name.replace("/", "-").replace(":", "-")
-                llm = self.get_llm(safe_name)
+                llm = await self.get_llm(safe_name)
                 if llm:
                     stmt = update(Llm).where(Llm.id == safe_name).values(name=name,
                                                                          llm_name=llm_name,
@@ -120,14 +120,10 @@ class LlmsManager:
                 "Authorization": f"Bearer {openai_key}"
             }
             response = await client.get(f"{openai_urlroot}/v1/models", headers=headers)
-            print(vars(response))
             if response.status_code == 200:
                 data = response.json()
-                import json
-                pretty_json = json.dumps(data, indent=4)
-                print(pretty_json)
                 available_models = [model_data['id'] for model_data in data.get("data", [])]
-                print(available_models)      
+                #print(available_models)      
             else:
                 print(f"Error: {response.status_code} - {response.text}")  # FIX
         # create / update OpenAI family Llm objects
@@ -149,7 +145,7 @@ class LlmsManager:
                     name = model
                     llm_name = "{}/{}".format(llm_provider,name)  # what LiteLLM expects
                     safe_name = f"{provider}/{name}".replace("/", "-").replace(":", "-")
-                    llm = self.get_llm(safe_name)
+                    llm = await self.get_llm(safe_name)
                     if llm:
                         stmt = update(Llm).where(Llm.id == safe_name).values(name=name,
                                                                             llm_name=llm_name,
@@ -210,14 +206,23 @@ class LlmsManager:
             return llms, total_count
 
     def completion(self, llm, messages, **optional_params) -> Union[ModelResponse, CustomStreamWrapper]:
-        response = self.router.completion(model=llm.llm_name,
-                                          messages=messages)
-        print("completion response: {}".format(response))
-        return response
+        try:
+            response = self.router.completion(model=llm.llm_name,
+                                              messages=messages,
+                                              **optional_params)
+            #response = completion(model=llm.llm_name,
+            #                      messages=messages,
+            #                      **kwargs)
+            print("completion response: {}".format(response))
+            return response
+        except Exception as e:
+            logger.info(f"completion failed with error: {e.message}")
+            raise
 
     async def acompletion(self, llm, messages, **optional_params) -> Union[CustomStreamWrapper, ModelResponse]:
         response = await self.router.acompletion(model=llm.llm_name,
-                                                 messages=messages)
+                                                 messages=messages,
+                                                 **optional_params)
         print("acompletion response: {}".format(response))
         return response
     

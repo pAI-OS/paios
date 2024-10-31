@@ -844,6 +844,10 @@ paths:
               properties:
                 messages:
                   $ref: '#/components/schemas/messagesList'
+                optional_params:
+                  $ref: '#/components/schemas/completionParamList'
+              required:
+                - messages              
       responses:
         '200':
           description: Completion succeeded
@@ -979,6 +983,8 @@ tags:
     description: Management of personas
   - name: Share Management
     description: Management of share links
+  - name: LLM Management
+    description: Discovery and invocation of LLM functionality
 components:
   securitySchemes:
     jwt:
@@ -1169,6 +1175,9 @@ components:
             type: string
           content:
             type: string
+    completionParamList:
+      type: object
+      example: {"max_tokens": 50, "temperature": 0.2}
     download:
       type: object
       properties:

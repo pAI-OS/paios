@@ -2,6 +2,7 @@ from starlette.responses import JSONResponse
 from backend.managers.LlmsManager import LlmsManager
 from backend.pagination import parse_pagination_params
 from backend.schemas import LlmSchema
+from litellm.exceptions import BadRequestError
 
 class LlmsView:
     def __init__(self):
@@ -35,16 +36,20 @@ class LlmsView:
 
     async def completion(self, id: str, body: dict):
         print("completion.  body: {}".format(body))
-        messages = []
-        if 'messages' in body and body['messages']:
-            messages = body['messages']
         llm = await self.llmm.get_llm(id)
         if llm:
-            print("Selected LLM is {}".format(llm.llm_name))
-            response = self.llmm.completion(llm, messages)
-            if response:
+            messages = []
+            if 'messages' in body and body['messages']:
+                messages = body['messages']
+            opt_params = {}
+            if 'optional_params' in body and body['optional_params']:
+                opt_params = body['optional_params']
+            try:
+                response = self.llmm.completion(llm, messages, **opt_params)
                 return JSONResponse(response.model_dump(), status_code=200)
-            else:
-                return JSONResponse(status_code=400, content={"message": "Completion failed"})
+            except BadRequestError as e:
+                return JSONResponse(status_code=400, content={"message": e.message})
+            except Exception as e:
+                return JSONResponse(status_code=400, content={"message": "Completion failed."})
         else:
             return JSONResponse(status_code=404, content={"message": "LLM not found"})
