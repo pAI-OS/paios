@@ -47,12 +47,10 @@ class SharesManager:
                                user_id=new_share.user_id, expiration_dt=new_share.expiration_dt,
                                is_revoked=new_share.is_revoked)
 
-    async def update_share(self, id: str, resource_id, user_id, expiration_dt, is_revoked) -> Optional[ShareSchema]:
+    async def update_share(self, id: str, share_data: ShareCreateSchema) -> Optional[ShareSchema]:       
         async with db_session_context() as session:
-            stmt = update(Share).where(Share.id == id).values(resource_id=resource_id,
-                                                                user_id=user_id,
-                                                                expiration_dt=expiration_dt,
-                                                                is_revoked=is_revoked)
+            print("in update share",type(share_data.get('expiration_dt')))      
+            stmt = update(Share).where(Share.id == id).values(**share_data)
             result = await session.execute(stmt)
             if result.rowcount > 0:
                 await session.commit()
@@ -115,9 +113,9 @@ class SharesManager:
 
             return shares, total_count
         
-    async def validate_assistant_user_id(self, assistant_id: str, user_id: str) -> Optional[str]:
+    async def validate_assistant_user_id(self, resource_id: str, user_id: str) -> Optional[str]:
         async with db_session_context() as session:
-            assistant = await session.execute(select(Resource).filter(Resource.id == assistant_id))
+            assistant = await session.execute(select(Resource).filter(Resource.id == resource_id))
             user = await session.execute(select(User).filter(User.id == user_id))
             if not assistant.scalar_one_or_none():
                return "Not a valid resource_id"

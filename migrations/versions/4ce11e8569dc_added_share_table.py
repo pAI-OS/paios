@@ -22,7 +22,7 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     op.create_table('share',
     sa.Column('id', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('resource_id', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('resource_id', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
     sa.Column('user_id', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
     sa.Column('expiration_dt', sa.DateTime(), nullable=True),
     sa.Column('is_revoked', sa.Boolean(), nullable=False),

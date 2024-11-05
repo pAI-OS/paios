@@ -79,7 +79,7 @@ class AssetSchema(AssetBaseSchema):
 
 # Share schemas
 class ShareBaseSchema(BaseModel):
-    resource_id: str
+    resource_id: Optional[str]
     user_id: Optional[str] = None
     expiration_dt: Optional[datetime] = None
     is_revoked: Optional[bool] = False
