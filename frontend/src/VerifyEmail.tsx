@@ -35,10 +35,10 @@ export const VerifyEmail = () => {
                     <div className="loading">Loading...</div>
                 ) : (
                     <div className="verification-message">
-                        <h1>Email Verification Status</h1>
-                        <p>{verificationStatus}</p>
+                        <h1>pAI-OSEmail Verification Status:</h1>
+                        <h1>{verificationStatus}</h1>
                         <button className="login-button" onClick={() => navigate("/login")}>
-                            Go to Login
+                            Click here to login
                         </button>
                     </div>
                 )}

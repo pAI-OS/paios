@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Email Verification</title>
+    <title>pAI-OS Email Verification</title>
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -37,20 +37,31 @@
         text-decoration: none;
         border-radius: 5px;
         font-size: 16px;
+        word-break: break-all;
+        white-space: normal;
+        max-width: 100%;
+        box-sizing: border-box;
+        margin: 10px 0;
       }
       .footer {
         margin-top: 20px;
         font-size: 14px;
         color: #888888;
       }
+      .verification-link {
+        word-break: break-all;
+        max-width: 100%;
+        display: inline-block;
+        margin: 10px 0;
+      }
     </style>
   </head>
   <body>
     <div class="container">
-      <h1>Email Verification</h1>
+      <h1>pAI-OS Email Verification</h1>
       <p>Hello,</p>
       <p>
-        Thank you for registering with us. Please verify your email address by
+        Thank you for registering with pAI-OS. Please verify your email address by
         clicking the button below:
       </p>
       <p>
@@ -60,7 +71,7 @@
         If the button doesn't work, please copy and paste the following link
         into your browser:
       </p>
-      <p>{{ verification_url }}</p>
+      <p style="word-break: break-all;">{{ verification_url }}</p>
       <p class="footer">If you did not request this email, please ignore it.</p>
     </div>
   </body>
