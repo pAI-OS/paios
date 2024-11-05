@@ -10,7 +10,7 @@ async def send(to, subject, body_text, body_html = None):
 
     # Retrieve SMTP server details from environment variables
     smtp_host = get_env_key('PAIOS_SMTP_HOST', 'localhost')
-    smtp_port = get_env_key('PAIOS_SMTP_PORT', '587') # Default SMTP port for STARTTLS
+    smtp_port = get_env_key('PAIOS_SMTP_PORT', '1025') # Default SMTP port for STARTTLS
     smtp_from = get_env_key('PAIOS_SMTP_FROM', 'paios@localhost')
     smtp_user = get_env_key('PAIOS_SMTP_USER', 'paios@localhost')
     smtp_pass = get_env_key('PAIOS_SMTP_PASS', secrets.token_urlsafe(32))
@@ -37,9 +37,9 @@ async def send(to, subject, body_text, body_html = None):
             msg,
             hostname=smtp_host,
             port=smtp_port,
-            start_tls=True,
-            username=smtp_user,
-            password=smtp_pass,
+            start_tls=False,
+            username=None,
+            password=None,
         )
     except Exception as e:
         print(f"Failed to send email: {e}")

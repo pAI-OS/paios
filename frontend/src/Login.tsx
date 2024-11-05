@@ -44,10 +44,9 @@ const Login: React.FC = () => {
         <div className="auth-container">
             <h1 className="paios-heading">pAI-OS</h1>
             <img src={logo} alt="pAI-OS Logo" className="logo" />
-            <h2>SIGNUP / SIGNIN</h2>
             <form onSubmit={handleUser}>
                 <input type="email" id="email" placeholder="Email" className="input-field" onChange={handleChange} value={email} />
-                <button type="submit" className="auth-button">SIGNUP / SIGNIN</button>
+                <button type="submit" className="auth-button">Enter pAI-OS</button>
             </form>
         </div>
     );

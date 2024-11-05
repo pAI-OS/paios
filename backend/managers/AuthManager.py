@@ -70,15 +70,27 @@ def verify_email_token(token):
         return None
     return user_id
 
-def send_verification_email(user_id, email_id):
+async def send_verification_email(user_id, email_id):
     token = generate_verification_token(user_id)
-    verification_url = f"https://localhost:8443/#/verify-email/{token}"
+    host = get_env_key('PAIOS_HOST', 'localhost')
+    port = get_env_key('PAIOS_PORT', '8443')
+    verification_url = f"https://{host}:{port}/#/verify-email/{token}"
+    
     template_path = Path(__file__).parent.parent / 'templates'
     env = Environment(loader=FileSystemLoader(template_path))
     template = env.get_template('email_verification_template.html')
     html_content = template.render(verification_url=verification_url)
-    send(email_id,"Verify Email","",html_content)
     
+    try:
+        await send(
+            to=email_id,
+            subject="Verify pAI-OS Email",
+            body_text=f"Please verify your email by clicking: {verification_url}",
+            body_html=html_content
+        )
+    except Exception as e:
+        logger.error(f"Failed to send verification email: {str(e)}")
+        raise
 
 def decode_jwt(token):
     jwt_secret = get_env_key('PAIOS_JWT_SECRET', lambda: secrets.token_urlsafe(32))
@@ -217,7 +229,7 @@ class AuthManager:
             new_cred = Cred(id=base64url_cred_id, public_key=base64url_public_key, webauthn_user_id=user.webauthn_user_id, backed_up=res.credential_backed_up, name=email_id, transports=transports)
             session.add(new_cred)
             await session.commit()
-            send_verification_email(user.id, email_id)
+            await send_verification_email(user.id, email_id)
             # payload = {
             #     "sub": user.id,
             #     "iat": datetime.now(timezone.utc),
