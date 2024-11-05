@@ -1,0 +1,11 @@
+services:
+  paios:
+    build: 
+      context: .  
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    ports:
+      - "8443:8443" 
+    # volumes:
+    #   - path/cer:server/paios/data/cert
+

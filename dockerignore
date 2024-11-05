@@ -1,0 +1,40 @@
+# Entornos virtuales de Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+__pycache__
+# Archivos de configuración de entorno
+
+.vscode
+# Archivos y carpetas generados por Docker
+docker-compose.override.yml
+*.dockerfile
+.dockerignore
+
+# Archivos de logs
+*.log
+.github
+# Configuraciones específicas del editor
+.vscode/
+.idea/
+
+# Archivos y carpetas de dependencias
+node_modules/
+package-lock.json
+yarn.lock
+
+# Archivos de compilación o distribuciones
+dist/
+build/
+.env
+.venv
+# Archivos relacionados con Git
+.git/
+*.swp
+*.swo
+README.md
+# data/cert
+data/downloads
+data/logs
+data/*
