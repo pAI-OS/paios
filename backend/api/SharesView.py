@@ -1,12 +1,14 @@
 from starlette.responses import JSONResponse, Response
 from common.paths import api_base_url
 from backend.managers.SharesManager import SharesManager
+from backend.managers.ResourcesManager import ResourcesManager
 from backend.pagination import parse_pagination_params
 from datetime import datetime, timezone
 
 class SharesView:
     def __init__(self):
         self.slm = SharesManager()
+        self.rm = ResourcesManager()
 
     async def get(self, id: str):
         share = await self.slm.retrieve_share(id)
@@ -20,6 +22,9 @@ class SharesView:
             expiration_dt = datetime.fromisoformat(body['expiration_dt']).astimezone(tz=timezone.utc)
         user_id = None
         if 'user_id' in body and body['user_id']:
+            valid = await self.slm.validate_assistant_user_id(body['resource_id'], body['user_id'])
+            if valid is not None:
+                return JSONResponse({"error": valid}, status_code=400)
             user_id = body['user_id']
         new_share = await self.slm.create_share(resource_id=body['resource_id'],
                                                 user_id=user_id,

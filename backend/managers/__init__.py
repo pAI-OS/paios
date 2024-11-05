@@ -6,6 +6,10 @@ from .DownloadsManager import DownloadsManager
 from .UsersManager import UsersManager
 from .PersonasManager import PersonasManager
 from .AuthManager import AuthManager
+from .RagManager import RagManager
+from .MessagesManager import MessagesManager
+from .ConversationsManager import ConversationsManager
+from .VoicesFacesManager import VoicesFacesManager
 
 # List of manager classes
 manager_classes = [
@@ -16,7 +20,11 @@ manager_classes = [
     DownloadsManager,
     UsersManager,
     AuthManager,
-    PersonasManager
+    PersonasManager,
+    RagManager,
+    MessagesManager,
+    ConversationsManager,
+    VoicesFacesManager
 ]
 
 # Initialize the managers dynamically
