@@ -35,7 +35,7 @@ export const VerifyEmail = () => {
                     <div className="loading">Loading...</div>
                 ) : (
                     <div className="verification-message">
-                        <h1>pAI-OSEmail Verification Status:</h1>
+                        <h1>pAI-OS Email Verification Status:</h1>
                         <h1>{verificationStatus}</h1>
                         <button className="login-button" onClick={() => navigate("/login")}>
                             Click here to login
