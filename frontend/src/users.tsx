@@ -1,16 +1,15 @@
 import { useMediaQuery, Theme } from "@mui/material";
-import { Create, Edit, EditButton, DeleteButton, List, SimpleList, Show, ShowButton, SimpleForm, SimpleShowLayout, Datagrid, TextField, TextInput, EmailField, useRecordContext } from "react-admin";
+import { Create, Edit, EditButton, DeleteButton, List, SimpleList, Show, ShowButton, SimpleForm, SimpleShowLayout, Datagrid, TextField, TextInput, EmailField, SelectInput, useRecordContext } from "react-admin";
 
 const UserTitle = () => {
     const record = useRecordContext();
     return <span>Users {record ? `- ${record.name}` : ""}</span>;
 };
 
-interface UserRecord {
-    id: string;
-    name: string;
-    email: string;
-}
+const roleChoices = [
+    { id: 'user', name: 'User' },
+    { id: 'admin', name: 'Admin' },
+];
 
 export const UserList = () => {
     const isSmall = useMediaQuery<Theme>((theme) => theme.breakpoints.down("sm"));
@@ -18,13 +17,15 @@ export const UserList = () => {
         <List>
             {isSmall ? (
                 <SimpleList
-                    primaryText={(record: UserRecord) => record.name}
-                    secondaryText={(record: UserRecord) => record.email}
+                    primaryText={(record) => record.name}
+                    secondaryText={(record) => record.email}
+                    tertiaryText={(record) => record.role}
                 />
             ) : (
                 <Datagrid rowClick="edit">
                     <TextField source="name" />
                     <EmailField source="email" />
+                    <TextField source="role" />
                     <ShowButton />
                     <EditButton />
                     <DeleteButton />
@@ -40,6 +41,7 @@ export const UserShow = () => (
             <TextField source="id" />
             <TextField source="name" />
             <EmailField source="email" />
+            <TextField source="role" />
         </SimpleShowLayout>
     </Show>
 );
@@ -49,6 +51,7 @@ export const UserEdit = () => (
         <SimpleForm>
             <TextInput source="name" />
             <TextInput source="email" />
+            <SelectInput source="role" choices={roleChoices} />
         </SimpleForm>
     </Edit>
 );
@@ -58,6 +61,7 @@ export const UserCreate = () => (
         <SimpleForm>
             <TextInput source="name" />
             <TextInput source="email" />
+            <SelectInput source="role" choices={roleChoices} defaultValue="user" />
         </SimpleForm>
     </Create>
 );

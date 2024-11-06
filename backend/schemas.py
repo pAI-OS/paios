@@ -47,6 +47,9 @@ class UserCreateSchema(UserBaseSchema):
 
 class UserSchema(UserBaseSchema):
     id: str
+    name: str
+    email: str
+    role: str
 
 # Asset schemas
 class AssetBaseSchema(BaseModel):
