@@ -98,7 +98,7 @@ def decode_jwt(token):
     try:
         decoded = jwt.decode(token, jwt_secret, algorithms=["HS256"])
         logger.debug("Decoded JWT: %s", decoded)
-        return {"uid": decoded['sub']}
+        return {"uid": decoded['sub'], "role": decoded['role']}
     
     except jwt.ExpiredSignatureError:
         logger.warning("Token expired")
@@ -305,6 +305,7 @@ class AuthManager:
             
             payload = {
                 "sub": user.id,
+                "role": user.role,
                 "iat": datetime.utcnow(),
                 "exp": datetime.utcnow() + timedelta(days=1)
             }
@@ -324,6 +325,11 @@ class AuthManager:
                 return None
 
             user.emailVerified = True
+
+            admin_user_result = await session.execute(select(User).where(User.role == "admin"))
+            admin_user = admin_user_result.scalar_one_or_none()
+            if not admin_user:
+                user.role = "admin"
             await session.commit()
             
             return True
