@@ -46,7 +46,7 @@ class UsersManager:
         async with db_session_context() as session:
             result = await session.execute(select(User).filter(User.id == id))
             user = result.scalar_one_or_none()
-            return UserSchema(id=user.id, name=user.name, email=user.email) if user else None
+            return UserSchema(id=user.id, name=user.name, email=user.email, role=user.role) if user else None
 
     async def retrieve_users(self, offset=0, limit=100, sort_by=None, sort_order='asc', filters=None):
         async with db_session_context() as session:
@@ -59,7 +59,7 @@ class UsersManager:
                     else:
                         query = query.filter(getattr(User, key) == value)
 
-            if sort_by and sort_by in ['id', 'name', 'email']:
+            if sort_by and sort_by in ['id', 'name', 'email', 'role']:
                 order_column = getattr(User, sort_by)
                 query = query.order_by(order_column.desc() if sort_order.lower() == 'desc' else order_column)
 
@@ -69,7 +69,8 @@ class UsersManager:
             users = [UserSchema(
                 id=user.id,
                 name=user.name,
-                email=user.email
+                email=user.email,
+                role=user.role
             ) for user in result.scalars().all()]
 
             # Get total count
