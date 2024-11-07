@@ -1,6 +1,7 @@
 from starlette.responses import JSONResponse, Response
 from common.paths import api_base_url
 from backend.managers.UsersManager import UsersManager
+from backend.managers.CasbinRoleManager import CasbinRoleManager
 from backend.pagination import parse_pagination_params
 from aiosqlite import IntegrityError
 from backend.schemas import UserSchema
@@ -8,6 +9,7 @@ from backend.schemas import UserSchema
 class UsersView:
     def __init__(self):
         self.um = UsersManager()
+        self.cb = CasbinRoleManager()
 
     async def get(self, id: str):
         user = await self.um.retrieve_user(id)
@@ -15,7 +17,11 @@ class UsersView:
             return JSONResponse(status_code=404, headers={"error": "User not found"})
         return JSONResponse(user.model_dump(), status_code=200)
 
-    async def post(self, body: dict):
+    async def post(self,token_info, body: dict):
+        enforcer = self.cb.get_enforcer()
+        if not enforcer.enforce(token_info["role"], 'user', 'POST'):
+            return JSONResponse({"message": "Permission denied"}, status_code=403)
+        
         try:
             id = await self.um.create_user(body['name'], body['email'])
             return JSONResponse({"id": id}, status_code=201, headers={'Location': f'{api_base_url}/users/{id}'})
