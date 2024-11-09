@@ -310,8 +310,8 @@ class AuthManager:
                 "exp": datetime.utcnow() + timedelta(days=1)
             }
             token = generate_jwt(payload)
-            
-            return token
+
+            return token, user.role
     async def verify_email(self, token: str):
         async with db_session_context() as session:
             user_id = verify_email_token(token)

@@ -1,5 +1,6 @@
 from starlette.responses import JSONResponse
 from backend.managers.AuthManager import AuthManager
+from backend.managers.CasbinRoleManager import CasbinRoleManager
 from backend.schemas import AuthOptionsRequest, RegistrationOptions, VerifyAuthentication, AuthenticationOptions, VerifyRegistration
 from connexion import request
 from uuid import uuid4
@@ -9,6 +10,7 @@ from sqlalchemy import delete
 class AuthView:
     def __init__(self):
         self.am = AuthManager()
+        self.cb = CasbinRoleManager()
 
     async def auth_options(self, body: AuthOptionsRequest):
         challenge, options, type = await self.am.auth_options(body["email"])
@@ -53,11 +55,12 @@ class AuthView:
 
     async def webauthn_login(self, body: VerifyAuthentication):
         challenge = request.cookies.get("challenge")
-        token = await self.am.webauthn_login(challenge, body["email"], body["auth_resp"])
+        token, role = await self.am.webauthn_login(challenge, body["email"], body["auth_resp"])
         if not token:
             return JSONResponse({"message": "Failed"}, status_code=401)
         
-        response = JSONResponse({"message": "Success", "token": token}, status_code=200)
+        permissions = self.cb.create_resource_access(role)
+        response = JSONResponse({"message": "Success", "token": token, "permissions": permissions}, status_code=200)
         response.set_cookie(key="challenge",value="", expires=0,secure=True, httponly=True, samesite='strict')
         
         return response

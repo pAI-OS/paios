@@ -1,5 +1,6 @@
 import { useMediaQuery, Theme } from "@mui/material";
-import { Create, Edit, EditButton, DeleteButton, List, SimpleList, Show, ShowButton, SimpleForm, SimpleShowLayout, Datagrid, TextField, TextInput, EmailField, SelectInput, useRecordContext } from "react-admin";
+import { Create, Edit, EditButton, DeleteButton, List, SimpleList, Show, ShowButton, SimpleForm, SimpleShowLayout, Datagrid, TextField, TextInput, EmailField, SelectInput, useRecordContext, usePermissions } from "react-admin";
+import { hasAccess } from "./utils/authUtils";
 
 const UserTitle = () => {
     const record = useRecordContext();
@@ -13,6 +14,7 @@ const roleChoices = [
 
 export const UserList = () => {
     const isSmall = useMediaQuery<Theme>((theme) => theme.breakpoints.down("sm"));
+    const { permissions } = usePermissions()
     return (
         <List>
             {isSmall ? (
@@ -26,9 +28,9 @@ export const UserList = () => {
                     <TextField source="name" />
                     <EmailField source="email" />
                     <TextField source="role" />
-                    <ShowButton />
-                    <EditButton />
-                    <DeleteButton />
+                    {hasAccess("users", "show", permissions) && <ShowButton />}
+                    {hasAccess("users", "edit", permissions) && <EditButton />}
+                    {hasAccess("users", "delete", permissions) && <DeleteButton />}
                 </Datagrid>
             )}
         </List>

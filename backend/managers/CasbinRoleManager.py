@@ -25,10 +25,11 @@ class CasbinRoleManager:
 
     def add_default_rules(self):
         default_rules = [
-            ("user", "DEFAULT", "GET"),
-            ("admin", "DEFAULT", "POST"),
-            ("admin", "DEFAULT", "PUT"),
-            ("admin", "DEFAULT", "DELETE")
+            ("user", "DEFAULT", "list"),
+            ("user", "DEFAULT", "show"),
+            ("admin", "DEFAULT", "create"),
+            ("admin", "DEFAULT", "edit"),
+            ("admin", "DEFAULT", "delete")
         ]
         
         for rule in default_rules:
@@ -38,3 +39,23 @@ class CasbinRoleManager:
 
     def get_enforcer(self):
         return self.enforcer
+    
+    def check_permissions(self, role, resource, resource_type):
+        return self.enforcer.enforce(role, resource, resource_type)
+    
+    def get_permissions(self, role="user"):
+        return self.enforcer.get_implicit_permissions_for_user(role)
+    
+    def create_resource_access(self, role):
+        permissions = self.get_permissions(role)
+
+        output = {}
+        for _, resource, action in permissions:
+            if resource not in output:
+                output[resource] = []
+            
+            if action not in output[resource]:
+                output[resource].append(action)
+
+        return output
+        

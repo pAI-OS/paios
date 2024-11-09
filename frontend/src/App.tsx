@@ -18,6 +18,7 @@ import { authProvider } from "./authProvider";
 import { CustomLayout } from './CustomLayout';
 import Login from './Login';
 import { VerifyEmail } from './VerifyEmail';
+import { hasAccess, ResourcePermissions } from './utils/authUtils';
 
 export const App = () => (
   <Admin
@@ -27,12 +28,56 @@ export const App = () => (
     layout={CustomLayout}
     loginPage={Login}
   >
-    <Resource name="assets" list={AssetList} create={AssetCreate} edit={AssetEdit} show={AssetShow} recordRepresentation='name' icon={DocIcon} />
-    <Resource name="users" list={UserList} create={UserCreate} edit={UserEdit} show={UserShow} recordRepresentation='name' icon={UserIcon} />
-    <Resource name="abilities" list={AbilityList} show={AbilityShow} recordRepresentation='id' icon={ExtensionIcon} />
-    <Resource name="resources" list={ChannelList} show={ChannelShow} recordRepresentation='id' icon={SyncAltIcon} />
-    <Resource name="downloads" list={DownloadsList} />
-    <Resource name="shares" list={ShareList} create={ShareCreate} edit={ShareEdit} show={ShareShow} recordRepresentation='id' icon={LinkIcon} />
+    {(permissions: ResourcePermissions) => (
+      <>
+        {hasAccess("assets", "list", permissions) ?
+          <Resource
+            name="assets"
+            list={AssetList}
+            create={hasAccess("assets", "create", permissions) ? AssetCreate : undefined}
+            edit={hasAccess("assets", "edit", permissions) ? AssetEdit : undefined}
+            show={hasAccess("assets", "show", permissions) ? AssetShow : undefined}
+            recordRepresentation='name'
+            icon={DocIcon} /> : null}
+        {hasAccess("users", "list", permissions) ?
+          <Resource
+            name="users"
+            list={UserList}
+            create={hasAccess("users", "create", permissions) ? UserCreate : undefined}
+            edit={hasAccess("users", "edit", permissions) ? UserEdit : undefined}
+            show={hasAccess("users", "show", permissions) ? UserShow : undefined}
+            recordRepresentation='name'
+            icon={UserIcon} /> : null}
+        {hasAccess("abilities", "list", permissions) ?
+          <Resource
+            name="abilities"
+            list={AbilityList}
+            show={hasAccess("abilities", "show", permissions) ? AbilityShow : undefined}
+            recordRepresentation='id'
+            icon={ExtensionIcon} /> : null}
+        {hasAccess("resources", "list", permissions) ?
+          <Resource
+            name="resources"
+            list={ChannelList}
+            show={hasAccess("abilities", "show", permissions) ? ChannelShow : undefined}
+            recordRepresentation='id'
+            icon={SyncAltIcon} /> : null}
+        {hasAccess("downloads", "list", permissions) ?
+          <Resource
+            name="downloads"
+            list={DownloadsList} /> : null}
+        {hasAccess("shares", "list", permissions) ?
+          <Resource
+            name="shares"
+            list={ShareList}
+            create={hasAccess("shares", "create", permissions) ? ShareCreate : undefined}
+            edit={hasAccess("shares", "edit", permissions) ? ShareEdit : undefined}
+            show={hasAccess("shares", "show", permissions) ? ShareShow : undefined}
+            recordRepresentation='id'
+            icon={LinkIcon} /> : null}
+      </>
+    )
+    }
     <CustomRoutes noLayout>
       <Route path='/verify-email/:token' element={<VerifyEmail />} />
     </CustomRoutes>
