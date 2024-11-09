@@ -14,6 +14,7 @@ export const authProvider: AuthProvider = {
             const res = await authentication(email)
             if (res.token) {
                 localStorage.setItem("token", res.token)
+                localStorage.setItem("permissions", JSON.stringify(res.permissions))
                 return Promise.resolve()
             } else {
                 return { redirectTo: false, stayOnLogin: true };
@@ -26,7 +27,7 @@ export const authProvider: AuthProvider = {
     // called when the user clicks on the logout button
     logout: () => {
         logout()
-        localStorage.removeItem("token")
+        localStorage.clear()
         return Promise.resolve();
     },
     // called when the API returns an error
@@ -56,7 +57,7 @@ export const authProvider: AuthProvider = {
         const token = localStorage.getItem("token");
         if (!token) return Promise.reject();
 
-        const decodedToken = jwtDecode<CustomJwtPayload>(token);
-        return Promise.resolve(decodedToken.roles);
+        const permissions = localStorage.getItem("permissions") ? JSON.parse(localStorage.getItem("permissions")!) : []
+        return Promise.resolve(permissions);
     },
 };
