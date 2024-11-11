@@ -2,13 +2,21 @@ from uuid import uuid4
 from threading import Lock
 from sqlalchemy import select, insert, update, delete, func, or_
 from backend.models import Collection
+from backend.processors.embedders.EmbeddersAdapter import EmbeddersAdapter
+from backend.processors.text_splitters.TextSplitterAdapter import TextSplitterAdapter
+from backend.processors.vector_stores.VectorStoresAdapter import VectorStoresAdapter
 from backend.schemas import CollectionCreate  # Import from schemas.py
 from backend.db import db_session_context
 from backend.processors.BaseProcessor import BaseProcessor
 from backend.processors.SimpleTextSplitter import SimpleTextSplitter
 from backend.processors.SimpleEmbedder import SimpleEmbedder
 from backend.processors.SimpleVectorStore import SimpleVectorStore
+
+from backend.processors.embedders import *
+from backend.processors.text_splitters import *
+from backend.processors.vector_stores import *
 from typing import List, Tuple, Optional, Dict, Any
+
 
 class CollectionsManager:
     _instance = None
@@ -71,16 +79,23 @@ class CollectionsManager:
 
         if not all([text_splitter, embedder, vector_store]):
             raise ValueError("Invalid processor selection")
-
         await self._process_collection(collection, text_splitter, embedder, vector_store)
 
-    async def _process_collection(self, collection: Collection, text_splitter: BaseProcessor, embedder: BaseProcessor, vector_store: BaseProcessor):
+    async def _process_collection(self, collection: Collection, text_splitter: BaseProcessor, embedder: BaseProcessor,
+                                  vector_store: BaseProcessor):
         # Implement a method to process collections
         # This could involve streaming data from an external source, like an email server
+        text_splitter_instance = TextSplitterAdapter(text_splitter, process=text_splitter.split_text)
+        embedder_instance = EmbeddersAdapter(embedder, process=embedder.embed_documents)
+        vector_store_instance = VectorStoresAdapter(vector_store, process=vector_store.from_texts)
         for batch in self._collection_batch_generator(collection):
-            chunks = await text_splitter.process(batch)
-            embeddings = await embedder.process(chunks)
-            await vector_store.process(f"{collection.id}_{uuid4()}", chunks, embeddings)
+            chunks = await text_splitter_instance.process(batch)
+            embeddings = await embedder_instance.process(chunks)
+            # specify param values as required by each vector store type (VStores methods may have different signatures)
+            if vector_store_instance.type_instance.__name__ == "Chroma":
+                await vector_store_instance.process(chunks, embeddings, collection_name="collection_name_to_create")
+            elif vector_store_instance.type_instance.__name__ == "AWS":
+                await vector_store_instance.process(chunks, embeddings)
 
     def _collection_batch_generator(self, collection: Collection):
         # This is a dummy generator. In a real scenario, this would fetch data from the actual source
@@ -95,7 +110,8 @@ class CollectionsManager:
 
     async def update_collection(self, id: str, collection_data: CollectionCreate) -> Optional[Collection]:
         async with db_session_context() as session:
-            stmt = update(Collection).where(Collection.id == id).values(**collection_data.model_dump(exclude_unset=True))
+            stmt = update(Collection).where(Collection.id == id).values(
+                **collection_data.model_dump(exclude_unset=True))
             result = await session.execute(stmt)
             if result.rowcount > 0:
                 await session.commit()
@@ -110,8 +126,8 @@ class CollectionsManager:
             await session.commit()
             return result.rowcount > 0
 
-    async def list_collections(self, offset: int = 0, limit: int = 100, sort_by: Optional[str] = None, 
-                               sort_order: str = 'asc', filters: Optional[Dict[str, Any]] = None, 
+    async def list_collections(self, offset: int = 0, limit: int = 100, sort_by: Optional[str] = None,
+                               sort_order: str = 'asc', filters: Optional[Dict[str, Any]] = None,
                                query: Optional[str] = None) -> Tuple[List[Collection], int]:
         async with db_session_context() as session:
             stmt = select(Collection)
