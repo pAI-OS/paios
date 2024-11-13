@@ -44,7 +44,7 @@ if __name__ == "__main__":
     app = create_app()
 
     # Define host and port
-    host = get_env_key("PAIOS_HOST", "localhost")
+    host = get_env_key("PAIOS_HOST", "0.0.0.0")
     port = int(get_env_key("PAIOS_PORT", 8443))
 
     # Log connection details

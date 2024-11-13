@@ -2,7 +2,7 @@ import secrets
 import string
 from threading import Lock
 from sqlalchemy import select, insert, update, delete, func
-from backend.models import Share
+from backend.models import Share, Resource, User
 from backend.db import db_session_context
 from backend.schemas import ShareCreateSchema, ShareSchema
 from typing import List, Tuple, Optional, Dict, Any
@@ -47,12 +47,10 @@ class SharesManager:
                                user_id=new_share.user_id, expiration_dt=new_share.expiration_dt,
                                is_revoked=new_share.is_revoked)
 
-    async def update_share(self, id: str, resource_id, user_id, expiration_dt, is_revoked) -> Optional[ShareSchema]:
+    async def update_share(self, id: str, share_data: ShareCreateSchema) -> Optional[ShareSchema]:       
         async with db_session_context() as session:
-            stmt = update(Share).where(Share.id == id).values(resource_id=resource_id,
-                                                                user_id=user_id,
-                                                                expiration_dt=expiration_dt,
-                                                                is_revoked=is_revoked)
+            print("in update share",type(share_data.get('expiration_dt')))      
+            stmt = update(Share).where(Share.id == id).values(**share_data)
             result = await session.execute(stmt)
             if result.rowcount > 0:
                 await session.commit()
@@ -114,3 +112,13 @@ class SharesManager:
             total_count = total_count.scalar()
 
             return shares, total_count
+        
+    async def validate_assistant_user_id(self, resource_id: str, user_id: str) -> Optional[str]:
+        async with db_session_context() as session:
+            assistant = await session.execute(select(Resource).filter(Resource.id == resource_id))
+            user = await session.execute(select(User).filter(User.id == user_id))
+            if not assistant.scalar_one_or_none():
+               return "Not a valid resource_id"
+            if not user.scalar_one_or_none():
+                return "Not a valid user_id"
+            return None
