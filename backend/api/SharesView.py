@@ -35,9 +35,10 @@ class SharesView:
 
     async def put(self, id: str, body: ShareCreateSchema):
         if 'expiration_dt' in body and body['expiration_dt'] is not None:
-            expiration_dt = datetime.fromisoformat(body['expiration_dt']).astimezone(tz=timezone.utc)
+            expiration_str = body['expiration_dt'].replace('Z', '')
+            expiration_dt = datetime.fromisoformat(expiration_str).astimezone(tz=timezone.utc)
             body['expiration_dt'] = expiration_dt
-        if 'user_id' in body and body['user_id']:
+        if 'user_id' in body and body['user_id'] and 'resource_id' in body:
             valid = await self.slm.validate_assistant_user_id(body['resource_id'], body['user_id'])
             if valid is not None:
                 return JSONResponse({"error": valid}, status_code=400)
