@@ -55,7 +55,7 @@ export const authProvider: AuthProvider = {
     // called when the user navigates to a new location, to check for permissions / roles
     getPermissions: () => {
         const token = localStorage.getItem("token");
-        if (!token) return Promise.reject();
+        if (!token) return Promise.resolve([])
 
         const permissions = localStorage.getItem("permissions") ? JSON.parse(localStorage.getItem("permissions")!) : []
         return Promise.resolve(permissions);
