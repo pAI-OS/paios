@@ -32,136 +32,6 @@ class LlmsManager:
                     asyncio.gather(router_init_task, return_exceptions=True)
                     self._initialized = True
 
-    async def _init_router(self):
-        try:
-            # load models
-            ollama_task = asyncio.create_task(self._load_ollama_models())
-            openai_task = asyncio.create_task(self._load_openai_models())
-            await asyncio.gather(ollama_task,
-                                 openai_task,
-                                 return_exceptions=True)
-            # collect the available LLMs
-            llms, total_llms = await self.retrieve_llms()
-            # configure router
-            model_list = []
-            for llm in llms:
-                model_name = f"{llm.provider}/{llm.name}"
-                params = {}
-                params["model"] = llm.llm_name
-                if llm.provider == "ollama":
-                    params["api_base"] = llm.api_base
-                if llm.provider == "openai":
-                    params["api_key"] = get_env_key("OPENAI_API_KEY")
-                model = {
-                    "model_name": model_name,
-                    "litellm_params": params,
-                }
-                model_list.append(model)
-            #import pprint
-            #pprint.pprint(model_list)
-            self.router = Router(model_list=model_list)
-        except Exception as e:
-            logger.exception(e)
-
-    async def _load_ollama_models(self):
-        try:
-            ollama_urlroot = get_env_key("OLLAMA_URLROOT")  # eg: http://localhost:11434
-        except ValueError:
-            return  # no Ollama server specified
-        # retrieve list of installed models
-        async with httpx.AsyncClient() as client:
-            response = await client.get("{}/api/tags".format(ollama_urlroot))
-            if response.status_code == 200:
-                data = response.json()
-                available_models = [model_data['model'] for model_data in data.get("models", [])]
-                #print(available_models)      
-            else:
-                pass # FIX
-        # create / update Ollama family Llm objects
-        provider = "ollama"
-        async with db_session_context() as session:
-            # mark existing models as inactive
-            stmt = update(Llm).where(Llm.provider == provider).values(is_active=False)
-            result = await session.execute(stmt)
-            if result.rowcount > 0:
-                await session.commit()
-            # insert / update models
-            for model in available_models:
-                name = model.removesuffix(":latest")
-                llm_name = "{}/{}".format(provider,name)  # what LiteLLM expects
-                safe_name = llm_name.replace("/", "-").replace(":", "-")
-                llm = await self.get_llm(safe_name)
-                if llm:
-                    stmt = update(Llm).where(Llm.id == safe_name).values(name=name,
-                                                                         llm_name=llm_name,
-                                                                         provider=provider,
-                                                                         api_base=ollama_urlroot,
-                                                                         is_active=True)
-                    result = await session.execute(stmt)
-                    if result.rowcount > 0:
-                        await session.commit()
-                else:
-                    new_llm = Llm(id=safe_name, name=name, llm_name=llm_name,
-                                  provider=provider, api_base=ollama_urlroot,
-                                  is_active=True)
-                    session.add(new_llm)
-                    await session.commit()
-
-    async def _load_openai_models(self):
-        try:
-            openai_key = get_env_key("OPENAI_API_KEY")
-        except ValueError:
-            print("No OpenAI API key specified.  Skipping.")
-            return  # no OpenAI API key specified
-        # retrieve list of installed models
-        async with httpx.AsyncClient() as client:
-            openai_urlroot = get_env_key("OPENAI_URLROOT", "https://api.openai.com")
-            headers = {
-                "Authorization": f"Bearer {openai_key}"
-            }
-            response = await client.get(f"{openai_urlroot}/v1/models", headers=headers)
-            if response.status_code == 200:
-                data = response.json()
-                available_models = [model_data['id'] for model_data in data.get("data", [])]
-                #print(available_models)      
-            else:
-                print(f"Error: {response.status_code} - {response.text}")  # FIX
-        # create / update OpenAI family Llm objects
-        provider = "openai"
-        async with db_session_context() as session:
-            # mark existing models as inactive
-            stmt = update(Llm).where(Llm.provider == provider).values(is_active=False)
-            result = await session.execute(stmt)
-            if result.rowcount > 0:
-                await session.commit()
-            # insert / update models
-            for model in available_models:
-                llm_provider = None
-                if any(substring in model for substring in {"gpt","o1","chatgpt"}):
-                    llm_provider = "openai"
-                if any(substring in model for substring in {"ada","babbage","curie","davinci","instruct"}):
-                    llm_provider = "text-completion-openai"
-                if llm_provider:
-                    name = model
-                    llm_name = "{}/{}".format(llm_provider,name)  # what LiteLLM expects
-                    safe_name = f"{provider}/{name}".replace("/", "-").replace(":", "-")
-                    llm = await self.get_llm(safe_name)
-                    if llm:
-                        stmt = update(Llm).where(Llm.id == safe_name).values(name=name,
-                                                                            llm_name=llm_name,
-                                                                            provider=provider,
-                                                                            api_base=openai_urlroot,
-                                                                            is_active=True)
-                        result = await session.execute(stmt)
-                        if result.rowcount > 0:
-                            await session.commit()
-                    else:
-                        new_llm = Llm(id=safe_name, name=name, llm_name=llm_name,
-                                    provider=provider, api_base=openai_urlroot,
-                                    is_active=True)
-                        session.add(new_llm)
-                        await session.commit()
-
     async def get_llm(self, id: str) -> Optional[Llm]:
         async with db_session_context() as session:
             result = await session.execute(select(Llm).filter(Llm.id == id))
@@ -210,19 +80,133 @@ class LlmsManager:
             response = self.router.completion(model=llm.llm_name,
                                               messages=messages,
                                               **optional_params)
+            # below is the direct way to call the LLM (i.e. not using the router):
             #response = completion(model=llm.llm_name,
             #                      messages=messages,
-            #                      **kwargs)
+            #                      **optional_params)
             print("completion response: {}".format(response))
             return response
         except Exception as e:
             logger.info(f"completion failed with error: {e.message}")
             raise
 
-    async def acompletion(self, llm, messages, **optional_params) -> Union[CustomStreamWrapper, ModelResponse]:
-        response = await self.router.acompletion(model=llm.llm_name,
-                                                 messages=messages,
-                                                 **optional_params)
-        print("acompletion response: {}".format(response))
-        return response
-    
+    async def _init_router(self):
+        try:
+            # load models
+            ollama_task = asyncio.create_task(self._load_ollama_models())
+            openai_task = asyncio.create_task(self._load_openai_models())
+            await asyncio.gather(ollama_task,
+                                 openai_task,
+                                 return_exceptions=True)
+            # collect the available LLMs
+            llms, total_llms = await self.retrieve_llms()
+            # configure router
+            model_list = []
+            for llm in llms:
+                model_name = f"{llm.provider}/{llm.name}"
+                params = {}
+                params["model"] = llm.llm_name
+                if llm.provider == "ollama":
+                    params["api_base"] = llm.api_base
+                if llm.provider == "openai":
+                    params["api_key"] = get_env_key("OPENAI_API_KEY")
+                model = {
+                    "model_name": model_name,
+                    "litellm_params": params,
+                }
+                model_list.append(model)
+            #import pprint
+            #pprint.pprint(model_list)
+            self.router = Router(model_list=model_list)
+        except Exception as e:
+            logger.exception(e)
+
+    async def _load_ollama_models(self):
+        try:
+            ollama_urlroot = get_env_key("OLLAMA_URLROOT", "http://localhost:11434")
+        except ValueError:
+            print("No Ollama server specified.  Skipping.")
+            return  # no Ollama server specified, skip
+        # retrieve list of installed models
+        async with httpx.AsyncClient() as client:
+            response = await client.get("{}/api/tags".format(ollama_urlroot))
+            if response.status_code == 200:
+                data = response.json()
+                available_models = [model_data['model'] for model_data in data.get("models", [])]
+            else:
+                print(f"Error: {response.status_code} - {response.text}")
+        # create / update Ollama family Llm objects
+        provider = "ollama"
+        models = {}
+        for model in available_models:
+            name = model.removesuffix(":latest")
+            llm_name = "{}/{}".format(provider,name)  # what LiteLLM expects
+            safe_name = llm_name.replace("/", "-").replace(":", "-")  # URL-friendly ID
+            models[model] = {"id": safe_name, "name": name, "llm_name": llm_name, "provider": provider, "api_base": ollama_urlroot}
+        await self._persist_models(provider=provider, models=models)
+
+    async def _load_openai_models(self):
+        try:
+            openai_key = get_env_key("OPENAI_API_KEY")
+        except ValueError:
+            print("No OpenAI API key specified.  Skipping.")
+            return  # no OpenAI API key specified, skip
+        # retrieve list of installed models
+        async with httpx.AsyncClient() as client:
+            openai_urlroot = get_env_key("OPENAI_URLROOT", "https://api.openai.com")
+            headers = {
+                "Authorization": f"Bearer {openai_key}"
+            }
+            response = await client.get(f"{openai_urlroot}/v1/models", headers=headers)
+            if response.status_code == 200:
+                data = response.json()
+                available_models = [model_data['id'] for model_data in data.get("data", [])]
+            else:
+                print(f"Error: {response.status_code} - {response.text}")
+        # create / update OpenAI family Llm objects
+        provider = "openai"
+        models = {}
+        for model in available_models:
+            llm_provider = None
+            if any(substring in model for substring in {"gpt","o1","chatgpt"}):
+                llm_provider = "openai"
+            if any(substring in model for substring in {"ada","babbage","curie","davinci","instruct"}):
+                llm_provider = "text-completion-openai"
+            if llm_provider:
+                name = model
+                llm_name = "{}/{}".format(llm_provider,name)  # what LiteLLM expects
+                safe_name = f"{provider}/{name}".replace("/", "-").replace(":", "-")  # URL-friendly ID
+            models[model] = {"id": safe_name, "name": name, "llm_name": llm_name, "provider": provider, "api_base": openai_urlroot}
+        await self._persist_models(provider=provider, models=models)
+
+    async def _persist_models(self, provider, models):
+        async with db_session_context() as session:
+            # mark existing models as inactive
+            stmt = update(Llm).where(Llm.provider == provider).values(is_active=False)
+            result = await session.execute(stmt)
+            if result.rowcount > 0:
+                await session.commit()
+            # insert / update models
+            for model in models:
+                parameters = models[model]
+                model_id = parameters["id"]
+                llm = await self.get_llm(model_id)
+                if llm:
+                    stmt = update(Llm).where(Llm.id == model_id).values(name=parameters["name"],
+                                                                        llm_name=parameters["llm_name"],
+                                                                        provider=parameters["provider"],
+                                                                        api_base=parameters["api_base"],
+                                                                        is_active=True)
+                    result = await session.execute(stmt)
+                    if result.rowcount > 0:
+                        await session.commit()
+                else:
+                    new_llm = Llm(id=model_id,
+                                  name=parameters["name"],
+                                  llm_name=parameters["llm_name"],
+                                  provider=parameters["provider"],
+                                  api_base=parameters["api_base"],
+                                  is_active=True)
+                    session.add(new_llm)
+                    await session.commit()
+
