@@ -1,6 +1,6 @@
 from datetime import datetime
 from pydantic import BaseModel, field_serializer
-from typing import Optional
+from typing import Optional, List
 
 
 # We have *Create schemas because API clients ideally don't set the id field, it's set by the server
@@ -14,14 +14,25 @@ class ConfigSchema(ConfigBaseSchema):
     key: str
 
 # Resource schemas
-class ChannelBaseSchema(BaseModel):
+class ResourceBaseSchema(BaseModel):
     name: str
-    uri: str
+    uri: Optional[str] = None
+    description: Optional[str] = None
+    resource_llm_id : Optional[str] = None
+    persona_id : Optional[str] = None    
+    status : Optional[str] = None
+    allow_edit : Optional[str] = None
+    kind : str
+    icon : Optional[str] = None
+    active : Optional[str] = None
+    class Config:
+        orm_mode = True
+        from_attributes = True
 
-class ChannelCreateSchema(ChannelBaseSchema):
+class ResourceCreateSchema(ResourceBaseSchema):
     pass
 
-class ChannelSchema(ChannelBaseSchema):
+class ResourceSchema(ResourceBaseSchema):
     id: str
 
 # Persona schemas
@@ -30,6 +41,9 @@ class PersonaBaseSchema(BaseModel):
     description: Optional[str] = None
     voice_id: str = None
     face_id: str = None
+    class Config:
+        orm_mode = True
+        from_attributes = True
 
 class PersonaCreateSchema(PersonaBaseSchema):
     pass
@@ -63,7 +77,6 @@ class AssetSchema(AssetBaseSchema):
     id: str
 
 # Share schemas
-
 class ShareBaseSchema(BaseModel):
     resource_id: str
     user_id: Optional[str] = None
@@ -104,3 +117,94 @@ class VerifyAuthentication(BaseModel):
     email: str
     auth_resp: dict
     challenge: str
+    
+# Voice schemas
+class VoiceBaseSchema(BaseModel):
+    xi_id: str
+    name: str
+    text_to_speak: Optional[str] = None
+    image_url: Optional[str] = None
+    sample_url: Optional[str] = None
+    msg_id: Optional[str] = None        
+    audio_msg_path: Optional[str] = None                 
+    class Config:
+        orm_mode = True
+        from_attributes = True
+
+class VoiceCreateSchema(VoiceBaseSchema):
+    pass
+
+class VoiceSchema(VoiceBaseSchema):
+    id:str
+
+# Face schemas
+class FaceBaseSchema(BaseModel):
+    name: str
+
+class FaceCreateSchema(FaceBaseSchema):
+    id: str
+
+class FaceSchema(FaceBaseSchema):
+    pass
+
+# Document schemas
+class DocsPathsBaseSchema(BaseModel):
+    docs_paths: Optional[List[str]] = None
+
+class DocsPathsCreateSchema(DocsPathsBaseSchema):
+    pass
+
+class DocsPathsSchema(DocsPathsBaseSchema):
+    id: str
+
+# Message schemas
+class MessageBaseSchema(BaseModel):
+    conversation_id: str
+    assistant_id: str
+    timestamp: str
+    prompt: str
+    chat_response: str
+    voice_active: str    
+    class Config:
+        orm_mode = True
+        from_attributes = True
+
+class MessageCreateSchema(MessageBaseSchema):
+    pass
+
+class MessageSchema(MessageBaseSchema):
+    id: str
+
+# Conversation schemas
+class ConversationBaseSchema(BaseModel):
+    name: str
+    created_timestamp: str
+    last_updated_timestamp: str
+    archive: str
+    assistant_id: str
+    messages: Optional[List[MessageSchema]] = None
+   
+    class Config:
+        orm_mode = True
+        from_attributes = True
+ 
+class ConversationCreateSchema(ConversationBaseSchema):
+    pass
+ 
+class ConversationSchema(ConversationBaseSchema):
+    id: str
+
+# File schemas
+class FileBaseSchema(BaseModel):
+    name: str
+    assistant_id: str
+    indexing_status: str
+    class Config:
+        orm_mode = True
+        from_attributes = True
+
+class FileCreateSchema(FileBaseSchema):
+    pass
+
+class FileSchema(FileBaseSchema):
+    id: str
