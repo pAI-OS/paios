@@ -17,6 +17,10 @@ def create_backend_app():
     allow_origins = [
         'http://localhost:5173',  # Default Vite dev server
         'https://localhost:8443',  # Secure port for local development
+        'http://localhost',
+        'http://localhost:3080',
+        'http://localhost:5173',
+        'http://localhost:3000'
     ]
 
     # Add PAIOS server URL if environment variables are set
@@ -42,7 +46,7 @@ def create_backend_app():
        allow_origins=allow_origins,
        allow_credentials=True,
        allow_methods=["GET","POST","PUT","DELETE","PATCH","HEAD","OPTIONS"],
-       allow_headers=["Content-Range", "X-Total-Count"],
+       allow_headers=["Authorization", "Content-Type", "Content-Range", "X-Total-Count"],
        expose_headers=["Content-Range", "X-Total-Count"],
     )
 
