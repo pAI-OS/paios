@@ -123,7 +123,7 @@ class LlmsManager:
 
     async def _load_ollama_models(self):
         try:
-            ollama_urlroot = get_env_key("OLLAMA_URLROOT", "http://localhost:11434")
+            ollama_urlroot = get_env_key("OLLAMA_URLROOT")
         except ValueError:
             print("No Ollama server specified.  Skipping.")
             return  # no Ollama server specified, skip

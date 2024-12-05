@@ -789,6 +789,8 @@ paths:
           description: Not Found
   /llms:
     get:
+      security:
+        - jwt: []
       tags:
         - LLM Management
       summary: Retrieve all available LLMs
@@ -811,6 +813,8 @@ paths:
               $ref: '#/components/headers/X-Total-Count'
   '/llms/{id}':
     get:
+      security:
+        - jwt: []
       tags:
         - LLM Management
       summary: Retrieve LLM by id
@@ -828,6 +832,8 @@ paths:
           description: LLM not found
   '/llms/{id}/completion':
     post:
+      security:
+        - jwt: []
       tags:
         - LLM Management
       summary: Invoke Completion on LLM
