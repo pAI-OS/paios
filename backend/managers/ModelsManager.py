@@ -12,7 +12,7 @@ from litellm.utils import CustomStreamWrapper, ModelResponse
 import logging
 logger = logging.getLogger(__name__)
 
-class LlmsManager:
+class ModelsManager:
     _instance = None
     _lock = Lock()
 
@@ -20,7 +20,7 @@ class LlmsManager:
         if not cls._instance:
             with cls._lock:
                 if not cls._instance:
-                    cls._instance = super(LlmsManager, cls).__new__(cls, *args, **kwargs)
+                    cls._instance = super(ModelsManager, cls).__new__(cls, *args, **kwargs)
         return cls._instance
 
     def __init__(self):
@@ -80,7 +80,7 @@ class LlmsManager:
             response = self.router.completion(model=llm.llm_name,
                                               messages=messages,
                                               **optional_params)
-            # below is the direct way to call the LLM (i.e. not using the router):
+            # below is the direct way to call the model (i.e. not using the router):
             #response = completion(model=llm.llm_name,
             #                      messages=messages,
             #                      **optional_params)
@@ -98,7 +98,7 @@ class LlmsManager:
             await asyncio.gather(ollama_task,
                                  openai_task,
                                  return_exceptions=True)
-            # collect the available LLMs
+            # collect the available models
             llms, total_llms = await self.retrieve_llms()
             # configure router
             model_list = []
