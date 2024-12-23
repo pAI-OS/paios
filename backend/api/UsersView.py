@@ -14,8 +14,8 @@ def check_permission(action, resourceId="user"):
         async def decorated_function(*args, **kwargs):
             cb = CasbinRoleManager()
             token_info = context.context['token_info']
-            if not cb.check_permissions(token_info["role"], resourceId, action):
-                raise Forbidden(description="Insufficient permissions")
+            if not cb.check_permissions(token_info["uid"], action, resourceId):
+                raise Forbidden(detail="Insufficient permissions")
         
             return await f(*args, **kwargs)
     

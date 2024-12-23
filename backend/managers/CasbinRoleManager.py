@@ -25,32 +25,31 @@ class CasbinRoleManager:
 
     def add_default_rules(self):
         default_rules = [
-            ("user", "DEFAULT", "list"),
-            ("user", "DEFAULT", "show"),
-            ("admin", "DEFAULT", "create"),
-            ("admin", "DEFAULT", "edit"),
-            ("admin", "DEFAULT", "delete")
+            ("user", "ADMIN_PORTAL", "ALL", "list"),
+            ("user", "ADMIN_PORTAL", "ALL", "show"),
+            ("admin", "ADMIN_PORTAL", "ALL", "list"),
+            ("admin", "ADMIN_PORTAL", "ALL", "show"),
+            ("admin", "ADMIN_PORTAL", "ALL", "create"),
+            ("admin", "ADMIN_PORTAL", "ALL", "edit"),
+            ("admin", "ADMIN_PORTAL", "ALL", "delete")
         ]
         
         for rule in default_rules:
             self.enforcer.add_policy(*rule)
-        
-        self.enforcer.add_grouping_policy("admin", "user")
 
     def get_enforcer(self):
         return self.enforcer
     
-    def check_permissions(self, role, resource, resource_type):
-        return self.enforcer.enforce(role, resource, resource_type)
+    def check_permissions(self, user_id, res_act, res_id, domain="ADMIN_PORTAL"):
+        return self.enforcer.enforce(user_id, domain, res_id, res_act)
     
-    def get_permissions(self, role="user"):
-        return self.enforcer.get_implicit_permissions_for_user(role)
+    def get_permissions(self, role, domain="ADMIN_PORTAL"):
+        return self.enforcer.get_permissions_for_user_in_domain(role, domain)
     
     def create_resource_access(self, role):
         permissions = self.get_permissions(role)
-
         output = {}
-        for _, resource, action in permissions:
+        for _,_, resource, action in permissions:
             if resource not in output:
                 output[resource] = []
             
@@ -58,4 +57,16 @@ class CasbinRoleManager:
                 output[resource].append(action)
 
         return output
+    
+    def assign_user_role(self, user_id, role="admin", domain="ADMIN_PORTAL"):
+        self.enforcer.add_role_for_user_in_domain(user_id, role, domain)
+
+    def get_admin_users(self, domain="ADMIN_PORTAL"):
+        return self.enforcer.get_users_for_role_in_domain("admin",domain)
+
+    def get_roles_for_user_in_domain(self, user_id, domain="ADMIN_PORTAL"):
+        return self.enforcer.get_roles_for_user_in_domain(user_id, domain)
+    
+    def get_user_role(self, user_id, domain="ADMIN_PORTAL"):
+        return ",".join(self.enforcer.get_roles_for_user_in_domain(user_id, domain))
         

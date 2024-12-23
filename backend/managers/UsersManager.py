@@ -4,6 +4,7 @@ from sqlalchemy import select, insert, update, delete, func
 from backend.models import User
 from backend.db import db_session_context
 from backend.schemas import UserSchema
+from backend.managers.CasbinRoleManager import CasbinRoleManager
 
 class UsersManager:
     _instance = None
@@ -46,7 +47,8 @@ class UsersManager:
         async with db_session_context() as session:
             result = await session.execute(select(User).filter(User.id == id))
             user = result.scalar_one_or_none()
-            return UserSchema(id=user.id, name=user.name, email=user.email, role=user.role) if user else None
+            cb = CasbinRoleManager()
+            return UserSchema(id=user.id, name=user.name, email=user.email, role=cb.get_user_role(user.id)) if user else None
 
     async def retrieve_users(self, offset=0, limit=100, sort_by=None, sort_order='asc', filters=None):
         async with db_session_context() as session:
@@ -59,18 +61,19 @@ class UsersManager:
                     else:
                         query = query.filter(getattr(User, key) == value)
 
-            if sort_by and sort_by in ['id', 'name', 'email', 'role']:
+            if sort_by and sort_by in ['id', 'name', 'email']:
                 order_column = getattr(User, sort_by)
                 query = query.order_by(order_column.desc() if sort_order.lower() == 'desc' else order_column)
 
             query = query.offset(offset).limit(limit)
 
             result = await session.execute(query)
+            cb = CasbinRoleManager()
             users = [UserSchema(
                 id=user.id,
                 name=user.name,
                 email=user.email,
-                role=user.role
+                role=cb.get_user_role(user.id)
             ) for user in result.scalars().all()]
 
             # Get total count

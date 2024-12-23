@@ -30,13 +30,12 @@ from webauthn.helpers.structs import (
 from webauthn.helpers.cose import COSEAlgorithmIdentifier
 from connexion.exceptions import Unauthorized
 from common.utils import get_env_key
-import casbin
 import os
 from pathlib import Path
 from common.mail import send
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 from jinja2 import Environment, FileSystemLoader
-
+from backend.managers.CasbinRoleManager import CasbinRoleManager
 # set up logging
 from common.log import get_logger
 logger = get_logger(__name__)
@@ -134,14 +133,6 @@ class AuthManager:
     #     policy_path = Path(__file__).parent.parent / 'rbac_policy.csv'
     #     self.enforcer = casbin.Enforcer(str(model_path), str(policy_path))
 
-    def check_permission(self, sub, obj, act):
-        return self.enforcer.enforce(sub, obj, act)
-
-    def add_role_for_user(self, user, role):
-        self.enforcer.add_grouping_policy(user, role)
-
-    def get_roles_for_user(self, user):
-        return self.enforcer.get_roles_for_user(user)
     
     async def auth_options(self, email_id: str):
         async with db_session_context() as session:
@@ -303,15 +294,17 @@ class AuthManager:
             if not res.new_sign_count != 1:
                 return None
             
+            cb = CasbinRoleManager()
+            role = cb.get_user_role(user.id)
             payload = {
                 "sub": user.id,
-                "role": user.role,
+                "role": role,
                 "iat": datetime.utcnow(),
                 "exp": datetime.utcnow() + timedelta(days=1)
             }
             token = generate_jwt(payload)
 
-            return token, user.role
+            return token, role
     async def verify_email(self, token: str):
         async with db_session_context() as session:
             user_id = verify_email_token(token)
@@ -326,10 +319,13 @@ class AuthManager:
 
             user.emailVerified = True
 
-            admin_user_result = await session.execute(select(User).where(User.role == "admin"))
-            admin_user = admin_user_result.scalar_one_or_none()
+            cb = CasbinRoleManager()
+            admin_user = cb.get_admin_users()
             if not admin_user:
-                user.role = "admin"
+                cb.assign_user_role(user.id)
+            else:
+                cb.assign_user_role(user.id, "user")
+
             await session.commit()
             
             return True

@@ -7,7 +7,7 @@ export const hasAccess = (
   action: string,
   permissions: ResourcePermissions
 ) => {
-  const resource = permissions[resourceId] || permissions["DEFAULT"];
+  const resource = permissions[resourceId] || permissions["ALL"];
   if (!resource) return false;
   const hasAccess = resource.includes(action);
   return hasAccess;
