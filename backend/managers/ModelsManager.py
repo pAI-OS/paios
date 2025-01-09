@@ -10,8 +10,9 @@ from typing import List, Tuple, Optional, Dict, Any, Union
 from litellm import Router, completion
 from litellm.utils import CustomStreamWrapper, ModelResponse
 
-import logging
-logger = logging.getLogger(__name__)
+# set up logging
+from common.log import get_logger
+logger = get_logger(__name__)
 
 class ModelsManager:
     _instance = None
@@ -34,9 +35,12 @@ class ModelsManager:
                     asyncio.gather(model_load_task, return_exceptions=True)
                     self._initialized = True
 
-    async def get_llm(self, id: str) -> Optional[Llm]:
+    async def get_llm(self, id: str, only_active=True) -> Optional[Llm]:
         async with db_session_context() as session:
-            result = await session.execute(select(Llm).filter(Llm.id == id))
+            query = select(Llm).filter(Llm.id == id)
+            if only_active:
+                query = query.filter(getattr(Llm, "is_active") == True)
+            result = await session.execute(query)
             llm = result.scalar_one_or_none()
             if llm:
                 return llm
@@ -86,12 +90,7 @@ class ModelsManager:
             #response = self.router.completion(model=llm.llm_name,
             #                                  messages=messages,
             #                                  **optional_params)
-            # below is the direct way to call the model using LiteLLM (i.e. not using the router):
-            #response = completion(model=llm.llm_name,
-            #                      messages=messages,
-            #                      **optional_params)
-            print("completion response: {}".format(response))
-            #print("completion response content: {}".format(response.choices[0].message.content))
+            logger.debug("completion response: {}".format(response))
             return response
         except Exception as e:
             logger.info(f"completion failed with error: {e.message}")
@@ -122,8 +121,6 @@ class ModelsManager:
                     "litellm_params": params,
                 }
                 model_list.append(model)
-            #import pprint
-            #pprint.pprint(model_list)
             self.router = Router(model_list=model_list)
         except Exception as e:
             logger.exception(e)
@@ -132,8 +129,8 @@ class ModelsManager:
         try:
             ollama_api_url = get_env_key("OLLAMA_API_URL")
         except ValueError:
-            print("No Ollama server specified.  Skipping.")
-            return  # no Ollama server specified, skip
+            logger.info("No Ollama server specified.  Skipping.")
+            return
         # retrieve list of installed models
         async with httpx.AsyncClient() as client:
             response = await client.get("{}/api/tags".format(ollama_api_url))
@@ -141,7 +138,7 @@ class ModelsManager:
                 data = response.json()
                 available_models = [model_data['model'] for model_data in data.get("models", [])]
             else:
-                print(f"Error: {response.status_code} - {response.text}")
+                logger.warning(f"Error when retrieving models: {response.status_code} - {response.text}")
         # create / update Ollama family Llm objects
         provider = "ollama"
         models = {}
@@ -157,8 +154,8 @@ class ModelsManager:
         try:
             openai_api_key = get_env_key("OPENAI_API_KEY")
         except ValueError:
-            print("No OpenAI API key specified.  Skipping.")
-            return  # no OpenAI API key specified, skip
+            logger.info("No OpenAI API key specified.  Skipping.")
+            return
         # retrieve list of installed models
         async with httpx.AsyncClient() as client:
             openai_api_url = get_env_key("OPENAI_API_URL", "https://api.openai.com")
@@ -170,7 +167,7 @@ class ModelsManager:
                 data = response.json()
                 available_models = [model_data['id'] for model_data in data.get("data", [])]
             else:
-                print(f"Error: {response.status_code} - {response.text}")
+                logger.warning(f"Error when retrieving models: {response.status_code} - {response.text}")
         # create / update OpenAI family Llm objects
         provider = "openai"
         models = {}
@@ -199,7 +196,7 @@ class ModelsManager:
             for model in models:
                 parameters = models[model]
                 model_id = parameters["id"]
-                llm = await self.get_llm(model_id)
+                llm = await self.get_llm(model_id, only_active=False)
                 if llm:
                     stmt = update(Llm).where(Llm.id == model_id).values(name=parameters["name"],
                                                                         provider=parameters["provider"],

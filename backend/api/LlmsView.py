@@ -45,8 +45,7 @@ class LlmsView:
                 opt_params = body['optional_params']
             try:
                 response = self.mm.completion(llm, messages, **opt_params)
-                #return JSONResponse(response.model_dump(), status_code=200)  # LiteLLM response handling
-                return JSONResponse(response.choices[0].message.content, status_code=200)  # aisuite response handling
+                return JSONResponse(response.choices[0].message.content, status_code=200)
             except BadRequestError as e:
                 return JSONResponse(status_code=400, content={"message": e.message})
             except Exception as e:
