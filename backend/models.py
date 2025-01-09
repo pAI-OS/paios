@@ -65,6 +65,15 @@ class Share(SQLModelBase, table=True):
     expiration_dt: datetime | None = Field(default=None)  # the link expiration date/time (optional)
     is_revoked: bool = Field()
 
+class Llm(SQLModelBase, table=True):
+    id: str = Field(primary_key=True)  # the model's unique, URL-friendly name
+    name: str = Field()
+    provider: str = Field()  # model provider, eg "ollama"
+    aisuite_name: str = Field()  # the model name known to aisuite
+    llm_name: str = Field()  # the model name known to LiteLLM
+    api_base: str | None = Field(default=None)
+    is_active: bool = Field()  # is the model installed / available?
+
 # Resolve forward references
 User.model_rebuild()
 Cred.model_rebuild()

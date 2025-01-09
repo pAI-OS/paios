@@ -700,6 +700,8 @@ paths:
       - $ref: '#/components/parameters/id'  
   /shares:
     get:
+      security:
+        - jwt: []
       tags:
         - Share Management
       summary: Retrieve all share links
@@ -721,6 +723,8 @@ paths:
             X-Total-Count:
               $ref: '#/components/headers/X-Total-Count'
     post:
+      security:
+        - jwt: []
       summary: Create new share link
       tags:
         - Share Management
@@ -737,6 +741,8 @@ paths:
               $ref: '#/components/schemas/ShareCreate'
   '/shares/{id}':
     get:
+      security:
+        - jwt: []
       tags:
         - Share Management
       summary: Retrieve share link by id
@@ -751,6 +757,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Share'
     put:
+      security:
+        - jwt: []
       tags:
         - Share Management
       summary: Update share link by id
@@ -766,6 +774,8 @@ paths:
         '200':
           description: OK
     delete:
+      security:
+        - jwt: []
       tags:
         - Share Management
       summary: Delete share link by id
@@ -777,6 +787,84 @@ paths:
           description: No Content
         '404':
           description: Not Found
+  /llms:
+    get:
+      security:
+        - jwt: []
+      tags:
+        - LLM Management
+      summary: Retrieve all available LLMs
+      description: Get all installed / available LLMs.
+      parameters:
+        - $ref: '#/components/parameters/sort'
+        - $ref: '#/components/parameters/range'
+        - $ref: '#/components/parameters/filter'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Llm'
+          headers:
+            X-Total-Count:
+              $ref: '#/components/headers/X-Total-Count'
+  '/llms/{id}':
+    get:
+      security:
+        - jwt: []
+      tags:
+        - LLM Management
+      summary: Retrieve LLM by id
+      description: Retrieve the LLM with the specified id.
+      parameters:
+        - $ref: '#/components/parameters/kebab-dot_id'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Llm'
+        '404':
+          description: LLM not found
+  '/llms/{id}/completion':
+    post:
+      security:
+        - jwt: []
+      tags:
+        - LLM Management
+      summary: Invoke Completion on LLM
+      description: Invoke Completion on the LLM with the specified id.
+      operationId: backend.api.LlmsView.completion
+      parameters:
+        - $ref: '#/components/parameters/kebab-dot_id'
+      requestBody:
+        description: Messages to input to Completion function.
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                messages:
+                  $ref: '#/components/schemas/messagesList'
+                optional_params:
+                  $ref: '#/components/schemas/completionParamList'
+              required:
+                - messages              
+      responses:
+        '200':
+          description: Completion succeeded
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Completion failed
+        '404':
+          description: LLM not found
   /auth/webauthn/register-options:
     post:
       summary: Generate WebAuthn registration options
@@ -901,6 +989,8 @@ tags:
     description: Management of personas
   - name: Share Management
     description: Management of share links
+  - name: LLM Management
+    description: Discovery and invocation of LLM functionality
 components:
   securitySchemes:
     jwt:
@@ -936,6 +1026,13 @@ components:
       required: true
       schema:
         $ref: '#/components/schemas/kebab-snake_id'
+    kebab-dot_id:
+      name: id
+      in: path
+      description: id of the object
+      required: true
+      schema:
+        $ref: '#/components/schemas/kebab-dot_id'
     key:
       name: key
       in: path
@@ -1003,6 +1100,12 @@ components:
       maxLength: 100
       example: langchain-core
       pattern: ^[a-z0-9]+([_-][a-z0-9]+)*$
+    kebab-dot_id:
+      type: string
+      minLength: 2
+      maxLength: 100
+      example: ollama-llama3.2
+      pattern: ^[a-z0-9]+([.-][a-z0-9]+)*$
     semVer:
       type: string
       example: '1.1.0'
@@ -1068,6 +1171,19 @@ components:
       readOnly: true
       example: abcd-efgh-ijkl
       pattern: ^[a-z]{4}-[a-z]{4}-[a-z]{4}$
+    messagesList:
+      type: array
+      example: [{"role": "user", "content": "What is Personal AI?"}]
+      items:
+        type: object
+        properties:
+          role:
+            type: string
+          content:
+            type: string
+    completionParamList:
+      type: object
+      example: {"max_tokens": 50, "temperature": 0.2}
     download:
       type: object
       properties:
@@ -1390,6 +1506,29 @@ components:
           example: false
       required:        
         - resource_id
+    Llm:
+      type: object
+      title: Llm
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        full_name:
+          type: string
+        provider:
+          type: string
+        api_base:
+          type: string
+          nullable: true
+        is_active:
+          type: boolean
+      required:
+        - id
+        - name
+        - full_name
+        - provider
+        - is_active
     RegistrationOptions:
       type: object
       properties:

@@ -20,3 +20,5 @@ structlog
 webauthn
 greenlet
 pyjwt
+litellm
+aisuite[ollama,openai]
