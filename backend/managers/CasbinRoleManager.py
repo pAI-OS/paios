@@ -40,14 +40,14 @@ class CasbinRoleManager:
     def get_enforcer(self):
         return self.enforcer
     
-    def check_permissions(self, user_id, res_act, res_id, domain="ADMIN_PORTAL"):
+    def check_permissions(self, user_id, res_act, res_id, domain):
         return self.enforcer.enforce(user_id, domain, res_id, res_act)
     
-    def get_permissions(self, role, domain="ADMIN_PORTAL"):
+    def get_permissions(self, role, domain):
         return self.enforcer.get_permissions_for_user_in_domain(role, domain)
     
-    def create_resource_access(self, role):
-        permissions = self.get_permissions(role)
+    def create_resource_access(self, role, domain):
+        permissions = self.get_permissions(role, domain)
         output = {}
         for _,_, resource, action in permissions:
             if resource not in output:
@@ -58,15 +58,15 @@ class CasbinRoleManager:
 
         return output
     
-    def assign_user_role(self, user_id, role="admin", domain="ADMIN_PORTAL"):
+    def assign_user_role(self, user_id, domain, role="admin"):
         self.enforcer.add_role_for_user_in_domain(user_id, role, domain)
 
-    def get_admin_users(self, domain="ADMIN_PORTAL"):
+    def get_admin_users(self, domain):
         return self.enforcer.get_users_for_role_in_domain("admin",domain)
 
-    def get_roles_for_user_in_domain(self, user_id, domain="ADMIN_PORTAL"):
+    def get_roles_for_user_in_domain(self, user_id, domain):
         return self.enforcer.get_roles_for_user_in_domain(user_id, domain)
     
-    def get_user_role(self, user_id, domain="ADMIN_PORTAL"):
+    def get_user_role(self, user_id, domain):
         return ",".join(self.enforcer.get_roles_for_user_in_domain(user_id, domain))
         

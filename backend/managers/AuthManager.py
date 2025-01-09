@@ -295,7 +295,7 @@ class AuthManager:
                 return None
             
             cb = CasbinRoleManager()
-            role = cb.get_user_role(user.id)
+            role = cb.get_user_role(user.id, "ADMIN_PORTAL")
             payload = {
                 "sub": user.id,
                 "role": role,
@@ -320,11 +320,11 @@ class AuthManager:
             user.emailVerified = True
 
             cb = CasbinRoleManager()
-            admin_user = cb.get_admin_users()
+            admin_user = cb.get_admin_users("ADMIN_PORTAL")
             if not admin_user:
-                cb.assign_user_role(user.id)
+                cb.assign_user_role(user.id, "ADMIN_PORTAL")
             else:
-                cb.assign_user_role(user.id, "user")
+                cb.assign_user_role(user.id, "ADMIN_PORTAL", "user")
 
             await session.commit()
             

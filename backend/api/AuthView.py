@@ -59,7 +59,7 @@ class AuthView:
         if not token:
             return JSONResponse({"message": "Failed"}, status_code=401)
         
-        permissions = self.cb.create_resource_access(role)
+        permissions = self.cb.create_resource_access(role,"ADMIN_PORTAL")
         response = JSONResponse({"message": "Success", "token": token, "permissions": permissions}, status_code=200)
         response.set_cookie(key="challenge",value="", expires=0,secure=True, httponly=True, samesite='strict')
         
