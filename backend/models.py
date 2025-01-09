@@ -68,8 +68,9 @@ class Share(SQLModelBase, table=True):
 class Llm(SQLModelBase, table=True):
     id: str = Field(primary_key=True)  # the model's unique, URL-friendly name
     name: str = Field()
-    llm_name: str = Field()  # the model name known to LiteLLM
     provider: str = Field()  # model provider, eg "ollama"
+    aisuite_name: str = Field()  # the model name known to aisuite
+    llm_name: str = Field()  # the model name known to LiteLLM
     api_base: str | None = Field(default=None)
     is_active: bool = Field()  # is the model installed / available?
 

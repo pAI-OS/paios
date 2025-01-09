@@ -860,7 +860,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                type: string
         '400':
           description: Completion failed
         '404':
@@ -1173,7 +1173,7 @@ components:
       pattern: ^[a-z]{4}-[a-z]{4}-[a-z]{4}$
     messagesList:
       type: array
-      example: [{"role": "user", "content": "What is Kwaai.ai?"}]
+      example: [{"role": "user", "content": "What is Personal AI?"}]
       items:
         type: object
         properties:

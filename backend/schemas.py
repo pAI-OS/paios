@@ -91,8 +91,8 @@ class ShareSchema(ShareBaseSchema):
 class LlmSchema(BaseModel):
     id: str
     name: str
-    full_name: str
     provider: str
+    full_name: str
     api_base: Optional[str] = None
     is_active: bool
 

@@ -12,8 +12,8 @@ class LlmsView:
         llm = await self.mm.get_llm(id)
         if llm is None:
             return JSONResponse(headers={"error": "LLM not found"}, status_code=404)
-        llm_schema = LlmSchema(id=llm.id, name=llm.name, full_name=f"{llm.provider}/{llm.name}",
-                               provider=llm.provider, api_base=llm.api_base, is_active=llm.is_active)
+        llm_schema = LlmSchema(id=llm.id, name=llm.name, provider=llm.provider, full_name=llm.aisuite_name,
+                               api_base=llm.api_base, is_active=llm.is_active)
         return JSONResponse(llm_schema.model_dump(), status_code=200)
 
     async def search(self, filter: str = None, range: str = None, sort: str = None):
@@ -24,9 +24,8 @@ class LlmsView:
         offset, limit, sort_by, sort_order, filters = result
 
         llms, total_count = await self.mm.retrieve_llms(limit=limit, offset=offset, sort_by=sort_by, sort_order=sort_order, filters=filters)
-        results = [LlmSchema(id=llm.id, name=llm.name, full_name=f"{llm.provider}/{llm.name}",
-                             provider=llm.provider, api_base=llm.api_base,
-                             is_active=llm.is_active)
+        results = [LlmSchema(id=llm.id, name=llm.name, provider=llm.provider, full_name=llm.aisuite_name,
+                             api_base=llm.api_base, is_active=llm.is_active)
                     for llm in llms]
         headers = {
             'X-Total-Count': str(total_count),
@@ -46,7 +45,8 @@ class LlmsView:
                 opt_params = body['optional_params']
             try:
                 response = self.mm.completion(llm, messages, **opt_params)
-                return JSONResponse(response.model_dump(), status_code=200)
+                #return JSONResponse(response.model_dump(), status_code=200)  # LiteLLM response handling
+                return JSONResponse(response.choices[0].message.content, status_code=200)  # aisuite response handling
             except BadRequestError as e:
                 return JSONResponse(status_code=400, content={"message": e.message})
             except Exception as e:

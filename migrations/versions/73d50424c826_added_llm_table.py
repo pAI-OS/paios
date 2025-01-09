@@ -23,8 +23,9 @@ def upgrade() -> None:
     op.create_table('llm',
     sa.Column('id', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
-    sa.Column('llm_name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('provider', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('aisuite_name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
+    sa.Column('llm_name', sqlmodel.sql.sqltypes.AutoString(), nullable=False),
     sa.Column('api_base', sqlmodel.sql.sqltypes.AutoString(), nullable=True),
     sa.Column('is_active', sa.Boolean(), nullable=False),
     sa.PrimaryKeyConstraint('id')
