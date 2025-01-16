@@ -111,6 +111,8 @@ def decode_jwt(token):
 
 
 class AuthManager:
+    # AuthManager: manages authentication processes: registration, login
+
     _instance = None
     _lock = Lock()
 
@@ -303,8 +305,8 @@ class AuthManager:
                 "exp": datetime.utcnow() + timedelta(days=1)
             }
             token = generate_jwt(payload)
-
             return token, role
+        
     async def verify_email(self, token: str):
         async with db_session_context() as session:
             user_id = verify_email_token(token)
@@ -320,9 +322,9 @@ class AuthManager:
             user.emailVerified = True
 
             cb = CasbinRoleManager()
-            admin_user = cb.get_admin_users("ADMIN_PORTAL")
-            if not admin_user:
-                cb.assign_user_role(user.id, "ADMIN_PORTAL")
+            admin_users = cb.get_admin_users("ADMIN_PORTAL")
+            if not admin_users:
+                cb.assign_user_role(user.id, "ADMIN_PORTAL", "admin") # assign admin role to first user created
             else:
                 cb.assign_user_role(user.id, "ADMIN_PORTAL", "user")
 

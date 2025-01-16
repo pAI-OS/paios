@@ -7,6 +7,9 @@ from uuid import uuid4
 from backend.models import Session
 from sqlalchemy import delete
 
+GENERIC_AUTH_ERROR = "Something went wrong"
+
+
 class AuthView:
     def __init__(self):
         self.am = AuthManager()
@@ -16,7 +19,7 @@ class AuthView:
         challenge, options, type = await self.am.auth_options(body["email"])
 
         if not options:
-            return JSONResponse({"error": "Something went wrong"}, status_code=500)
+            return JSONResponse({"error": GENERIC_AUTH_ERROR}, status_code=500)
 
         response = JSONResponse({"options": options, "flow": type}, status_code=200)
         response.set_cookie(key="challenge",value=challenge, secure=True, httponly=True, samesite='strict')
@@ -26,7 +29,7 @@ class AuthView:
         challenge, options = await self.am.webauthn_register_options(body["email"])
 
         if not options:
-            return JSONResponse({"error": "Something went wrong"}, status_code=500)
+            return JSONResponse({"error": GENERIC_AUTH_ERROR}, status_code=500)
         
         response = JSONResponse({"options": options}, status_code=200)
         response.set_cookie(key="challenge",value=challenge, secure=True, httponly=True, samesite='strict')
@@ -36,7 +39,7 @@ class AuthView:
         challenge = request.cookies.get("challenge")
         res = await self.am.webauthn_register(challenge, body["email"], body["user_id"], body["att_resp"])
         if not res:
-            return JSONResponse({"message": "Something went wrong"}, status_code=401)
+            return JSONResponse({"message": GENERIC_AUTH_ERROR}, status_code=401)
         
         response = JSONResponse({"message": "Success"}, status_code=200)
         response.set_cookie(key="challenge",value="", expires=0,secure=True, httponly=True, samesite='strict')
@@ -47,7 +50,7 @@ class AuthView:
         challenge, options = await self.am.webauthn_login_options(body["email"])
 
         if not options:
-            return JSONResponse({"error": "Something went wrong"}, status_code=500)
+            return JSONResponse({"error": GENERIC_AUTH_ERROR}, status_code=500)
          
         response = JSONResponse({"options": options}, status_code=200)
         response.set_cookie(key="challenge", value=challenge, secure=True, httponly=True, samesite='strict')
@@ -59,7 +62,7 @@ class AuthView:
         if not token:
             return JSONResponse({"message": "Failed"}, status_code=401)
         
-        permissions = self.cb.create_resource_access(role,"ADMIN_PORTAL")
+        permissions = self.cb.get_resource_access(role,"ADMIN_PORTAL")
         response = JSONResponse({"message": "Success", "token": token, "permissions": permissions}, status_code=200)
         response.set_cookie(key="challenge",value="", expires=0,secure=True, httponly=True, samesite='strict')
         

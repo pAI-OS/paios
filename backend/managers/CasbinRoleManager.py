@@ -46,7 +46,7 @@ class CasbinRoleManager:
     def get_permissions(self, role, domain):
         return self.enforcer.get_permissions_for_user_in_domain(role, domain)
     
-    def create_resource_access(self, role, domain):
+    def get_resource_access(self, role, domain):
         permissions = self.get_permissions(role, domain)
         output = {}
         for _,_, resource, action in permissions:
@@ -58,7 +58,7 @@ class CasbinRoleManager:
 
         return output
     
-    def assign_user_role(self, user_id, domain, role="admin"):
+    def assign_user_role(self, user_id, domain, role):
         self.enforcer.add_role_for_user_in_domain(user_id, role, domain)
 
     def get_admin_users(self, domain):
