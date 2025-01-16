@@ -2,18 +2,11 @@ from starlette.responses import JSONResponse
 from backend.managers.AbilitiesManager import AbilitiesManager
 from backend.pagination import parse_pagination_params
 import logging
-from backend.managers.AuthManager import AuthManager
-from connexion.exceptions import Unauthorized
 logger = logging.getLogger(__name__)
 
 class AbilitiesView:
     def __init__(self):
         self.am = AbilitiesManager()
-        self.auth_manager = AuthManager()
-
-    def check_permission(self, user_id, action):
-        if not self.auth_manager.check_permission(user_id, 'abilities', action):
-            raise Unauthorized('Permission denied')
 
     def error_immutable(self):
         return JSONResponse(status_code=400, content={"message": "Invalid Request: Abilities must be installed and are immutable; their metadata.json files cannot be edited via the API."})
@@ -28,16 +21,12 @@ class AbilitiesView:
         return self.error_immutable()
 
     def get(self, id=None):
-        user_id = self.get_current_user_id()  # Implement this method to get the current user's ID
-        self.check_permission(user_id, 'read')
         ability = self.am.get_ability(id)
         if ability:
             return JSONResponse(status_code=200, content=ability)
         return JSONResponse(status_code=404, content={"message": "Ability not found"})
 
     async def search(self, filter: str = None, range: str = None, sort: str = None):
-        user_id = self.get_current_user_id()
-        self.check_permission(user_id, 'read')
         result = parse_pagination_params(filter, range, sort)
         if isinstance(result, JSONResponse):
             return result
@@ -60,8 +49,6 @@ class AbilitiesView:
         return JSONResponse(abilities, status_code=200, headers=headers)
 
     async def install(self, id: str, version: str = None):
-        user_id = self.get_current_user_id()
-        self.check_permission(user_id, 'write')
         try:
             if self.am.install_ability(id, version):
                 return JSONResponse(status_code=200, content={"message": "Ability installed"})
@@ -71,8 +58,6 @@ class AbilitiesView:
             return JSONResponse(status_code=400, content={"message": str(e)})
 
     async def upgrade(self, id: str, version: str = None):
-        user_id = self.get_current_user_id()
-        self.check_permission(user_id, 'write')
         try:
             if self.am.upgrade_ability(id, version):
                 return JSONResponse(status_code=200, content={"message": "Ability upgraded"})
@@ -82,8 +67,6 @@ class AbilitiesView:
             return JSONResponse(status_code=400, content={"message": str(e)})
 
     async def uninstall(self, id: str):
-        user_id = self.get_current_user_id()
-        self.check_permission(user_id, 'write')
         try:
             if self.am.uninstall_ability(id):
                 return JSONResponse(status_code=200, content={"message": "Ability uninstalled"})
@@ -93,8 +76,6 @@ class AbilitiesView:
             return JSONResponse(status_code=400, content={"message": str(e)})
 
     async def install_dependency(self, id: str, dependency_id: str):
-        user_id = self.get_current_user_id()
-        self.check_permission(user_id, 'write')
         try:
             await self.am.install_dependency(id, dependency_id)
             return JSONResponse(status_code=202, content={"message": "Dependency install started"})
@@ -105,8 +86,6 @@ class AbilitiesView:
             return JSONResponse(status_code=500, content={"error": str(e)})
 
     async def start(self, id: str):
-        user_id = self.get_current_user_id()
-        self.check_permission(user_id, 'write')
         try:
             result = self.am.start_ability(id)
             if "error" in result:
@@ -117,8 +96,6 @@ class AbilitiesView:
             return JSONResponse(status_code=500, content={"error": str(e)})
 
     async def stop(self, id: str):
-        user_id = self.get_current_user_id()
-        self.check_permission(user_id, 'write')
         try:
             result = self.am.stop_ability(id)
             if "error" in result:
@@ -127,8 +104,3 @@ class AbilitiesView:
                 return JSONResponse(status_code=200, content={"message": "Ability stopped"})
         except Exception as e:
             return JSONResponse(status_code=500, content={"error": str(e)})
-
-    def get_current_user_id(self):
-        # Implement this method to get the current user's ID from the JWT token
-        # You may need to modify your JWT handling to include the user ID
-        pass
