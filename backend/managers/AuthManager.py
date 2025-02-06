@@ -62,7 +62,7 @@ def verify_email_token(token):
     SALT = "email-confirmation-salt"
     serializer = URLSafeTimedSerializer(SECRET_KEY)
     try:
-        user_id = serializer.loads(token, salt=SALT, max_age=900)
+        user_id = serializer.loads(token, salt=SALT, max_age=900) # token is valid for 15 minutes
     except SignatureExpired:
         return None 
     except BadSignature:
@@ -297,7 +297,7 @@ class AuthManager:
                 return None
             
             cb = CasbinRoleManager()
-            role = cb.get_user_role(user.id, "ADMIN_PORTAL")
+            role = cb.get_user_roles(user.id, "ADMIN_PORTAL")
             payload = {
                 "sub": user.id,
                 "role": role,

@@ -48,7 +48,7 @@ class UsersManager:
             result = await session.execute(select(User).filter(User.id == id))
             user = result.scalar_one_or_none()
             cb = CasbinRoleManager()
-            return UserSchema(id=user.id, name=user.name, email=user.email, role=cb.get_user_role(user.id, "ADMIN_PORTAL")) if user else None
+            return UserSchema(id=user.id, name=user.name, email=user.email, role=cb.get_user_roles(user.id, "ADMIN_PORTAL")) if user else None
 
     async def retrieve_users(self, offset=0, limit=100, sort_by=None, sort_order='asc', filters=None):
         async with db_session_context() as session:
@@ -73,7 +73,7 @@ class UsersManager:
                 id=user.id,
                 name=user.name,
                 email=user.email,
-                role=cb.get_user_role(user.id, "ADMIN_PORTAL")
+                role=cb.get_user_roles(user.id, "ADMIN_PORTAL")
             ) for user in result.scalars().all()]
 
             # Get total count

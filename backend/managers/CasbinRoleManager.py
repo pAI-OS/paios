@@ -67,6 +67,6 @@ class CasbinRoleManager:
     def get_roles_for_user_in_domain(self, user_id, domain):
         return self.enforcer.get_roles_for_user_in_domain(user_id, domain)
     
-    def get_user_role(self, user_id, domain):
+    def get_user_roles(self, user_id, domain):
         return ",".join(self.enforcer.get_roles_for_user_in_domain(user_id, domain))
         
