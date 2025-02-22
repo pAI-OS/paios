@@ -73,12 +73,10 @@ class ShareBaseSchema(BaseModel):
     expiration_dt: Optional[datetime] = None
     is_revoked: Optional[bool] = False
 
-    @field_serializer('user_id')
+    @field_serializer('user_id', when_used='unless-none')
     def serialize_user_id(self, user_id: str, _info):
         if user_id:
             return user_id
-        else:
-            return ""
 
     @field_serializer('expiration_dt', when_used='unless-none')
     def serialize_expiration_dt(self, dt: datetime, _info):
